@@ -1,0 +1,154 @@
+:root {
+  --primary-bg: #1e0033;
+  --secondary-bg: #2b0052;
+  --text-color: #fff;
+  --orange: #ff6600;
+  --purple: #9b59b6;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-color);
+}
+
+.app {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background: var(--secondary-bg);
+  padding: 20px;
+  height: 100vh;
+}
+
+.sidebar .logo {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+  background: var(--orange);
+}
+
+.login {
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  flex: 1;
+  background: var(--secondary-bg);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.card.orange h2 {
+  color: var(--orange);
+}
+.card.purple h2 {
+  color: var(--purple);
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--orange);
+  color: white;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+/* Progress Bars */
+.bar {
+  background: #444;
+  height: 10px;
+  border-radius: 5px;
+  margin: 5px 0;
+}
+
+.fill {
+  height: 10px;
+  background: var(--orange);
+  border-radius: 5px;
+}
+
+/* Settings Toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 24px;
+  inset: 0;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background: var(--orange);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
