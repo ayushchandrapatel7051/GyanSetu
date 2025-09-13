@@ -42,7 +42,7 @@ if (!document.querySelector(".page.active")) {
 // Login/logout toggle (defensive)
 const loginBtn = document.getElementById("loginBtn");
 if (loginBtn) {
-  let loggedIn = false;
+  let loggedIn = true;
   loginBtn.addEventListener("click", () => {
     loggedIn = !loggedIn;
     loginBtn.innerHTML = loggedIn

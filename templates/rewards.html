@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GyanSetu — Rewards</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">GyanSetu</h1>
+          <nav>
+            <ul class="menu">
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
+            </ul>
+          </nav>
+          <div class="sidebar-bottom">
+            <button class="login" id="loginBtn" style="background: none">
+              <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="lang-fixed">
+          <i class="fas fa-globe"></i>
+          <label for="language" class="lang-label">Language:</label>
+          <select id="language" class="lang-select">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
+        </div>
+
+        <section id="rewards" class="page active">
+          <h2 class="page-title">Rewards</h2>
+          <div class="grid-2">
+            <div class="panel">
+              <h3>XP & Milestones</h3>
+              <div class="xp-big">
+                <span class="xp-number">1,250</span
+                ><span class="muted"> XP</span>
+              </div>
+              <div class="muted">Progress to next milestone (2,000 XP)</div>
+              <div class="bar" style="margin-top: 12px">
+                <div class="fill" style="width: 62.5%"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Leaderboard</h3>
+              <ol class="leaderboard">
+                <li>
+                  <span>Aditi</span><span class="xp-small">2,200 XP</span>
+                </li>
+                <li><span>Raj</span><span class="xp-small">1,900 XP</span></li>
+                <li><span>You</span><span class="xp-small">1,250 XP</span></li>
+              </ol>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../js/nav.js"></script>
+    <script src="../js/script.js"></script>
+  </body>
+</html>

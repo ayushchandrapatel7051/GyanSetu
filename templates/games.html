@@ -3,8 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GyanSetu — Home</title>
-
+    <title>GyanSetu — Games</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
       rel="stylesheet"
@@ -17,14 +16,12 @@
   </head>
   <body>
     <div class="app">
-      <!-- Sidebar -->
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-inner">
           <h1 class="logo">GyanSetu</h1>
-
           <nav>
             <ul class="menu">
-              <li class="menu-item active" data-page="home">
+              <li class="menu-item" data-page="home">
                 <i class="fas fa-house"></i><span>Home</span>
               </li>
               <li class="menu-item" data-page="lessons">
@@ -44,7 +41,6 @@
               </li>
             </ul>
           </nav>
-
           <div class="sidebar-bottom">
             <button class="login" id="loginBtn" style="background: none">
               <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
@@ -53,71 +49,41 @@
         </div>
       </aside>
 
-      <!-- Main content -->
       <main class="content">
-        <!-- Top bar -->
-        <!-- remove the old language markup inside topbar and add this once at top of <body> or keep it inside topbar but with class lang-fixed -->
-        <div class="lang-fixed" aria-label="Language selector">
-          <i class="fas fa-globe" aria-hidden="true"></i>
-          <label for="language" class="lang-label" style="margin: 0"
-            >Language:</label
-          >
-          <select id="language" class="lang-select" aria-label="Language">
-            <option value="en" selected>English</option>
+        <div class="lang-fixed">
+          <i class="fas fa-globe"></i>
+          <label for="language" class="lang-label">Language:</label>
+          <select id="language" class="lang-select">
+            <option value="en">English</option>
             <option value="hi">Hindi</option>
             <option value="or">Odia</option>
           </select>
         </div>
 
-        <!-- Pages -->
-        <section id="home" class="page active">
-          <h2 class="page-title">Home</h2>
-          <div class="cards">
-            <article class="card card-cta card-orange">
-              <div class="badge"><img src="./assets/img/1.png" /></div>
-              <h3>Continue Learning</h3>
-              <p>Resume your last lesson.</p>
+        <section class="page active">
+          <h2 class="page-title">Games</h2>
+          <div class="cards small">
+            <article class="card card-game card-orange">
+              <div class="tile">Math</div>
+              <h3>Math Puzzle</h3>
+              <p>Practice math with interactive puzzles.</p>
               <button
                 class="btn btn-orange"
-                onclick="location.href='./templates/lessons.html'"
+                onclick="location.href='quiz.html'"
               >
-                Get Started
+                Play Now
               </button>
             </article>
 
-            <article class="card card-cta card-purple">
-              <div class="badge"><img src="./assets/img/2.png" /></div>
-              <h3>Play Games</h3>
-              <p>Engage in interactive games.</p>
+            <article class="card card-game card-purple">
+              <div class="tile">Science</div>
+              <h3>Science Quiz</h3>
+              <p>Challenge yourself with science questions.</p>
               <button
                 class="btn btn-purple"
-                onclick="location.href='./templates/games.html'"
+                onclick="location.href='quiz.html'"
               >
-                Get Started
-              </button>
-            </article>
-
-            <article class="card card-cta card-orange">
-              <div class="badge"><img src="./assets/img/3.png" /></div>
-              <h3>Track Progress</h3>
-              <p>Check your learning progress.</p>
-              <button
-                class="btn btn-orange"
-                onclick="location.href='./templates/progress.html'"
-              >
-                Get Started
-              </button>
-            </article>
-
-            <article class="card card-cta card-purple">
-              <div class="badge"><img src="./assets/img/4.png" /></div>
-              <h3>Earn Rewards</h3>
-              <p>Collect points and badges.</p>
-              <button
-                class="btn btn-purple"
-                onclick="location.href='./templates/rewards.html'"
-              >
-                Get Started
+                Play Now
               </button>
             </article>
           </div>

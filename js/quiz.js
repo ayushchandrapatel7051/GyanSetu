@@ -26,10 +26,20 @@
   let quizStartTime = null;
 
   async function loadQuestions() {
-    const res = await fetch("questions.json");
-    questions = await res.json();
-    qTotalEl.textContent = questions.length;
-    startQuiz();
+    try {
+      const res = await fetch("../data/questions.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("Could not load questions.json");
+      questions = await res.json();
+      if (!Array.isArray(questions) || questions.length === 0) {
+        questionText.textContent = "No questions available.";
+        return;
+      }
+      qTotalEl.textContent = questions.length;
+      startQuiz();
+    } catch (err) {
+      console.error(err);
+      questionText.textContent = "Error loading questions.";
+    }
   }
 
   function startQuiz() {
@@ -37,22 +47,32 @@
     score = 0;
     perQuestion = [];
     quizStartTime = Date.now();
+    scoreEl.textContent = 0;
     renderCurrent();
+    updateProgress();
   }
 
   function renderCurrent() {
     clearInterval(timerInterval);
     const q = questions[currentIndex];
     qIndexEl.textContent = currentIndex + 1;
-    questionText.textContent = q.question;
+    questionText.textContent = q.question || "No question text";
     optionsList.innerHTML = "";
     q.options.forEach((opt, idx) => {
       const li = document.createElement("li");
       li.textContent = opt;
-      li.onclick = () => handleAnswer(li, idx);
+      li.tabIndex = 0;
+      li.addEventListener("click", () => handleAnswer(li, idx));
+      li.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleAnswer(li, idx);
+        }
+      });
       optionsList.appendChild(li);
     });
     questionStart = Date.now();
+    timerDisplay.textContent = "0.0s";
     timerInterval = setInterval(() => {
       timerDisplay.textContent =
         ((Date.now() - questionStart) / 1000).toFixed(1) + "s";
@@ -61,35 +81,49 @@
   }
 
   function handleAnswer(li, idx) {
+    if (!questions.length) return;
     clearInterval(timerInterval);
     const q = questions[currentIndex];
     const took = (Date.now() - questionStart) / 1000;
-    [...optionsList.children].forEach((el) => el.classList.add("disabled"));
-    if (idx === q.correct_option) {
+    Array.from(optionsList.children).forEach((el) =>
+      el.classList.add("disabled")
+    );
+    const correctIdx = Number(q.correct_option);
+    if (idx === correctIdx) {
       li.classList.add("correct");
       score++;
     } else {
       li.classList.add("wrong");
-      optionsList.children[q.correct_option].classList.add("correct");
+      if (optionsList.children[correctIdx])
+        optionsList.children[correctIdx].classList.add("correct");
     }
     perQuestion.push({
-      id: q.question_id,
+      id: q.question_id ?? currentIndex,
       tookSeconds: took.toFixed(2),
-      correct: idx === q.correct_option,
+      correct: idx === correctIdx,
     });
-    //lastAnswerTime.textContent = `Answered in ${took.toFixed(2)}s`;
+    lastAnswerTime.textContent = `Answered in ${took.toFixed(2)}s`;
     scoreEl.textContent = score;
     nextBtn.disabled = false;
-    progressFill.style.width =
-      ((currentIndex + 1) / questions.length) * 100 + "%";
+    updateProgress();
   }
 
-  nextBtn.onclick = () => {
-    currentIndex >= questions.length - 1
-      ? finishQuiz()
-      : renderCurrent(++currentIndex);
-  };
-  quitBtn.onclick = () => (location.href = "index.html");
+  function updateProgress() {
+    const pct = questions.length
+      ? ((currentIndex + (nextBtn.disabled ? 0 : 1)) / questions.length) * 100
+      : 0;
+    progressFill.style.width = Math.min(Math.max(pct, 0), 100) + "%";
+  }
+
+  nextBtn.addEventListener("click", () => {
+    if (currentIndex >= questions.length - 1) finishQuiz();
+    else {
+      currentIndex++;
+      renderCurrent();
+    }
+  });
+
+  quitBtn.addEventListener("click", () => (location.href = "index.html"));
 
   function finishQuiz() {
     clearInterval(timerInterval);
@@ -110,7 +144,9 @@
     const correct = perQuestion.filter((p) => p.correct).length;
     const incorrect = attempted - correct;
     const notAnswered = questions.length - attempted;
-    const accuracy = ((correct / questions.length) * 100).toFixed(0);
+    const accuracy = questions.length
+      ? ((correct / questions.length) * 100).toFixed(0)
+      : "0";
 
     // Fill result page
     document.getElementById("marksObtained").textContent = correct;
@@ -124,20 +160,34 @@
     document.getElementById("incorrectCount").textContent = incorrect;
     document.getElementById("notAnsweredCount").textContent = notAnswered;
 
-    new Chart(document.getElementById("attemptsChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["Correct", "Incorrect", "Not Answered"],
-        datasets: [
-          {
-            data: [correct, incorrect, notAnswered],
-            backgroundColor: ["#34d399", "#ef4444", "#6b7280"],
+    // draw chart if Chart is available
+    if (typeof Chart !== "undefined") {
+      try {
+        // destroy existing chart if any
+        if (window._attemptsChart) {
+          window._attemptsChart.destroy();
+          window._attemptsChart = null;
+        }
+        const ctx = document.getElementById("attemptsChart").getContext("2d");
+        window._attemptsChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Correct", "Incorrect", "Not Answered"],
+            datasets: [
+              {
+                data: [correct, incorrect, notAnswered],
+                backgroundColor: ["#34d399", "#ef4444", "#6b7280"],
+              },
+            ],
           },
-        ],
-      },
-      options: { plugins: { legend: { position: "bottom" } } },
-    });
+          options: { plugins: { legend: { display: false } }, cutout: "70%" },
+        });
+      } catch (e) {
+        console.warn("Chart render failed", e);
+      }
+    }
 
+    // show result page
     document.getElementById("questionCard").style.display = "none";
     document.querySelector(".quiz-controls").style.display = "none";
     summary.style.display = "none";
@@ -145,16 +195,29 @@
   }
 
   document.addEventListener("click", (e) => {
-    if (e.target.id === "playAgainBtn") {
-      startQuiz();
+    if (e.target && e.target.id === "playAgainBtn") {
+      // restart quiz
       document.getElementById("resultPage").style.display = "none";
       document.getElementById("questionCard").style.display = "block";
       document.querySelector(".quiz-controls").style.display = "flex";
+      // shuffle if you like or keep order
+      // questions = shuffleArray(questions);
+      startQuiz();
     }
-    if (e.target.id === "backHomeBtn") {
+    if (e.target && e.target.id === "backHomeBtn") {
       location.href = "index.html";
     }
   });
+
+  // optional: shuffle helper if you want to shuffle on restart
+  function shuffleArray(a) {
+    const arr = a.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
   loadQuestions();
 })();

@@ -16,9 +16,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <!-- Global styles -->
-    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="../css/style.css" />
     <!-- Quiz-specific styles -->
-    <link rel="stylesheet" href="./css/quiz.css" />
+    <link rel="stylesheet" href="../css/quiz.css" />
   </head>
   <body>
     <div class="app">
@@ -29,9 +29,23 @@
 
           <nav>
             <ul class="menu">
+              <!-- Home: keep data-page="home" for nav.js highlight, but use anchor so click goes to index.html -->
               <li class="menu-item" data-page="home">
-                <i class="fas fa-house"></i><span>Home</span>
+                <a
+                  href="index.html"
+                  class="menu-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: inherit;
+                    text-decoration: none;
+                  "
+                >
+                  <i class="fas fa-house"></i><span>Home</span>
+                </a>
               </li>
+
               <li class="menu-item" data-page="lessons">
                 <i class="fas fa-book-open"></i><span>Lessons</span>
               </li>
@@ -169,6 +183,7 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/quiz.js"></script>
+    <script src="../js/nav.js"></script>
+    <script src="../js/quiz.js"></script>
   </body>
 </html>

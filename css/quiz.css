@@ -150,11 +150,11 @@
 }
 .options-list li.correct {
   border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.06);
+  background: rgba(117, 248, 165, 0.2);
 }
 .options-list li.wrong {
   border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.06);
+  background: rgba(255, 90, 90, 0.2);
 }
 .options-list li.disabled {
   pointer-events: none;
