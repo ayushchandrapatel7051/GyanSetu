@@ -51,7 +51,7 @@
           </nav>
 
           <div class="sidebar-bottom">
-            <button class="login" id="loginBtn">
+            <button class="login" id="loginBtn" style="background: none">
               <i class="fas fa-right-to-bracket"></i><span>Log In</span>
             </button>
           </div>
@@ -61,20 +61,17 @@
       <!-- Main content -->
       <main class="content">
         <!-- Top bar -->
-        <div class="topbar">
-          <div class="topbar-left"></div>
-          <div class="topbar-right">
-            <label for="language" class="lang-label">Language:</label>
-            <select
-              id="language"
-              class="lang-select"
-              aria-label="Language selector"
-            >
-              <option value="en" selected>English</option>
-              <option value="hi">Hindi</option>
-              <option value="or">Odia</option>
-            </select>
-          </div>
+        <!-- remove the old language markup inside topbar and add this once at top of <body> or keep it inside topbar but with class lang-fixed -->
+        <div class="lang-fixed" aria-label="Language selector">
+          <i class="fas fa-globe" aria-hidden="true"></i>
+          <label for="language" class="lang-label" style="margin: 0"
+            >Language:</label
+          >
+          <select id="language" class="lang-select" aria-label="Language">
+            <option value="en" selected>English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
         </div>
 
         <!-- Pages -->

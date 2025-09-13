@@ -2,13 +2,20 @@
   --bg-1: #16002a; /* dark purple base */
   --bg-2: #2a0b3f; /* sidebar gradient mid */
   --card: rgba(255, 255, 255, 0.04);
-  --accent-orange: #ff7a1a;
-  --accent-purple: #9b69ff;
   --muted: rgba(255, 255, 255, 0.65);
   --text: #ffffff;
   --glass: rgba(255, 255, 255, 0.02);
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   --radius: 20px;
+
+  /* Unified button + sidebar color */
+  --btn-color: linear-gradient(
+    90deg,
+    #d946ef,
+    #6366f1,
+    #3b82f6
+  ); /* single modern purple */
+  --btn-hover: #9b69ff; /* lighter hover */
 }
 
 /* Reset + base */
@@ -18,6 +25,7 @@
 html,
 body {
   height: 100%;
+  overflow: auto;
 }
 body {
   margin: 0;
@@ -39,20 +47,21 @@ body {
 
 /* Sidebar */
 .sidebar {
-  width: 260px;
-  padding: 28px;
-  background: linear-gradient(180deg, var(--bg-2), rgba(20, 6, 36, 0.9));
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 260px; /* keep same width as before */
+  z-index: 30; /* sit above page background */
+  /* keep existing padding, background and other styles */
 }
-
 .sidebar-inner {
+  height: 100%;
+  padding-left: 20px;
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
-
 .logo {
   margin: 4px 0 20px 0;
   font-size: 32px;
@@ -70,7 +79,6 @@ body {
   flex-direction: column;
   gap: 8px;
 }
-
 .menu-item {
   display: flex;
   align-items: center;
@@ -79,10 +87,8 @@ body {
   border-radius: 12px;
   cursor: pointer;
   color: var(--muted);
-  transition: all 0.18s ease;
-  user-select: none;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
-
 .menu-item i {
   font-size: 18px;
   width: 24px;
@@ -93,15 +99,14 @@ body {
   font-weight: 600;
   font-size: 16px;
 }
-
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text);
+  background: var(--btn-hover);
+  color: #fff;
+  transform: translateY(-1px);
 }
 .menu-item.active {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  background: var(--btn-color);
+  color: #fff;
 }
 
 /* Push bottom area */
@@ -120,27 +125,52 @@ body {
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  background: linear-gradient(180deg, var(--card), rgba(255, 255, 255, 0.01));
+  background: var(--btn-color);
   border-radius: 12px;
-  color: var(--text);
+  color: #fff;
   border: none;
   cursor: pointer;
   font-weight: 700;
   justify-content: center;
-  box-shadow: var(--shadow);
+  transition: background 0.25s ease;
 }
 .login i {
-  color: var(--text);
+  color: #fff;
+}
+.login:hover {
+  background: var(--btn-hover);
+}
+
+/* Fix language control to top-right of viewport */
+.lang-fixed {
+  position: fixed;
+  top: 16px; /* distance from top of viewport */
+  right: 28px; /* align with content padding */
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 6px 10px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Slightly reduce size on small screens and hide to avoid overlap */
+@media (max-width: 1100px) {
+  .lang-fixed {
+    display: none;
+  }
 }
 
 /* Content area */
 .content {
-  flex: 1;
+  margin-left: calc(260px + 28px); /* sidebar width + gap */
+  /* keep existing padding and scroll behavior */
   padding: 28px;
   min-height: 100vh;
   overflow: auto;
 }
-
 /* Topbar */
 .topbar {
   display: flex;
@@ -172,23 +202,18 @@ body {
   letter-spacing: 0.2px;
 }
 
-/* Cards container */
+/* Cards */
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
   align-items: start;
 }
-
 .cards.small {
   grid-template-columns: repeat(2, 1fr);
 }
 .card {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: var(--card);
   padding: 28px;
   border-radius: 18px;
   box-shadow: var(--shadow);
@@ -199,8 +224,6 @@ body {
   justify-content: flex-start;
   text-align: center;
 }
-
-/* badge circle on card */
 .badge {
   width: 120px;
   height: 120px;
@@ -214,7 +237,6 @@ body {
   margin-bottom: 18px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
-
 .card-cta h3 {
   font-size: 22px;
   margin: 6px 0 8px;
@@ -225,7 +247,7 @@ body {
   margin: 0 0 18px 0;
 }
 
-/* small tiles for games */
+/* Game tiles */
 .card-game .tile {
   width: 110px;
   height: 110px;
@@ -236,19 +258,7 @@ body {
   font-weight: 700;
   font-size: 22px;
   margin-bottom: 18px;
-}
-
-/* colors */
-.card-orange .badge,
-.card-orange .tile,
-.btn-orange {
-  background: var(--accent-orange);
-  color: #fff;
-}
-.card-purple .badge,
-.card-purple .tile,
-.btn-purple {
-  background: var(--accent-purple);
+  background: var(--btn-color);
   color: #fff;
 }
 
@@ -259,36 +269,32 @@ body {
   border-radius: 30px;
   cursor: pointer;
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: background 0.25s ease, transform 0.2s ease;
 }
-.btn-orange {
-  background: var(--accent-orange);
-  color: #fff;
+.btn:hover {
+  background: var(--btn-hover);
+  transform: translateY(-1px);
 }
+.btn-orange,
 .btn-purple {
-  background: var(--accent-purple);
+  background: var(--btn-color);
   color: #fff;
 }
 
-/* Panels / grid used in other pages */
+/* Panels / grids */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 22px;
 }
-
 .panel {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: var(--card);
   border-radius: 18px;
   padding: 20px;
   box-shadow: var(--shadow);
 }
 
-/* lists */
+/* Lists */
 .list-plain {
   list-style: none;
   padding: 0;
@@ -299,7 +305,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* tiny helpers */
+/* Tiny helpers */
 .muted {
   color: var(--muted);
   font-weight: 500;
@@ -313,7 +319,7 @@ body {
 .xp-number {
   font-size: 48px;
   font-weight: 800;
-  color: var(--accent-orange);
+  color: var(--btn-color);
 }
 .leaderboard {
   list-style: none;
@@ -327,7 +333,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* progress bars */
+/* Progress bars */
 .bar {
   height: 12px;
   background: rgba(255, 255, 255, 0.06);
@@ -336,10 +342,10 @@ body {
 }
 .fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-orange), #ff9a57);
+  background: var(--btn-color);
 }
 
-/* badges list */
+/* Badges list */
 .badges-list {
   list-style: none;
   margin: 0;
@@ -352,24 +358,20 @@ body {
   gap: 6px;
 }
 
-/* settings grid */
+/* Settings */
 .settings-grid {
   display: flex;
   gap: 20px;
   align-items: flex-start;
 }
 .setting-card {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: var(--card);
   padding: 16px;
   border-radius: 12px;
   width: 320px;
 }
 
-/* switch */
+/* Switch */
 .switch {
   position: relative;
   display: inline-block;
@@ -398,13 +400,13 @@ body {
   transition: transform 0.25s;
 }
 .switch input:checked + .slider {
-  background: var(--accent-orange);
+  background: var(--btn-color);
 }
 .switch input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-/* responsive */
+/* Responsive */
 @media (max-width: 1100px) {
   .cards {
     grid-template-columns: repeat(2, 1fr);
@@ -419,16 +421,15 @@ body {
     display: block;
   }
   .content {
+    margin-left: 0;
     padding: 20px;
   }
 }
 
-/* Hide all pages by default */
+/* Page visibility */
 .page {
   display: none;
 }
-
-/* Show only the active page */
 .page.active {
   display: block;
 }
