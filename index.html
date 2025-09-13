@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EduQuest</title>
     <link rel="stylesheet" href="style.css" />
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="app">
@@ -12,18 +17,34 @@
       <aside class="sidebar">
         <h2 class="logo">EduQuest</h2>
         <ul>
-          <li class="active" data-page="home"><span>🏠</span> Home</li>
-          <li data-page="lessons"><span>📖</span> Lessons</li>
-          <li data-page="games"><span>🎮</span> Games</li>
-          <li data-page="progress"><span>📊</span> Progress</li>
-          <li data-page="rewards"><span>🏅</span> Rewards</li>
-          <li data-page="settings"><span>⚙️</span> Settings</li>
+          <li class="active" data-page="home">
+            <i class="fas fa-home"></i> Home
+          </li>
+          <li data-page="lessons"><i class="fas fa-book"></i> Lessons</li>
+          <li data-page="games"><i class="fas fa-gamepad"></i> Games</li>
+          <li data-page="progress">
+            <i class="fas fa-chart-line"></i> Progress
+          </li>
+          <li data-page="rewards"><i class="fas fa-award"></i> Rewards</li>
+          <li data-page="settings"><i class="fas fa-cog"></i> Settings</li>
         </ul>
-        <div class="login">⬅ Log In</div>
+
+        <!-- Log In/Out Button -->
+        <div class="login"><i class="fas fa-sign-in-alt"></i> Log In</div>
       </aside>
 
       <!-- Main Content -->
       <main class="content">
+        <!-- Top Bar -->
+        <div class="topbar">
+          <label for="language">Language: </label>
+          <select id="language">
+            <option value="en" selected>English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
+        </div>
+
         <!-- Pages -->
         <section id="home" class="page active">
           <h1>Home</h1>
@@ -94,9 +115,9 @@
             <div class="bar"><div class="fill" style="width: 50%"></div></div>
           </div>
           <div class="badges">
-            <p>🏅 Math Starter - 5 lessons</p>
-            <p>🏅 Science Explorer - 3 quizzes</p>
-            <p>🔥 7-Day Streak</p>
+            <p><i class="fas fa-medal"></i> Math Starter - 5 lessons</p>
+            <p><i class="fas fa-flask"></i> Science Explorer - 3 quizzes</p>
+            <p><i class="fas fa-fire"></i> 7-Day Streak</p>
           </div>
         </section>
 

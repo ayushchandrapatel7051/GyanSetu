@@ -28,3 +28,23 @@ toggle.addEventListener("change", () => {
     document.documentElement.style.setProperty("--text-color", "#fff");
   }
 });
+
+// Login/Logout Toggle
+const loginBtn = document.querySelector(".login");
+let loggedIn = false;
+
+loginBtn.addEventListener("click", () => {
+  loggedIn = !loggedIn;
+  loginBtn.innerHTML = loggedIn
+    ? '<i class="fas fa-sign-out-alt"></i> Log Out'
+    : '<i class="fas fa-sign-in-alt"></i> Log In';
+});
+
+// Language Dropdown
+const languageSelect = document.getElementById("language");
+
+languageSelect.addEventListener("change", () => {
+  const lang = languageSelect.value;
+  console.log("Language selected:", lang);
+  // Future: you can add translation handling here
+});
