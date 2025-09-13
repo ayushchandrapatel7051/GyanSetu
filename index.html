@@ -1,155 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>EduQuest</title>
-    <link rel="stylesheet" href="style.css" />
+
+    <!-- Google font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- FontAwesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="app">
       <!-- Sidebar -->
-      <aside class="sidebar">
-        <h2 class="logo">EduQuest</h2>
-        <ul>
-          <li class="active" data-page="home">
-            <i class="fas fa-home"></i> Home
-          </li>
-          <li data-page="lessons"><i class="fas fa-book"></i> Lessons</li>
-          <li data-page="games"><i class="fas fa-gamepad"></i> Games</li>
-          <li data-page="progress">
-            <i class="fas fa-chart-line"></i> Progress
-          </li>
-          <li data-page="rewards"><i class="fas fa-award"></i> Rewards</li>
-          <li data-page="settings"><i class="fas fa-cog"></i> Settings</li>
-        </ul>
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">EduQuest</h1>
 
-        <!-- Log In/Out Button -->
-        <div class="login"><i class="fas fa-sign-in-alt"></i> Log In</div>
+          <nav>
+            <ul class="menu">
+              <li class="menu-item active" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="sidebar-bottom">
+            <button class="login" id="loginBtn">
+              <i class="fas fa-right-to-bracket"></i><span>Log In</span>
+            </button>
+          </div>
+        </div>
       </aside>
 
-      <!-- Main Content -->
+      <!-- Main content -->
       <main class="content">
-        <!-- Top Bar -->
+        <!-- Top bar -->
         <div class="topbar">
-          <label for="language">Language: </label>
-          <select id="language">
-            <option value="en" selected>English</option>
-            <option value="hi">Hindi</option>
-            <option value="or">Odia</option>
-          </select>
+          <div class="topbar-left"></div>
+          <div class="topbar-right">
+            <label for="language" class="lang-label">Language:</label>
+            <select
+              id="language"
+              class="lang-select"
+              aria-label="Language selector"
+            >
+              <option value="en" selected>English</option>
+              <option value="hi">Hindi</option>
+              <option value="or">Odia</option>
+            </select>
+          </div>
         </div>
 
         <!-- Pages -->
         <section id="home" class="page active">
-          <h1>Home</h1>
+          <h2 class="page-title">Home</h2>
           <div class="cards">
-            <div class="card orange">
-              <h2>Lesson</h2>
-              <p>Continue Learning</p>
-              <button>Get Started</button>
-            </div>
-            <div class="card purple">
-              <h2>Game</h2>
-              <p>Play Games</p>
-              <button>Get Started</button>
-            </div>
-            <div class="card orange">
-              <h2>Progress</h2>
-              <p>Track Progress</p>
-              <button>Get Started</button>
-            </div>
-            <div class="card purple">
-              <h2>Reward</h2>
-              <p>Earn Rewards</p>
-              <button>Get Started</button>
-            </div>
+            <article class="card card-cta card-orange">
+              <div class="badge">Lesson</div>
+              <h3>Continue Learning</h3>
+              <p>Resume your last lesson.</p>
+              <button class="btn btn-orange">Get Started</button>
+            </article>
+
+            <article class="card card-cta card-purple">
+              <div class="badge">Game</div>
+              <h3>Play Games</h3>
+              <p>Engage in interactive games.</p>
+              <button class="btn btn-purple">Get Started</button>
+            </article>
+
+            <article class="card card-cta card-orange">
+              <div class="badge">Progress</div>
+              <h3>Track Progress</h3>
+              <p>Check your learning progress.</p>
+              <button class="btn btn-orange">Get Started</button>
+            </article>
+
+            <article class="card card-cta card-purple">
+              <div class="badge">Reward</div>
+              <h3>Earn Rewards</h3>
+              <p>Collect points and badges.</p>
+              <button class="btn btn-purple">Get Started</button>
+            </article>
           </div>
         </section>
 
         <section id="lessons" class="page">
-          <h1>Lessons</h1>
-          <div class="lessons-grid">
-            <div class="box">
+          <h2 class="page-title">Lessons</h2>
+          <div class="grid-2">
+            <div class="panel">
               <h3>Mathematics</h3>
-              <p>Algebra - 5 lessons</p>
-              <p>Geometry - 4 lessons</p>
-              <p>Fractions - 6 lessons</p>
+              <ul class="list-plain">
+                <li>Algebra <span class="muted">5 lessons</span></li>
+                <li>Geometry <span class="muted">4 lessons</span></li>
+                <li>Fractions <span class="muted">6 lessons</span></li>
+              </ul>
             </div>
-            <div class="box">
+
+            <div class="panel">
               <h3>Science</h3>
-              <p>Physics - 7 lessons</p>
-              <p>Biology - 5 lessons</p>
-              <p>Chemistry - 6 lessons</p>
+              <ul class="list-plain">
+                <li>Physics <span class="muted">7 lessons</span></li>
+                <li>Biology <span class="muted">5 lessons</span></li>
+                <li>Chemistry <span class="muted">6 lessons</span></li>
+              </ul>
             </div>
           </div>
         </section>
 
         <section id="games" class="page">
-          <h1>Games</h1>
-          <div class="cards">
-            <div class="card orange">
-              <h2>Math</h2>
-              <p>Math Puzzle</p>
-              <button>Play Now</button>
-            </div>
-            <div class="card purple">
-              <h2>Science</h2>
-              <p>Science Quiz</p>
-              <button>Play Now</button>
-            </div>
+          <h2 class="page-title">Games</h2>
+          <div class="cards small">
+            <article class="card card-game card-orange">
+              <div class="tile">Math</div>
+              <h3>Math Puzzle</h3>
+              <p>A fun game to practice your math skills.</p>
+              <button class="btn btn-orange">Play Now</button>
+            </article>
+
+            <article class="card card-game card-purple">
+              <div class="tile">Science</div>
+              <h3>Science Quiz</h3>
+              <p>Test your knowledge with challenging questions.</p>
+              <button class="btn btn-purple">Play Now</button>
+            </article>
           </div>
         </section>
 
         <section id="progress" class="page">
-          <h1>My Progress</h1>
-          <div class="progress-box">
-            <p>Mathematics - 75%</p>
-            <div class="bar"><div class="fill" style="width: 75%"></div></div>
-            <p>Science - 50%</p>
-            <div class="bar"><div class="fill" style="width: 50%"></div></div>
-          </div>
-          <div class="badges">
-            <p><i class="fas fa-medal"></i> Math Starter - 5 lessons</p>
-            <p><i class="fas fa-flask"></i> Science Explorer - 3 quizzes</p>
-            <p><i class="fas fa-fire"></i> 7-Day Streak</p>
+          <h2 class="page-title">My Progress</h2>
+          <div class="grid-2">
+            <div class="panel">
+              <h3>Subject Progress</h3>
+              <div class="progress-row">
+                <span>Mathematics</span>
+                <span class="muted">75%</span>
+              </div>
+              <div class="bar"><div class="fill" style="width: 75%"></div></div>
+
+              <div class="progress-row" style="margin-top: 14px">
+                <span>Science</span>
+                <span class="muted">50%</span>
+              </div>
+              <div class="bar"><div class="fill" style="width: 50%"></div></div>
+            </div>
+
+            <div class="panel">
+              <h3>Badges & Streaks</h3>
+              <ul class="badges-list">
+                <li>
+                  <i class="fas fa-circle" style="color: var(--orange)"></i>
+                  <strong>Math Starter</strong>
+                  <div class="muted">Completed 5 math lessons</div>
+                </li>
+                <li>
+                  <i class="fas fa-circle" style="color: var(--purple)"></i>
+                  <strong>Science Explorer</strong>
+                  <div class="muted">Completed 3 science quizzes</div>
+                </li>
+                <li>
+                  <i class="fas fa-fire"></i> <strong>7-Day Streak</strong>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
         <section id="rewards" class="page">
-          <h1>Rewards</h1>
-          <div class="xp">
-            <h2>1,250 XP</h2>
-            <p>Next Milestone: 2,000 XP</p>
-            <div class="bar"><div class="fill" style="width: 62.5%"></div></div>
-          </div>
-          <div class="leaderboard">
-            <p>1. Aditi - 2,200 XP</p>
-            <p>2. Raj - 1,900 XP</p>
-            <p>3. You - 1,250 XP</p>
+          <h2 class="page-title">Rewards</h2>
+          <div class="grid-2">
+            <div class="panel">
+              <h3>XP & Milestones</h3>
+              <div class="xp-big">
+                <span class="xp-number">1,250</span
+                ><span class="muted"> XP</span>
+              </div>
+              <div class="muted">Progress to next milestone (2,000 XP)</div>
+              <div class="bar" style="margin-top: 12px">
+                <div class="fill" style="width: 62.5%"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Leaderboard</h3>
+              <ol class="leaderboard">
+                <li>
+                  <span>Aditi</span><span class="xp-small">2,200 XP</span>
+                </li>
+                <li><span>Raj</span><span class="xp-small">1,900 XP</span></li>
+                <li><span>You</span><span class="xp-small">1,250 XP</span></li>
+              </ol>
+            </div>
           </div>
         </section>
 
         <section id="settings" class="page">
-          <h1>Settings</h1>
+          <h2 class="page-title">Settings</h2>
           <div class="settings-grid">
-            <div class="box">
-              <h3>Language</h3>
-              <p>English</p>
-              <button>Change</button>
+            <div class="setting-card">
+              <h4>Language</h4>
+              <div class="muted">English</div>
+              <button class="btn btn-orange">Change</button>
             </div>
-            <div class="box">
-              <h3>Grade Level</h3>
-              <p>5th Grade</p>
-              <button>Change</button>
+
+            <div class="setting-card">
+              <h4>Grade Level</h4>
+              <div class="muted">5th Grade</div>
+              <button class="btn btn-orange">Change</button>
             </div>
-            <div class="box">
-              <h3>Dark/Light Mode</h3>
+
+            <div class="setting-card">
+              <h4>Dark / Light Mode</h4>
               <label class="switch">
                 <input type="checkbox" id="theme-toggle" />
                 <span class="slider"></span>
@@ -159,6 +246,7 @@
         </section>
       </main>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>
