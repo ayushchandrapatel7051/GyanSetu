@@ -1,5 +1,5 @@
 :root {
-  --bg-1: #16002a; 
+  --bg-1: #16002a;
   --bg-2: #2a0b3f;
   --card: rgba(255, 255, 255, 0.04);
   --muted: rgba(255, 255, 255, 0.65);
@@ -8,13 +8,7 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   --radius: 20px;
 
-  
-  --btn-color: linear-gradient(
-    90deg,
-    #d946ef,
-    #6366f1,
-    #3b82f6
-  );
+  --btn-color: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
   --btn-hover: #9b69ff;
 }
 
@@ -166,7 +160,7 @@ body {
 /* Content area: fill horizontally except for the sidebar on the left */
 .content {
   margin-left: calc(260px + 28px); /* sidebar width + gap */
-  padding: 28px 0 28px 0;          /* remove right and left padding */
+  padding: 28px 0 28px 0; /* remove right and left padding */
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
@@ -199,8 +193,8 @@ body {
 .lang-select option {
   background: var(--bg-1);
   color: var(--text);
-  border: none !important;     /* remove border */
-  outline: none !important;    /* remove outline */
+  border: none !important; /* remove border */
+  outline: none !important; /* remove outline */
   box-shadow: none !important;
 }
 
@@ -217,35 +211,67 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
   align-items: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 .cards.small {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 .card {
   background: var(--card);
-  padding: 28px;
+  padding: clamp(16px, 4vw, 28px);
   border-radius: 18px;
   box-shadow: var(--shadow);
-  min-height: 220px;
+  min-height: clamp(150px, 30vh, 220px);
+  width: 100%;
+  /* remove max-width so grid column controls size; if you want, keep a max: */
+  /* max-width: 400px; */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
+  box-sizing: border-box;
 }
+
 .badge {
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
+  width: 200px;
+  height: 200px;
+  overflow: hidden; /* hides extra image parts */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 22px;
-  color: #fff;
+  margin-top: 0px;
   margin-bottom: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
+
+@media (max-width: 1199px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* For the image inside the badge */
+.badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* makes image fill while keeping aspect ratio */
+}
+
 .card-cta h3 {
   font-size: 22px;
   margin: 6px 0 8px;
@@ -525,9 +551,9 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  margin-top: 18px; 
+  margin-top: 18px;
 }
 
 .dropdown-row select {
-  background: linear-gradient(90deg, #d946ef, #6366f1,#3b82f6 );
+  background: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
 }

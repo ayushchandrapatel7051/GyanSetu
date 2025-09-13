@@ -1,0 +1,222 @@
+/* quiz.css - quiz specific styles */
+
+.question-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 220px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* Question text */
+.question-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* question image (if any) */
+.question-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+/* Options list styling */
+.options-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.options-list li {
+  padding: 14px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid rgba(255, 255, 255, 0.03);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  text-align: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* hover */
+.options-list li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Correct answer state (green border, transparent interior) */
+.options-list li.correct {
+  border-color: rgba(34, 197, 94, 0.9); /* green */
+  background: rgba(76, 255, 142, 0.2); /* subtle transparent green fill */
+  color: #76ffa8;
+}
+
+/* Wrong answer state (red border + little transparent red inside) */
+.options-list li.wrong {
+  border-color: rgba(239, 68, 68, 0.95); /* red */
+  background: rgba(255, 91, 91, 0.2);
+  color: #fff0f0;
+  box-shadow: inset 0 2px 8px rgba(239, 68, 68, 0.06);
+}
+
+/* disabled clickable after answer */
+.options-list li.disabled {
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+/* single column on narrow screens */
+@media (max-width: 700px) {
+  .options-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* header area */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+/* timer display styling */
+#timerDisplay {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+/* controls */
+.quiz-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* summary */
+.quiz-summary {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+/* small helpers */
+.muted {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+/* quiz.css */
+
+/* Question area */
+.question-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.question-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+.options-list {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+}
+.options-list li {
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid rgba(255, 255, 255, 0.03);
+  text-align: center;
+  transition: 0.12s;
+}
+.options-list li.correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.06);
+}
+.options-list li.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+.options-list li.disabled {
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* Result Page */
+.result-page {
+  margin-top: 20px;
+  text-align: center;
+}
+.marks-card {
+  background: rgba(59, 130, 246, 0.08);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+.marks-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #60a5fa;
+}
+.result-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+.stat {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.stat .label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+.stat.purple {
+  color: #a78bfa;
+}
+.stat.green {
+  color: #34d399;
+}
+.stat.orange {
+  color: #fbbf24;
+}
+.attempts-analysis {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  align-items: center;
+  margin: 20px 0;
+}
+.result-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.bar {
+  margin-top: 20px;
+}

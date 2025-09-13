@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EduQuest — Quiz</title>
+
+    <!-- Google font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Global styles -->
+    <link rel="stylesheet" href="./css/style.css" />
+    <!-- Quiz-specific styles -->
+    <link rel="stylesheet" href="./css/quiz.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">GyanSetu</h1>
+
+          <nav>
+            <ul class="menu">
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item active" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="sidebar-bottom">
+            <button class="login" id="loginBtn" style="background: none">
+              <i class="fas fa-right-to-bracket"></i><span>Log In</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="content">
+        <div class="lang-fixed">
+          <i class="fas fa-globe"></i>
+          <label for="language">Language:</label>
+          <select id="language" class="lang-select">
+            <option value="en" selected>English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
+        </div>
+
+        <section id="quiz-page" class="page active">
+          <h2 class="page-title">Quiz — Practice Questions</h2>
+
+          <div class="quiz-container panel">
+            <div class="quiz-header">
+              <div class="quiz-meta">
+                <div>
+                  Question <span id="qIndex">0</span>/<span id="qTotal">0</span>
+                </div>
+                <div>Score: <span id="score">0</span></div>
+              </div>
+              <div class="quiz-timer">
+                <div>Time on this question:</div>
+                <div id="timerDisplay">0.0s</div>
+              </div>
+            </div>
+
+            <div id="questionCard" class="question-card">
+              <div id="questionText" class="question-text">Loading...</div>
+              <div
+                id="questionImage"
+                class="question-image"
+                style="display: none"
+              >
+                <img src="" alt="question image" />
+              </div>
+              <ul id="optionsList" class="options-list"></ul>
+            </div>
+
+            <div class="quiz-controls">
+              <button id="nextBtn" class="btn btn-purple" disabled>Next</button>
+              <button id="quitBtn" class="btn btn-orange">Quit</button>
+              <div id="lastAnswerTime"></div>
+            </div>
+
+            <div id="progressBar" class="bar">
+              <div id="progressFill" class="fill" style="width: 0%"></div>
+            </div>
+
+            <!-- Old summary (still kept) -->
+            <div id="summary" style="display: none">
+              <h3>Quiz finished</h3>
+              <p>Score: <strong id="finalScore"></strong></p>
+              <p>Total time spent: <strong id="totalTime"></strong> seconds</p>
+              <ol id="perQuestionTimes"></ol>
+            </div>
+
+            <!-- New Result Page -->
+            <div id="resultPage" class="result-page" style="display: none">
+              <div class="marks-card">
+                <h3>Marks Obtained</h3>
+                <div class="marks-value">
+                  <span id="marksObtained">0</span>/<span id="marksTotal"
+                    >0</span
+                  >
+                </div>
+              </div>
+
+              <div class="result-stats">
+                <div class="stat purple">
+                  <span id="qsAttempted">0</span>
+                  <div class="label">Qs attempted</div>
+                </div>
+                <div class="stat green">
+                  <span id="accuracy">0%</span>
+                  <div class="label">Accuracy</div>
+                </div>
+                <div class="stat orange">
+                  <span id="timeTaken">0 min</span>
+                  <div class="label">Time Taken</div>
+                </div>
+              </div>
+
+              <h3 class="section-title">Attempts Analysis (Overall)</h3>
+              <div class="attempts-analysis">
+                <canvas id="attemptsChart" width="200" height="200"></canvas>
+                <div class="analysis-details">
+                  <p>Correct: <span id="correctCount">0</span> Qs</p>
+                  <p>Incorrect: <span id="incorrectCount">0</span> Qs</p>
+                  <p>Not Answered: <span id="notAnsweredCount">0</span> Qs</p>
+                </div>
+              </div>
+
+              <div class="result-actions">
+                <button class="btn btn-purple" id="playAgainBtn">
+                  Play Again
+                </button>
+                <button class="btn btn-orange" id="backHomeBtn">
+                  Back to Home
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/quiz.js"></script>
+  </body>
+</html>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>EduQuest</title>
+    <title>GyanSetu</title>
 
     <!-- Google font -->
     <link
@@ -18,14 +18,14 @@
     />
 
     <!-- Main CSS -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
     <div class="app">
       <!-- Sidebar -->
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-inner">
-          <h1 class="logo">EduQuest</h1>
+          <h1 class="logo">GyanSetu</h1>
 
           <nav>
             <ul class="menu">
@@ -78,28 +78,28 @@
           <h2 class="page-title">Home</h2>
           <div class="cards">
             <article class="card card-cta card-orange">
-              <div class="badge">Lesson</div>
+              <div class="badge"><img src="./assets/img/1.png"/></div>
               <h3>Continue Learning</h3>
               <p>Resume your last lesson.</p>
               <button class="btn btn-orange">Get Started</button>
             </article>
 
             <article class="card card-cta card-purple">
-              <div class="badge">Game</div>
+              <div class="badge"><img src="./assets/img/2.png"/></div>
               <h3>Play Games</h3>
               <p>Engage in interactive games.</p>
               <button class="btn btn-purple">Get Started</button>
             </article>
 
             <article class="card card-cta card-orange">
-              <div class="badge">Progress</div>
+              <div class="badge"><img src="./assets/img/3.png"/></div>
               <h3>Track Progress</h3>
               <p>Check your learning progress.</p>
               <button class="btn btn-orange">Get Started</button>
             </article>
 
             <article class="card card-cta card-purple">
-              <div class="badge">Reward</div>
+              <div class="badge"><img src="./assets/img/4.png"/></div>
               <h3>Earn Rewards</h3>
               <p>Collect points and badges.</p>
               <button class="btn btn-purple">Get Started</button>
@@ -137,14 +137,14 @@
               <div class="tile">Math</div>
               <h3>Math Puzzle</h3>
               <p>A fun game to practice your math skills.</p>
-              <button class="btn btn-orange">Play Now</button>
+              <button class="btn btn-orange" onclick="location.href='quiz.html'">Play Now</button>
             </article>
 
             <article class="card card-game card-purple">
               <div class="tile">Science</div>
               <h3>Science Quiz</h3>
               <p>Test your knowledge with challenging questions.</p>
-              <button class="btn btn-purple">Play Now</button>
+              <button class="btn btn-orange" onclick="location.href='quiz.html'">Play Now</button>
             </article>
           </div>
         </section>
@@ -258,6 +258,6 @@
       </main>
     </div>
 
-    <script src="script.js"></script>
+    <script src="./js/script.js"></script>
   </body>
 </html>
