@@ -65,8 +65,7 @@
         <div class="lang-fixed" aria-label="Language selector">
           <i class="fas fa-globe" aria-hidden="true"></i>
           <label for="language" class="lang-label" style="margin: 0"
-            >Language:</label
-          >
+            >Language:</label>
           <select id="language" class="lang-select" aria-label="Language">
             <option value="en" selected>English</option>
             <option value="hi">Hindi</option>
@@ -220,24 +219,39 @@
         <section id="settings" class="page">
           <h2 class="page-title">Settings</h2>
           <div class="settings-grid">
+              <div class="setting-card profile-card">
+                <div class="profile-card-content">
+                   <div class="profile-info">
+                    <img src="avatar.jpg" alt="Profile" class="avatar" />
+                        <div class="profile-text">
+                            <h3>John Doe</h3>
+                            <p class="muted">johndoe@email.com</p>
+                          </div>
+                      </div>
+                  <button class="btn edit-profile-btn">Edit Profile</button>
+                </div>
+              </div>
             <div class="setting-card">
               <h4>Language</h4>
-              <div class="muted">English</div>
-              <button class="btn btn-orange">Change</button>
+              <div class="dropdown-row">
+                <select class="lang-select">
+                  <option value="en">English</option>
+                  <option value="hi">Hindi</option>
+                  <option value="or">Odia</option>
+                </select>
+              </div>
             </div>
 
             <div class="setting-card">
-              <h4>Grade Level</h4>
-              <div class="muted">5th Grade</div>
-              <button class="btn btn-orange">Change</button>
-            </div>
-
-            <div class="setting-card">
-              <h4>Dark / Light Mode</h4>
-              <label class="switch">
-                <input type="checkbox" id="theme-toggle" />
-                <span class="slider"></span>
-              </label>
+              <h4>Grade</h4>
+              <div class="dropdown-row">
+                <select class="lang-select">
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
             </div>
           </div>
         </section>
