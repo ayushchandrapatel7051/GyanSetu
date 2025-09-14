@@ -63,7 +63,7 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 }
 .auth-visual img {
-  max-width: 100%;
+  max-width: 250px;
   border-radius: 12px;
   margin-bottom: 18px;
   opacity: 0.98;
