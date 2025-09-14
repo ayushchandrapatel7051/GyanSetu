@@ -605,3 +605,76 @@ body {
 .dropdown-row select {
   background: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
 }
+/* ===== Modal (Edit Profile) ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-card {
+  width: 600px;
+  max-width: 100%;
+  background: var(--bg-2);
+  padding: 28px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-card h3 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.modal-card label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--muted);
+}
+
+.modal-card input,
+.modal-card textarea,
+.modal-card select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card);
+  color: var(--text);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-footer .btn {
+  border-radius: 20px;
+}
+
+.modal-footer .danger {
+  background: rgba(255, 138, 138, 0.08);
+  color: #ff8a8a;
+  border: 1px solid rgba(255, 138, 138, 0.2);
+}
+
+.modal-footer .danger:hover {
+  background: #ff8a8a;
+  color: #fff;
+}

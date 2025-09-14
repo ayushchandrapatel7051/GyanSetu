@@ -1,6 +1,5 @@
 // auth.js
-// Updated signup/login code — now includes XP, Milestones, Progress, Badges, streak,
-// quizzes_completed, lessons_completed, avatar. Login sets isLoggedIn and lastActive in DB.
+// Signup/login with XP, milestones, badges, streak, quizzes_completed, lessons_completed, avatar.
 
 (() => {
   const dbName = "gyansetu-auth";
@@ -15,7 +14,7 @@
   const loginMsg = document.getElementById("loginMsg");
   const signupMsg = document.getElementById("signupMsg");
 
-  // Open or create DB
+  // IndexedDB helpers
   function openDB() {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(dbName, dbVersion);
@@ -77,7 +76,7 @@
     }
   }
 
-  // toggle tabs
+  // tab toggles
   function showLogin() {
     tabLogin.classList.add("active");
     tabSignup.classList.remove("active");
@@ -106,27 +105,16 @@
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     signupMsg.textContent = "";
+
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
-    const email = document
-      .getElementById("signupEmail")
-      .value.trim()
-      .toLowerCase();
+    const email = document.getElementById("signupEmail").value.trim().toLowerCase();
     const grade = document.getElementById("grade").value;
     const language = document.getElementById("languagePref").value;
     const phone = document.getElementById("phoneNumber").value.trim();
     const password = document.getElementById("signupPassword").value;
 
-    // basic validation
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !grade ||
-      !language ||
-      !phone ||
-      !password
-    ) {
+    if (!firstName || !lastName || !email || !grade || !language || !phone || !password) {
       signupMsg.textContent = "Please fill all fields.";
       signupMsg.classList.add("error");
       return;
@@ -145,35 +133,28 @@
         return;
       }
 
-      // Default progress subjects object (you can expand subjects later)
-      const defaultProgress = {
-        Maths: 0,
-        Science: 0,
-        English: 0,
-      };
+      const defaultProgress = { Maths: 0, Science: 0, English: 0 };
 
-      // user object with extra fields requested
       const user = {
         email,
         firstName,
         lastName,
+        name: `${firstName} ${lastName}`, // ✅ store combined name
         grade,
         language,
         phone: "+91" + phone,
-        // NOTE: demo only, not secure. In production, hash + server-side storage required.
-        password: btoa(password), // lightweight obfuscation only
+        password: btoa(password),
         createdAt: Date.now(),
 
-        // Additional fields requested
         xp: 0,
         milestones: [],
-        progress: defaultProgress, // object of subjects -> percent
+        progress: defaultProgress,
         badges: [],
         streak: 0,
-        quizzes_completed: [], // array of quiz ids
-        lessons_completed: [], // array of lesson ids
-        avatar: null, // avatar id or URL
-        isLoggedIn: false, // not logged in immediately after signup
+        quizzes_completed: [],
+        lessons_completed: [],
+        avatar: null,
+        isLoggedIn: false,
         lastActive: null,
       };
 
@@ -183,7 +164,6 @@
       signupMsg.textContent = "Account created ✅ You can log in now.";
       signupMsg.classList.add("success");
 
-      // auto-switch to login after small delay
       setTimeout(() => {
         showLogin();
         document.getElementById("loginEmail").value = email;
@@ -199,10 +179,8 @@
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginMsg.textContent = "";
-    const email = document
-      .getElementById("loginEmail")
-      .value.trim()
-      .toLowerCase();
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
     const password = document.getElementById("loginPassword").value;
 
     if (!email || !password) {
@@ -214,29 +192,15 @@
     try {
       let user = await getUserByEmail(email);
       if (!user) {
-        // fallback to localStorage
         const raw = localStorage.getItem(`gyan_user_${email}`);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed.password === btoa(password)) {
-            // success: mark in DB as logged in (create record in DB if absent)
             user = parsed;
             try {
-              // ensure DB has the user record
-              await addUserToDB({
-                ...user,
-                isLoggedIn: true,
-                lastActive: Date.now(),
-              });
-            } catch (e) {
-              // if addUserToDB fails because already exists, attempt update
-              try {
-                await updateUserInDB({
-                  ...user,
-                  isLoggedIn: true,
-                  lastActive: Date.now(),
-                });
-              } catch (_) {}
+              await addUserToDB({ ...user, isLoggedIn: true, lastActive: Date.now() });
+            } catch {
+              await updateUserInDB({ ...user, isLoggedIn: true, lastActive: Date.now() });
             }
             loginSuccess(user);
             return;
@@ -248,11 +212,9 @@
       }
 
       if (user.password === btoa(password)) {
-        // mark as logged in in DB
         user.isLoggedIn = true;
         user.lastActive = Date.now();
         await updateUserInDB(user);
-        // update localStorage copy
         saveUserLocal(user);
         loginSuccess(user);
       } else {
@@ -269,30 +231,28 @@
   function loginSuccess(user) {
     loginMsg.textContent = `Welcome back, ${user.firstName}! Redirecting...`;
     loginMsg.classList.add("success");
-    // store current logged user to localStorage (light safe subset)
+
     localStorage.setItem(
       "gyan_current_user",
       JSON.stringify({
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        name: user.name || `${user.firstName} ${user.lastName}`, // ✅ ensure name
         grade: user.grade,
         language: user.language,
         phone: user.phone,
       })
     );
-    // small delay then go to index
+
     setTimeout(() => {
       window.location.href = "../index.html";
     }, 700);
   }
 
-  // simple "forgot" button demo
+  // forgot
   document.getElementById("forgotBtn").addEventListener("click", () => {
-    const email = document
-      .getElementById("loginEmail")
-      .value.trim()
-      .toLowerCase();
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
     if (!email) {
       loginMsg.textContent = "Enter your email to recover.";
       loginMsg.classList.add("error");
@@ -304,19 +264,17 @@
           loginMsg.textContent = "Account not found.";
           loginMsg.classList.add("error");
         } else {
-          loginMsg.textContent = `Password hint: (first 2 letters) ${atob(
-            user.password
-          ).slice(0, 2)}●●●`;
+          loginMsg.textContent = `Password hint: (first 2 letters) ${atob(user.password).slice(0, 2)}●●●`;
           loginMsg.classList.add("success");
         }
       })
-      .catch((err) => {
+      .catch(() => {
         loginMsg.textContent = "Could not recover password.";
         loginMsg.classList.add("error");
       });
   });
 
-  // optional: expose a logout helper that other pages can call
+  // logout helper
   window.gyanLogout = async function () {
     try {
       const raw = localStorage.getItem("gyan_current_user");
@@ -331,12 +289,11 @@
     } catch (e) {
       console.warn("Logout cleanup failed", e);
     } finally {
-      // clear local session data and go to auth
       localStorage.removeItem("gyan_current_user");
       location.href = "auth.html";
     }
   };
 
-  // init page: show login
+  // init page
   showLogin();
 })();
