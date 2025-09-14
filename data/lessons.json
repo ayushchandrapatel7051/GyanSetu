@@ -72,6 +72,16 @@
       {
         "type": "paragraph",
         "text": "Summary: Fractions break a whole into equal parts, can be simplified, and are used in daily life."
+      },
+      { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: Simplify 12/16 → A: 3/4",
+          "Q2: Add 1/3 + 1/6 → A: 1/2",
+          "Q3: Convert 3/2 into a mixed fraction → A: 1 1/2"
+        ]
       }
     ]
   },
@@ -140,6 +150,16 @@
       {
         "type": "paragraph",
         "text": "Understanding photosynthesis helps in agriculture (greenhouses), reforestation, and even in designing artificial photosynthesis systems for sustainable energy."
+      },
+      { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: Name the gas released during photosynthesis → A: Oxygen",
+          "Q2: Where does photosynthesis occur? → A: In the chloroplasts of leaves",
+          "Q3: Write the chemical equation → A: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂"
+        ]
       }
     ]
   },
@@ -198,6 +218,15 @@
       {
         "type": "paragraph",
         "text": "Summary: Magnets are fascinating objects with practical applications in daily life, technology, and industry."
+      },
+      { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: What happens when two North poles are brought together? → A: They repel",
+          "Q2: Name two magnetic materials → A: Iron, Nickel"
+        ]
       }
     ]
   },
@@ -286,7 +315,312 @@
     {
       "type": "paragraph",
       "text": "Summary: Rational numbers extend our understanding of numbers and help in solving real-world problems involving parts, ratios, and proportions."
+    },
+    { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: Write 0.6 as a rational number → A: 3/5",
+          "Q2: Which is greater: 5/6 or 4/5? → A: 5/6 = 25/30, 4/5 = 24/30, so 5/6 > 4/5"
+        ]
+      }
+  ]
+  },
+  {
+  "id": "science-8-reproduction-in-plants",
+  "title": "Reproduction in Plants",
+  "grade": 8,
+  "subject": "Science",
+  "duration_minutes": 30,
+  "thumbnail": "../assets/thumbs/reproduction-plants.png",
+  "description": "Learn about how plants reproduce – covering sexual reproduction, asexual reproduction, pollination, fertilization, and seed dispersal.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/reproduction-plants.png",
+      "alt": "Diagram showing reproduction in plants",
+      "caption": "Plants reproduce through both sexual and asexual methods.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Plant Reproduction" },
+    {
+      "type": "paragraph",
+      "text": "Reproduction in plants is the process by which new plants are produced. It ensures the continuation of the species. Plants reproduce both sexually and asexually."
+    },
+    { "type": "heading", "level": 2, "text": "Asexual Reproduction" },
+    {
+      "type": "paragraph",
+      "text": "Asexual reproduction does not involve gametes. New plants are produced from vegetative parts like roots, stems, or leaves."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Vegetative propagation by roots (e.g., sweet potato)",
+        "Vegetative propagation by stems (e.g., money plant, rose)",
+        "Cuttings, layering, grafting used in horticulture"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Sexual Reproduction" },
+    {
+      "type": "paragraph",
+      "text": "Sexual reproduction in plants involves the formation of male and female gametes, pollination, fertilization, and the development of seeds and fruits."
+    },
+    { "type": "heading", "level": 2, "text": "Pollination" },
+    {
+      "type": "paragraph",
+      "text": "Pollination is the transfer of pollen grains from the anther (male part) to the stigma (female part) of a flower. It can be self-pollination or cross-pollination."
+    },
+    { "type": "heading", "level": 2, "text": "Fertilization and Seed Formation" },
+    {
+      "type": "paragraph",
+      "text": "After pollination, the male gamete fuses with the female gamete to form a zygote, which develops into an embryo. The ovule becomes a seed, and the ovary becomes a fruit."
+    },
+    { "type": "heading", "level": 2, "text": "Seed Dispersal" },
+    {
+      "type": "paragraph",
+      "text": "Seeds are dispersed by wind, water, animals, and explosive mechanisms to reduce competition and help plants spread to new places."
+    },
+    {
+      "type": "paragraph",
+      "text": "Summary: Plant reproduction is crucial for maintaining biodiversity and food production."
+    },
+    { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: Name two modes of asexual reproduction → A: Cutting and Grafting",
+          "Q2: What is pollination? → A: Transfer of pollen from anther to stigma"
+        ]
+      }
+  ]
+  },
+  {
+  "id": "math-8-decimals",
+  "title": "Decimals",
+  "grade": 8,
+  "subject": "Maths",
+  "duration_minutes": 25,
+  "thumbnail": "../assets/thumbs/decimals.png",
+  "description": "Learn what decimals are, place value of decimal digits, and how to perform operations like addition, subtraction, multiplication, and division with decimals.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/decimals.png",
+      "alt": "Decimal number line example",
+      "caption": "Decimals help represent numbers between whole numbers on the number line.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Decimals" },
+    {
+      "type": "paragraph",
+      "text": "A decimal number is a number that uses a decimal point to show a value less than 1. It is another way to write fractions with denominators like 10, 100, or 1000."
+    },
+    { "type": "heading", "level": 2, "text": "Place Value in Decimals" },
+    {
+      "type": "paragraph",
+      "text": "The first digit after the decimal is tenths, the next is hundredths, then thousandths, and so on."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "0.5 → 5 tenths",
+        "0.25 → 2 tenths, 5 hundredths",
+        "1.234 → 1 whole, 2 tenths, 3 hundredths, 4 thousandths"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Comparing Decimals" },
+    {
+      "type": "paragraph",
+      "text": "Compare decimals by looking at digits from left to right. Add zeros if needed to make lengths equal."
+    },
+    {
+      "type": "paragraph",
+      "text": "Example: Compare 0.5 and 0.45 → 0.50 > 0.45 so 0.5 is greater."
+    },
+    { "type": "heading", "level": 2, "text": "Operations on Decimals" },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Addition: Line up decimal points, then add normally.",
+        "Subtraction: Line up decimal points, subtract normally.",
+        "Multiplication: Ignore decimal points, multiply numbers, then put decimal in result.",
+        "Division: Move decimal point in divisor to make it whole, move dividend's decimal same steps, then divide."
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Converting Decimals to Fractions" },
+    {
+      "type": "paragraph",
+      "text": "Write decimal as a fraction with denominator 10, 100, or 1000 depending on decimal places, then simplify."
+    },
+    {
+      "type": "paragraph",
+      "text": "Example: 0.75 = 75/100 = 3/4."
+    },
+    { "type": "heading", "level": 2, "text": "Real-Life Applications of Decimals" },
+    {
+      "type": "paragraph",
+      "text": "Decimals are used in money (₹5.50), measurements (2.75 m), and science (1.23 g)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Summary: Decimals make it easy to work with numbers between whole numbers, especially in practical situations."
+    },
+     { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Q1: Convert 0.75 into a fraction → A: 3/4",
+          "Q2: Add 2.5 + 3.45 → A: 5.95",
+          "Q3: Which is greater: 0.6 or 0.56? → A: 0.6"
+        ]
+      }
+  ]
+    },
+    {
+  "id": "math-9-irrational-numbers",
+  "title": "Irrational Numbers",
+  "grade": 9,
+  "subject": "Maths",
+  "duration_minutes": 30,
+  "thumbnail": "../assets/thumbs/irrational.png",
+  "description": "Learn about irrational numbers, their properties, representation on the number line, and examples like √2, π, and more.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/irrational.png",
+      "alt": "Irrational numbers visual representation",
+      "caption": "Irrational numbers cannot be expressed as a fraction p/q with integers p and q.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Irrational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "Irrational numbers are real numbers that cannot be expressed as p/q where p and q are integers and q ≠ 0. Their decimal expansion is non-terminating and non-repeating."
+    },
+    { "type": "heading", "level": 2, "text": "Examples of Irrational Numbers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "√2, √3, √5 (non-perfect square roots)",
+        "π (pi ≈ 3.14159…)",
+        "e (Euler’s number ≈ 2.718…)"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Properties of Irrational Numbers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "They cannot be written as terminating or repeating decimals.",
+        "Sum/product of a rational and an irrational number is irrational (except special cases like 2 + (-2)).",
+        "Their squares can be rational (example: (√2)² = 2)."
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Representation on Number Line" },
+    {
+      "type": "paragraph",
+      "text": "Irrational numbers can be represented on the number line using geometric construction. For example, to represent √2, construct a right-angled triangle with both legs = 1 unit. The hypotenuse is √2."
+    },
+    { "type": "heading", "level": 2, "text": "Difference Between Rational and Irrational Numbers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Rational numbers can be expressed as p/q, irrational numbers cannot.",
+        "Rational numbers have terminating or repeating decimals, irrational numbers do not."
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Q1: Is √9 irrational? → A: No, √9 = 3 which is rational.",
+        "Q2: Represent √3 on the number line. → A: Construct right triangle with legs 1 and √2, hypotenuse = √3.",
+        "Q3: Is 0.333... irrational? → A: No, it is rational because it can be written as 1/3."
+      ]
+    }
+  ]
+},
+{
+  "id": "science-9-motion",
+  "title": "Motion",
+  "grade": 9,
+  "subject": "Science",
+  "duration_minutes": 35,
+  "thumbnail": "../assets/thumbs/motion.png",
+  "description": "Learn about motion, types of motion, speed, velocity, acceleration, and graphical representation of motion.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/motion.png",
+      "alt": "Object in motion",
+      "caption": "Motion is the change in position of an object with respect to time.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Motion" },
+    {
+      "type": "paragraph",
+      "text": "Motion is said to occur when an object changes its position with respect to a reference point and time."
+    },
+    { "type": "heading", "level": 2, "text": "Types of Motion" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Translatory Motion (straight-line motion)",
+        "Rotational Motion (about an axis)",
+        "Oscillatory Motion (back and forth motion)"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Speed and Velocity" },
+    {
+      "type": "paragraph",
+      "text": "Speed is the distance travelled per unit time. Velocity is speed in a particular direction. Velocity can be positive or negative depending on direction."
+    },
+    { "type": "heading", "level": 2, "text": "Acceleration" },
+    {
+      "type": "paragraph",
+      "text": "Acceleration is the rate of change of velocity with respect to time. It can be uniform or non-uniform."
+    },
+    {
+      "type": "paragraph",
+      "text": "Formula: a = (v - u)/t where u = initial velocity, v = final velocity, t = time taken."
+    },
+    { "type": "heading", "level": 2, "text": "Graphical Representation of Motion" },
+    {
+      "type": "paragraph",
+      "text": "Distance-time and velocity-time graphs help in analyzing motion. The slope of a distance-time graph gives speed. The area under a velocity-time graph gives distance travelled."
+    },
+    { "type": "heading", "level": 2, "text": "Equations of Motion" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "v = u + at",
+        "s = ut + ½at²",
+        "v² = u² + 2as"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Practice Questions & Answers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "Q1: An object moves 20 m in 4 seconds. Find its speed. → A: Speed = Distance/Time = 20/4 = 5 m/s.",
+        "Q2: A car's velocity changes from 10 m/s to 20 m/s in 5 seconds. Find its acceleration. → A: a = (20-10)/5 = 2 m/s²",
+        "Q3: Name three types of motion. → A: Translatory, Rotational, Oscillatory."
+      ]
     }
   ]
 }
 ]
+
+  
