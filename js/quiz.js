@@ -1,6 +1,4 @@
-// js/quiz.js (updated: choose number of questions + subject-specific files + random order)
-// Replaces previous quiz.js logic; keeps original UI selectors and result rendering.
-
+// js/quiz.js — dropdown selector + reliable restart
 (() => {
   // DOM refs
   const qIndexEl = document.getElementById("qIndex");
@@ -20,10 +18,35 @@
   const quizSelector = document.getElementById("quizSelector");
   const quizPage = document.getElementById("quiz-page");
 
-  // find play buttons inside cards (works without changing HTML)
+  // find play buttons inside cards
   const cardPlayButtons = Array.from(
     document.querySelectorAll(".card.card-game .btn")
   );
+
+  // insert dropdown chooser into the selector (above play cards)
+  (function insertDropdown() {
+    const container = quizSelector.querySelector(".cards") || quizSelector;
+    // avoid duplicate insertion
+    if (document.getElementById("qsCountSelect")) return;
+    const wrapper = document.createElement("div");
+    wrapper.style =
+      "display:flex;gap:12px;align-items:center;margin-bottom:14px;";
+    wrapper.innerHTML = `
+      <label style="font-weight:700;margin-right:8px;color:var(--muted)">Number of questions:</label>
+      <select id="qsCountSelect" style="padding:8px;border-radius:8px;border:none;background:linear-gradient(90deg,#d946ef,#6366f1,#3b82f6);color:#fff;font-weight:700">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+      </select>
+    `;
+    container.parentNode.insertBefore(wrapper, container);
+  })();
+
+  function getSelectedCount() {
+    const sel = document.getElementById("qsCountSelect");
+    if (!sel) return 10;
+    return Number(sel.value || 10);
+  }
 
   let questions = [];
   let currentIndex = 0;
@@ -33,8 +56,8 @@
   let timerInterval = null;
   let quizStartTime = null;
   let currentSubject = null;
+  let lastUsedCount = 10;
 
-  // Utility: safely hide/show elements
   function show(el) {
     if (!el) return;
     el.style.display = "";
@@ -44,61 +67,14 @@
     el.style.display = "none";
   }
 
-  // When the page includes both selector and quiz, ensure quiz-page hidden initially
+  // ensure quiz-page hidden initially
   hide(quizPage);
 
-  // Create a small chooser modal for number of questions
-  function askNumberOfQuestions() {
-    return new Promise((resolve) => {
-      // If modal exists already reuse
-      let modal = document.getElementById("qs-count-modal");
-      if (!modal) {
-        modal = document.createElement("div");
-        modal.id = "qs-count-modal";
-        modal.style =
-          "position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:2000;";
-        modal.innerHTML = `
-          <div style="background:rgba(11,7,20,0.98);padding:18px;border-radius:12px;min-width:280px;box-shadow:0 12px 40px rgba(0,0,0,0.6);">
-            <h3 style="margin:0 0 8px 0;font-size:18px">Choose number of questions</h3>
-            <div style="display:flex;gap:10px;margin-bottom:12px">
-              <button class="qs-count-btn" data-count="5" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer">5</button>
-              <button class="qs-count-btn" data-count="10" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer">10</button>
-              <button class="qs-count-btn" data-count="20" style="flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer">20</button>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-              <button id="qs-count-cancel" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;cursor:pointer">Cancel</button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(modal);
-        // attach listeners
-        modal.querySelectorAll(".qs-count-btn").forEach((b) => {
-          b.addEventListener("click", (e) => {
-            const val = Number(b.getAttribute("data-count") || 5);
-            modal.style.display = "none";
-            resolve(val);
-          });
-        });
-        modal
-          .querySelector("#qs-count-cancel")
-          .addEventListener("click", () => {
-            modal.style.display = "none";
-            resolve(null);
-          });
-      } else {
-        modal.style.display = "flex";
-      }
-    });
-  }
-
-  // Prevent inline onclick navigation on Play buttons and attach our listeners.
+  // attach listeners to Play buttons
   cardPlayButtons.forEach((btn) => {
-    // remove inline onclick attribute if present so the default location.href doesn't happen
     if (btn.hasAttribute("onclick")) btn.removeAttribute("onclick");
-
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
-      // determine subject by looking for a sibling .tile or parent card text
       const card = btn.closest(".card");
       let subject = null;
       if (card) {
@@ -115,41 +91,31 @@
         if (subject.includes("math")) subject = "math";
         else if (subject.includes("science")) subject = "science";
         else subject = subject.split(" ")[0];
-      } else {
-        subject = "all";
-      }
+      } else subject = "all";
 
-      // Ask user how many questions they want
-      const count = await askNumberOfQuestions();
-      if (!count) {
-        // user cancelled -> stay on selector
-        return;
-      }
-
+      const count = getSelectedCount();
+      lastUsedCount = count;
       currentSubject = subject;
+
+      // show quiz page
       hide(quizSelector);
       show(quizPage);
-
-      // reset any result view if visible
       hide(document.getElementById("resultPage"));
       show(document.getElementById("questionCard"));
-      document.querySelector(".quiz-controls").style.display = "flex";
+      if (document.querySelector(".quiz-controls"))
+        document.querySelector(".quiz-controls").style.display = "flex";
 
-      // now load questions for this subject and start
       loadQuestions(subject, count);
     });
   });
 
-  // Load questions from subject-specific files and optionally limit to count
+  // Load questions file based on subject
   async function loadQuestions(subject = "all", count = 10) {
     try {
-      // show loading state
       questionText.textContent = "Loading questions...";
       optionsList.innerHTML = "";
       qIndexEl.textContent = 0;
       qTotalEl.textContent = 0;
-
-      // select file based on subject
       let path = "../data/questions.json";
       if (subject === "math") path = "../data/maths.json";
       else if (subject === "science") path = "../data/science.json";
@@ -157,14 +123,13 @@
       const res = await fetch(path, { cache: "no-store" });
       if (!res.ok) throw new Error("Could not load " + path);
       let data = await res.json();
-
       if (!Array.isArray(data) || data.length === 0) {
         questionText.textContent = "No questions available.";
         questions = [];
         return;
       }
 
-      // If questions have subject metadata and user requested specific subject, try to filter
+      // filter if data contains mixed subjects and user requested specific
       if (subject && subject !== "all") {
         const normalized = subject.toLowerCase();
         const filtered = data.filter((q) => {
@@ -176,29 +141,21 @@
         if (filtered.length > 0) data = filtered;
       }
 
-      // Randomize order of questions
+      // shuffle pool then slice to requested count
       let pool = shuffleArray(data);
-
-      // If requested count less than pool length, slice
-      if (count && count > 0 && count < pool.length) {
+      if (count && count > 0 && count < pool.length)
         pool = pool.slice(0, count);
-      }
 
-      // For safety, normalize each question (and shuffle options while tracking correct index)
+      // normalize & shuffle options per question
       questions = pool.map((q, idx) => {
         const clone = JSON.parse(JSON.stringify(q));
-        // ensure options array
         if (Array.isArray(clone.options) && clone.options.length > 1) {
-          // determine correct index (number)
           const correctIdx = Number(clone.correct_option ?? clone.correct ?? 0);
           const opts = clone.options.map((o, i) => ({ o, i }));
           const shuffled = shuffleArray(opts);
-          const newOptions = shuffled.map((s) => s.o);
-          const newCorrect = shuffled.findIndex((s) => s.i === correctIdx);
-          clone.options = newOptions;
-          clone.correct_option = newCorrect;
+          clone.options = shuffled.map((s) => s.o);
+          clone.correct_option = shuffled.findIndex((s) => s.i === correctIdx);
         }
-        // attach question_id if missing
         if (!clone.question_id) clone.question_id = clone.id ?? idx;
         return clone;
       });
@@ -219,8 +176,8 @@
     perQuestion = [];
     quizStartTime = Date.now();
     scoreEl.textContent = 0;
-    // ensure controls visible
-    document.querySelector(".quiz-controls").style.display = "flex";
+    if (document.querySelector(".quiz-controls"))
+      document.querySelector(".quiz-controls").style.display = "flex";
     renderCurrent();
     updateProgress();
   }
@@ -232,19 +189,19 @@
       optionsList.innerHTML = "";
       return;
     }
-
     const q = questions[currentIndex];
     qIndexEl.textContent = currentIndex + 1;
     questionText.textContent = q.question || "No question text";
     optionsList.innerHTML = "";
 
-    // Show image if present
     const qImageWrapper = document.getElementById("questionImage");
     if (q.image) {
-      qImageWrapper.style.display = "";
-      const img = qImageWrapper.querySelector("img");
-      img.src = q.image;
-      img.alt = q.image_alt || "question image";
+      if (qImageWrapper) {
+        qImageWrapper.style.display = "";
+        const img = qImageWrapper.querySelector("img");
+        img.src = q.image;
+        img.alt = q.image_alt || "question image";
+      }
     } else {
       if (qImageWrapper) qImageWrapper.style.display = "none";
     }
@@ -317,12 +274,13 @@
   });
 
   quitBtn.addEventListener("click", () => {
-    // if user quits mid-quiz, return to selector
     hide(quizPage);
     show(quizSelector);
-    // reset view
-    document.getElementById("questionCard").style.display = "block";
-    document.querySelector(".quiz-controls").style.display = "flex";
+    // ensure controls reset
+    if (document.getElementById("questionCard"))
+      document.getElementById("questionCard").style.display = "block";
+    if (document.querySelector(".quiz-controls"))
+      document.querySelector(".quiz-controls").style.display = "flex";
   });
 
   function finishQuiz() {
@@ -339,7 +297,6 @@
       perQuestionTimes.appendChild(li);
     });
 
-    // Stats
     const attempted = perQuestion.length;
     const correct = perQuestion.filter((p) => p.correct).length;
     const incorrect = attempted - correct;
@@ -348,7 +305,6 @@
       ? ((correct / questions.length) * 100).toFixed(0)
       : "0";
 
-    // Fill result page
     document.getElementById("marksObtained").textContent = correct;
     document.getElementById("marksTotal").textContent = questions.length;
     document.getElementById("qsAttempted").textContent =
@@ -360,7 +316,7 @@
     document.getElementById("incorrectCount").textContent = incorrect;
     document.getElementById("notAnsweredCount").textContent = notAnswered;
 
-    // draw chart if Chart is available
+    // draw chart if Chart.js available
     if (typeof Chart !== "undefined") {
       try {
         if (window._attemptsChart) {
@@ -372,12 +328,7 @@
           type: "doughnut",
           data: {
             labels: ["Correct", "Incorrect", "Not Answered"],
-            datasets: [
-              {
-                data: [correct, incorrect, notAnswered],
-                backgroundColor: ["#34d399", "#ef4444", "#6b7280"],
-              },
-            ],
+            datasets: [{ data: [correct, incorrect, notAnswered] }],
           },
           options: { plugins: { legend: { display: false } }, cutout: "70%" },
         });
@@ -386,28 +337,27 @@
       }
     }
 
-    // show result page
     hide(document.getElementById("questionCard"));
-    hide(document.querySelector(".quiz-controls"));
+    if (document.querySelector(".quiz-controls"))
+      document.querySelector(".quiz-controls").style.display = "none";
     hide(summary);
     show(document.getElementById("resultPage"));
   }
 
-  // Global click handler for playAgain & backHome
+  // Play Again and Back Home handlers
   document.addEventListener("click", (e) => {
     if (e.target && e.target.id === "playAgainBtn") {
-      // restart quiz with same subject; ask again for number of questions
+      // restart quiz with same subject; read current dropdown value
       hide(document.getElementById("resultPage"));
       show(document.getElementById("questionCard"));
-      document.querySelector(".quiz-controls").style.display = "flex";
-      (async () => {
-        const count = await askNumberOfQuestions();
-        if (!count) return;
-        loadQuestions(currentSubject, count);
-      })();
+      if (document.querySelector(".quiz-controls"))
+        document.querySelector(".quiz-controls").style.display = "flex";
+      const count = getSelectedCount();
+      lastUsedCount = count;
+      if (!currentSubject) currentSubject = "all";
+      loadQuestions(currentSubject, count);
     }
     if (e.target && e.target.id === "backHomeBtn") {
-      // go back to selector
       hide(quizPage);
       show(quizSelector);
     }
@@ -422,6 +372,4 @@
     }
     return arr;
   }
-
-  // Do NOT auto-load questions here. Quiz will start when a Play button is clicked.
 })();
