@@ -335,6 +335,16 @@ body {
   color: #fff;
 }
 
+.card-game .tile {
+  background: none;
+}
+
+.card-game .tile img {
+  width: 150%;
+  height: 150%;
+  object-fit: contain;
+}
+
 /* Buttons */
 .btn {
   border: none;
