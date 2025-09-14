@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GyanSetu — Auth</title>
+
+    <!-- Main theme (your existing file) -->
+    <link rel="stylesheet" href="../css/style.css" />
+    <!-- Auth page overrides -->
+    <link rel="stylesheet" href="../css/auth.css" />
+  </head>
+  <body>
+    <div class="auth-page">
+      <div class="auth-panel">
+        <header class="auth-header">
+          <h1 class="brand">GyanSetu</h1>
+          <p class="tagline">Learn • Play • Grow</p>
+        </header>
+
+        <div class="auth-tabs">
+          <button id="tabLogin" class="tab active">Login</button>
+          <button id="tabSignup" class="tab">Sign Up</button>
+        </div>
+
+        <div class="auth-body">
+          <!-- LOGIN -->
+          <form id="loginForm" class="auth-form">
+            <div class="form-row">
+              <label for="loginEmail">Email</label>
+              <input
+                id="loginEmail"
+                type="email"
+                required
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="loginPassword">Password</label>
+              <input
+                id="loginPassword"
+                type="password"
+                required
+                placeholder="Enter password"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-purple">Log In</button>
+              <button type="button" id="forgotBtn" class="btn-link muted">
+                Forgot?
+              </button>
+            </div>
+
+            <div id="loginMsg" class="form-msg"></div>
+          </form>
+
+          <!-- SIGNUP -->
+          <form id="signupForm" class="auth-form" style="display: none">
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="firstName">First name</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  required
+                  placeholder="First name"
+                />
+              </div>
+
+              <div class="form-row">
+                <label for="lastName">Last name</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  required
+                  placeholder="Last name"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="signupEmail">Email</label>
+              <input
+                id="signupEmail"
+                type="email"
+                required
+                placeholder="you@example.com"
+              />
+            </div>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="grade">Grade</label>
+                <select id="grade" required>
+                  <option value="">Select grade</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
+                  <option>9</option>
+                  <option>10</option>
+                  <option>11</option>
+                  <option>12</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label for="languagePref">Preferred language</label>
+                <select id="languagePref" required>
+                  <option value="english">English</option>
+                  <option value="hindi">Hindi</option>
+                  <option value="odia">Odia</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row phone-row">
+              <label for="phoneNumber">Phone number</label>
+              <div class="phone-input">
+                <span class="india-cc">🇮🇳 +91</span>
+                <input
+                  id="phoneNumber"
+                  type="tel"
+                  pattern="[6-9][0-9]{9}"
+                  placeholder="9XXXXXXXXX"
+                  required
+                />
+              </div>
+              <small class="muted"
+                >Enter 10 digit mobile number (India only)</small
+              >
+            </div>
+
+            <div class="form-row">
+              <label for="signupPassword">Password</label>
+              <input
+                id="signupPassword"
+                type="password"
+                minlength="6"
+                required
+                placeholder="Create password"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-purple">
+                Create account
+              </button>
+            </div>
+
+            <div id="signupMsg" class="form-msg"></div>
+          </form>
+        </div>
+
+        <footer class="auth-footer muted">
+          By continuing, you agree to our terms. This demo stores data locally
+          in browser.
+        </footer>
+      </div>
+
+      <aside class="auth-visual">
+        <!-- you can replace this with your hero image -->
+        <img src="assets/hero-auth.png" alt="learning hero" />
+        <h2>Welcome to GyanSetu</h2>
+        <p>Play games, track progress and collect rewards while you learn.</p>
+      </aside>
+    </div>
+    <script src="../main.js"></script>
+    <script src="../js/auth.js"></script>
+  </body>
+</html>
