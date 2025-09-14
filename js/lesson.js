@@ -32,7 +32,8 @@
   } catch (err) {
     console.error(err);
     titleEl.textContent = "Lesson not found";
-    contentEl.innerHTML = "<p class='muted'>This lesson could not be loaded.</p>";
+    contentEl.innerHTML =
+      "<p class='muted'>This lesson could not be loaded.</p>";
     return;
   }
 
@@ -109,9 +110,9 @@
         imgStyles.push("display:block");
         imgStyles.push("margin:1rem");
         wrapper.innerHTML = `<figure>
-          <img src="${block.src}" alt="${escapeHTML(block.alt || "")}" style="${imgStyles.join(
-          ";"
-        )}" />
+          <img src="${block.src}" alt="${escapeHTML(
+          block.alt || ""
+        )}" style="${imgStyles.join(";")}" />
           ${
             block.caption
               ? `<figcaption class="muted small-muted">${escapeHTML(
@@ -127,7 +128,9 @@
           <source src="${block.src}">
         </video>${
           block.caption
-            ? `<div class="muted small-muted">${escapeHTML(block.caption)}</div>`
+            ? `<div class="muted small-muted">${escapeHTML(
+                block.caption
+              )}</div>`
             : ""
         }`;
         break;
@@ -246,9 +249,13 @@
   function escapeHTML(s) {
     if (!s && s !== 0) return "";
     return String(s).replace(/[&<>"']/g, (m) => {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-        m
-      ];
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[m];
     });
   }
 })();

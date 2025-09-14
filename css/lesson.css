@@ -1,0 +1,61 @@
+/* small viewer-specific tweaks */
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.lesson-meta {
+  color: var(--muted);
+  font-weight: 600;
+}
+.lesson-content {
+  background: var(--card);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.block {
+  margin-bottom: 18px;
+}
+.block h1,
+.block h2,
+.block h3 {
+  margin: 6px 0;
+}
+.lesson-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  align-items: center;
+}
+.progress-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.small-muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+pre.code-block {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  border-radius: 8px;
+  overflow: auto;
+  color: #dbeafe;
+}
+#reportBtn {
+  color: white;
+  background: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
+}
+#lessonActions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%; /* make sure it spans full width */
+}
+
+#lessonActions button {
+  margin-left: 10px; /* space between buttons */
+}

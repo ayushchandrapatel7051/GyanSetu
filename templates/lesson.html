@@ -14,56 +14,7 @@
     />
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/lessons.css" />
-    <style>
-      /* small viewer-specific tweaks */
-      .lesson-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-      .lesson-meta {
-        color: var(--muted);
-        font-weight: 600;
-      }
-      .lesson-content {
-        background: var(--card);
-        padding: 18px;
-        border-radius: 12px;
-        box-shadow: var(--shadow);
-      }
-      .block {
-        margin-bottom: 18px;
-      }
-      .block h1,
-      .block h2,
-      .block h3 {
-        margin: 6px 0;
-      }
-      .lesson-controls {
-        display: flex;
-        gap: 10px;
-        margin-top: 12px;
-        align-items: center;
-      }
-      .progress-inline {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      .small-muted {
-        color: var(--muted);
-        font-size: 13px;
-      }
-      pre.code-block {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 12px;
-        border-radius: 8px;
-        overflow: auto;
-        color: #dbeafe;
-      }
-    </style>
+    <link rel="stylesheet" href="../css/lesson.css" />
   </head>
   <body>
     <div class="app">
@@ -77,6 +28,18 @@
               </li>
               <li class="menu-item" data-page="lessons">
                 <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
               </li>
             </ul>
           </nav>
@@ -129,14 +92,19 @@
                 <div id="lessonPercent" class="small-muted">0%</div>
               </div>
 
-              <div style="margin-left: auto" class="small-muted">
-                Time spent: <span id="timeSpent">0s</span>
-              </div>
-
-              <div>
+              <div id="lessonActions">
+                <button id="bookmarkBtn" class="btn btn-purple">
+                  <i class="fa fa-bookmark"></i>
+                </button>
+                <button id="reportBtn" class="btn btn-link muted">
+                  <i class="fa fa-flag"></i>
+                </button>
                 <button id="markComplete" class="btn btn-orange">
                   Mark Complete
                 </button>
+              </div>
+              <div style="margin-left: auto" class="small-muted">
+                Time spent: <span id="timeSpent">0s</span>
               </div>
             </div>
 
@@ -145,13 +113,6 @@
             />
 
             <div id="lessonContent"></div>
-
-            <div style="margin-top: 18px" id="lessonActions">
-              <button id="bookmarkBtn" class="btn btn-purple">Bookmark</button>
-              <button id="reportBtn" class="btn btn-link muted">
-                Report issue
-              </button>
-            </div>
           </div>
         </section>
       </main>

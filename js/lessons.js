@@ -46,7 +46,7 @@
 
     // show progress inside arrow area optionally
     if (progress && typeof progress.percent === "number") {
-      right.innerHTML = `<div style="text-align:center;font-size:13px"><div style="width:44px;height:8px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden"><div style="width:${progress.percent}%;height:100%;background:linear-gradient(90deg,#d946ef,#6366f1)"></div></div><div style="font-size:10px;margin-top:4px">${progress.percent}%</div></div>`;
+      right.innerHTML = `<div style="text-align:center;font-size:13px"></div><div style="font-size:10px;margin-top:4px">${progress.percent}%</div></div>`;
     } else {
       right.innerHTML = `<i class="fas fa-arrow-right"></i>`;
     }

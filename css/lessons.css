@@ -152,3 +152,18 @@
     transform: translateX(0);
   }
 }
+/*Grade and Subject filter dropdowns*/
+#filterGrade {
+  background: var(--bg-1);
+  color: var(--text);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+#filterSubject {
+  background: var(--bg-1);
+  color: var(--text);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
