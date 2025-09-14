@@ -17,9 +17,9 @@
         "type": "image",
         "src": "../assets/img/pizza.png",
         "alt": "Pizza slices example",
-        "caption": "3/4 of a pizza means 3 slices out of 4 total slices."
+        "caption": "3/4 of a pizza means 3 slices out of 4 total slices.",
+        "width": "300px"
       },
-
       { "type": "heading", "level": 2, "text": "Types of Fractions" },
       {
         "type": "paragraph",
@@ -34,7 +34,6 @@
           "Mixed fraction: 1 3/4"
         ]
       },
-
       { "type": "heading", "level": 2, "text": "Equivalent Fractions" },
       {
         "type": "paragraph",
@@ -43,22 +42,13 @@
       {
         "type": "list",
         "ordered": false,
-        "items": [
-          "1/2 = 2/4 = 3/6",
-          "2/3 = 4/6 = 6/9"
-        ]
+        "items": ["1/2 = 2/4 = 3/6", "2/3 = 4/6 = 6/9"]
       },
-
       { "type": "heading", "level": 2, "text": "Simplifying Fractions" },
       {
         "type": "paragraph",
-        "text": "To simplify a fraction, divide the numerator and denominator by their greatest common divisor (GCD)."
+        "text": "Example: To simplify 8/12, find the GCD (4) and divide numerator and denominator: 8 ÷ 4 = 2, 12 ÷ 4 = 3 → result = 2/3."
       },
-      {
-  "type": "paragraph",
-  "text": "Example: To simplify 8/12, find the GCD (4) and divide numerator and denominator: 8 ÷ 4 = 2, 12 ÷ 4 = 3 → result = 2/3."
-      },
-
       { "type": "heading", "level": 2, "text": "Adding and Subtracting Fractions" },
       {
         "type": "paragraph",
@@ -73,13 +63,11 @@
           "Add or subtract numerators"
         ]
       },
-
       { "type": "heading", "level": 2, "text": "Real-Life Applications" },
       {
         "type": "paragraph",
         "text": "Fractions are used in cooking (1/2 cup sugar), construction (3/8 inch screw), and in sports (batting averages)."
       },
-
       { "type": "quiz", "quiz_id": "quiz-math-001" },
       {
         "type": "paragraph",
@@ -103,15 +91,15 @@
       },
       {
         "type": "image",
-        "src": "../assets/img/photosynthesis.gif"
+        "src": "../assets/img/photosynthesis.gif",
+        "caption": "Animation showing photosynthesis process",
+        "width": "400px"
       },
-
       { "type": "heading", "level": 2, "text": "Definition" },
       {
         "type": "paragraph",
         "text": "Photosynthesis is the process by which green plants and some bacteria use sunlight, carbon dioxide, and water to produce glucose and oxygen."
       },
-
       { "type": "heading", "level": 2, "text": "Raw Materials Needed" },
       {
         "type": "list",
@@ -123,19 +111,16 @@
           "Sunlight as the energy source"
         ]
       },
-
       { "type": "heading", "level": 2, "text": "Process Overview" },
       {
         "type": "paragraph",
         "text": "The process takes place in the chloroplasts, where chlorophyll captures light energy and converts it into chemical energy."
       },
-
       { "type": "heading", "level": 2, "text": "Chemical Equation" },
       {
         "type": "paragraph",
         "text": "6CO₂ + 6H₂O + sunlight → C₆H₁₂O₆ + 6O₂"
       },
-
       { "type": "heading", "level": 2, "text": "Importance of Photosynthesis" },
       {
         "type": "list",
@@ -146,18 +131,162 @@
           "Removes carbon dioxide from atmosphere"
         ]
       },
-
       { "type": "heading", "level": 2, "text": "Factors Affecting Photosynthesis" },
       {
         "type": "paragraph",
         "text": "Rate of photosynthesis depends on light intensity, availability of water, carbon dioxide concentration, and temperature."
       },
-
       { "type": "heading", "level": 2, "text": "Real-Life Applications" },
       {
         "type": "paragraph",
         "text": "Understanding photosynthesis helps in agriculture (greenhouses), reforestation, and even in designing artificial photosynthesis systems for sustainable energy."
       }
     ]
-  }
+  },
+  {
+    "id": "science-6-fun-with-magnets",
+    "title": "Fun With Magnets",
+    "grade": 6,
+    "subject": "Science",
+    "duration_minutes": 20,
+    "thumbnail": "../assets/thumbs/magnets.png",
+    "description": "Fun with Magnets introduces students to the fundamental concepts of magnetism, covering topics such as magnetic poles, magnetic materials, and the behavior of magnets in different situations.",
+    "content": [
+      {
+        "type": "image",
+        "src": "../assets/img/magnet.gif",
+        "alt": "Magnets attracting pins",
+        "caption": "Magnets can attract iron objects like pins, nails, and paper clips.",
+        "width": "350px"
+      },
+      { "type": "heading", "level": 1, "text": "Introduction to Magnetism" },
+      {
+        "type": "paragraph",
+        "text": "Magnets are objects that produce a magnetic field, which can attract certain materials like iron, cobalt, and nickel. They have been used since ancient times for navigation and in daily life."
+      },
+      { "type": "heading", "level": 2, "text": "Magnetic and Non-Magnetic Materials" },
+      {
+        "type": "paragraph",
+        "text": "Magnetic materials are attracted by a magnet (iron, nickel, cobalt), while non-magnetic materials (wood, plastic, paper) are not affected. This property helps in separating materials in industries."
+      },
+      { "type": "heading", "level": 2, "text": "Poles of a Magnet" },
+      {
+        "type": "paragraph",
+        "text": "A magnet has two poles: North Pole and South Pole. Like poles repel each other, while unlike poles attract. This property is used in making compasses."
+      },
+      { "type": "heading", "level": 2, "text": "Magnetic Field and Lines" },
+      {
+        "type": "paragraph",
+        "text": "The space around a magnet where its force acts is called the magnetic field. Iron filings arrange themselves along invisible magnetic field lines when sprinkled around a magnet."
+      },
+      { "type": "heading", "level": 2, "text": "Making Your Own Magnet" },
+      {
+        "type": "paragraph",
+        "text": "Magnets can be made by rubbing a piece of iron with a magnet (magnetizing by stroking) or using electricity (electromagnets). This is an exciting activity for students to try."
+      },
+      { "type": "heading", "level": 2, "text": "Uses of Magnets" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Used in compasses for navigation",
+          "Used in electric bells and motors",
+          "Found in fridge doors and magnetic locks",
+          "Used in separating magnetic materials from waste"
+        ]
+      },
+      {
+        "type": "paragraph",
+        "text": "Summary: Magnets are fascinating objects with practical applications in daily life, technology, and industry."
+      }
+    ]
+  },
+  {
+  "id": "science-7-rational-numbers",
+  "title": "Rational Numbers",
+  "grade": 7,
+  "subject": "Maths",
+  "duration_minutes": 25,
+  "thumbnail": "../assets/thumbs/rational.png",
+  "description": "A rational number is a number that is of the form p/q where p and q are integers and q ≠ 0. The set of rational numbers is denoted by Q.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/rational.png",
+      "alt": "Rational numbers diagram",
+      "caption": "Rational numbers are numbers that can be written as p/q, where q ≠ 0.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Rational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "A rational number is any number that can be expressed in the form p/q where p and q are integers and q ≠ 0. The set of rational numbers is denoted by Q. All fractions, some decimals, and all integers are examples of rational numbers."
+    },
+    { "type": "heading", "level": 2, "text": "Examples of Rational Numbers" },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "1/2 (half)",
+        "-3/5 (negative rational number)",
+        "7 (can be written as 7/1)",
+        "0.75 (can be written as 3/4)"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Standard Form of Rational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "A rational number is said to be in standard form if its denominator is positive and the numerator and denominator have no common factors other than 1."
+    },
+    {
+      "type": "paragraph",
+      "text": "Example: -6/-8 = 6/8 (make denominator positive), then simplify to 3/4."
+    },
+    { "type": "heading", "level": 2, "text": "Equivalent Rational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "Equivalent rational numbers represent the same value. Multiplying or dividing both numerator and denominator by the same non-zero number gives an equivalent rational number."
+    },
+    {
+      "type": "list",
+      "ordered": false,
+      "items": [
+        "1/2 = 2/4 = 3/6",
+        "-3/5 = -6/10"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Comparison of Rational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "To compare rational numbers, make their denominators equal (find the LCM) and then compare their numerators."
+    },
+    {
+      "type": "paragraph",
+      "text": "Example: Compare 3/4 and 5/8. LCM of 4 and 8 = 8. 3/4 = 6/8 and 5/8 = 5/8 → 6/8 > 5/8, so 3/4 > 5/8."
+    },
+    { "type": "heading", "level": 2, "text": "Operations on Rational Numbers" },
+    {
+      "type": "paragraph",
+      "text": "We can add, subtract, multiply, and divide rational numbers using simple rules:"
+    },
+    {
+      "type": "list",
+      "ordered": true,
+      "items": [
+        "Addition/Subtraction: Make denominators same, then add/subtract numerators.",
+        "Multiplication: Multiply numerators together and denominators together.",
+        "Division: Multiply the first number by the reciprocal of the second."
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "Real-Life Applications" },
+    {
+      "type": "paragraph",
+      "text": "Rational numbers are used in sharing (splitting food, money), in measurements (1/2 litre of milk), in finance (interest rates), and in science (ratios and proportions)."
+    },
+    {
+      "type": "paragraph",
+      "text": "Summary: Rational numbers extend our understanding of numbers and help in solving real-world problems involving parts, ratios, and proportions."
+    }
+  ]
+}
 ]
