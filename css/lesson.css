@@ -59,3 +59,11 @@ pre.code-block {
 #lessonActions button {
   margin-left: 10px; /* space between buttons */
 }
+
+#lessonView {
+  margin-top: 40px;
+}
+
+.lang-fixed {
+  background: rgb(47, 10, 68);
+}
