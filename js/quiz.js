@@ -1,5 +1,4 @@
 // quiz.js
-
 (() => {
   // DOM refs
   const qIndexEl = document.getElementById("qIndex");
@@ -16,6 +15,13 @@
   const totalTimeEl = document.getElementById("totalTime");
   const perQuestionTimes = document.getElementById("perQuestionTimes");
   const lastAnswerTime = document.getElementById("lastAnswerTime");
+  const quizSelector = document.getElementById("quizSelector");
+  const quizPage = document.getElementById("quiz-page");
+
+  // find play buttons inside cards (works without changing HTML)
+  const cardPlayButtons = Array.from(
+    document.querySelectorAll(".card.card-game .btn")
+  );
 
   let questions = [];
   let currentIndex = 0;
@@ -24,42 +30,161 @@
   let perQuestion = [];
   let timerInterval = null;
   let quizStartTime = null;
+  let currentSubject = null;
 
-  async function loadQuestions() {
+  // Utility: safely hide/show elements
+  function show(el) {
+    if (!el) return;
+    el.style.display = "";
+  }
+  function hide(el) {
+    if (!el) return;
+    el.style.display = "none";
+  }
+
+  // When the page includes both selector and quiz, ensure quiz-page hidden initially
+  // (Your HTML had style="display: none" already, but ensure here too)
+  hide(quizPage);
+
+  // Prevent inline onclick navigation on Play buttons and attach our listeners.
+  cardPlayButtons.forEach((btn) => {
+    // remove inline onclick attribute if present so the default location.href doesn't happen
+    if (btn.hasAttribute("onclick")) btn.removeAttribute("onclick");
+
+    // determine subject by looking for a sibling .tile or parent card text
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      // try to detect subject
+      const card = btn.closest(".card");
+      let subject = null;
+      if (card) {
+        const tile = card.querySelector(".tile");
+        if (tile && tile.textContent)
+          subject = tile.textContent.trim().toLowerCase();
+        else {
+          // try h3 text fallback
+          const h3 = card.querySelector("h3");
+          if (h3 && h3.textContent)
+            subject = h3.textContent.trim().toLowerCase();
+        }
+      }
+      // normalize subject to a keyword (math / science / other)
+      if (subject) {
+        if (subject.includes("math")) subject = "math";
+        else if (subject.includes("science")) subject = "science";
+        else subject = subject.split(" ")[0];
+      } else {
+        subject = "all";
+      }
+
+      // store and show quiz
+      currentSubject = subject;
+      hide(quizSelector);
+      show(quizPage);
+
+      // reset any result view if visible
+      hide(document.getElementById("resultPage"));
+      show(document.getElementById("questionCard"));
+      document.querySelector(".quiz-controls").style.display = "flex";
+
+      // now load questions for this subject and start
+      loadQuestions(subject);
+    });
+  });
+
+  // Load questions.json and optionally filter by subject
+  async function loadQuestions(subject = "all") {
     try {
+      // show loading state
+      questionText.textContent = "Loading questions...";
+      optionsList.innerHTML = "";
+      qIndexEl.textContent = 0;
+      qTotalEl.textContent = 0;
+
       const res = await fetch("../data/questions.json", { cache: "no-store" });
       if (!res.ok) throw new Error("Could not load questions.json");
-      questions = await res.json();
-      if (!Array.isArray(questions) || questions.length === 0) {
+      let data = await res.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
         questionText.textContent = "No questions available.";
+        questions = [];
         return;
       }
+
+      // If questions have a 'subject' or 'category' property, filter by it.
+      if (subject && subject !== "all") {
+        const normalized = subject.toLowerCase();
+        const filtered = data.filter((q) => {
+          const s = (q.subject || q.category || q.topic || "")
+            .toString()
+            .toLowerCase();
+          // match exact or includes
+          return s === normalized || s.includes(normalized);
+        });
+        // fallback to math/science keyword matching inside question text if nothing matched
+        if (filtered.length > 0) data = filtered;
+        else {
+          const fallback = data.filter((q) => {
+            const combined = (q.question || "" + q.options || "")
+              .toString()
+              .toLowerCase();
+            return combined.includes(normalized);
+          });
+          if (fallback.length > 0) data = fallback;
+          // else keep full data (so user still gets a quiz if no subject metadata)
+        }
+      }
+
+      questions = data;
       qTotalEl.textContent = questions.length;
       startQuiz();
     } catch (err) {
       console.error(err);
       questionText.textContent = "Error loading questions.";
+      questions = [];
     }
   }
 
   function startQuiz() {
+    clearInterval(timerInterval);
     currentIndex = 0;
     score = 0;
     perQuestion = [];
     quizStartTime = Date.now();
     scoreEl.textContent = 0;
+    // ensure controls visible
+    document.querySelector(".quiz-controls").style.display = "flex";
     renderCurrent();
     updateProgress();
   }
 
   function renderCurrent() {
     clearInterval(timerInterval);
+    if (!questions || questions.length === 0) {
+      questionText.textContent = "No questions available.";
+      optionsList.innerHTML = "";
+      return;
+    }
+
     const q = questions[currentIndex];
     qIndexEl.textContent = currentIndex + 1;
     questionText.textContent = q.question || "No question text";
     optionsList.innerHTML = "";
-    q.options.forEach((opt, idx) => {
+
+    // Show image if present
+    const qImageWrapper = document.getElementById("questionImage");
+    if (q.image) {
+      qImageWrapper.style.display = "";
+      const img = qImageWrapper.querySelector("img");
+      img.src = q.image;
+      img.alt = q.image_alt || "question image";
+    } else {
+      if (qImageWrapper) qImageWrapper.style.display = "none";
+    }
+
+    (q.options || []).forEach((opt, idx) => {
       const li = document.createElement("li");
+      li.className = "option-item";
       li.textContent = opt;
       li.tabIndex = 0;
       li.addEventListener("click", () => handleAnswer(li, idx));
@@ -71,6 +196,7 @@
       });
       optionsList.appendChild(li);
     });
+
     questionStart = Date.now();
     timerDisplay.textContent = "0.0s";
     timerInterval = setInterval(() => {
@@ -123,7 +249,14 @@
     }
   });
 
-  quitBtn.addEventListener("click", () => (location.href = "index.html"));
+  quitBtn.addEventListener("click", () => {
+    // if user quits mid-quiz, return to selector
+    hide(quizPage);
+    show(quizSelector);
+    // reset view
+    document.getElementById("questionCard").style.display = "block";
+    document.querySelector(".quiz-controls").style.display = "flex";
+  });
 
   function finishQuiz() {
     clearInterval(timerInterval);
@@ -163,7 +296,6 @@
     // draw chart if Chart is available
     if (typeof Chart !== "undefined") {
       try {
-        // destroy existing chart if any
         if (window._attemptsChart) {
           window._attemptsChart.destroy();
           window._attemptsChart = null;
@@ -188,24 +320,27 @@
     }
 
     // show result page
-    document.getElementById("questionCard").style.display = "none";
-    document.querySelector(".quiz-controls").style.display = "none";
-    summary.style.display = "none";
-    document.getElementById("resultPage").style.display = "block";
+    hide(document.getElementById("questionCard"));
+    hide(document.querySelector(".quiz-controls"));
+    hide(summary);
+    show(document.getElementById("resultPage"));
   }
 
+  // Global click handler for playAgain & backHome
   document.addEventListener("click", (e) => {
     if (e.target && e.target.id === "playAgainBtn") {
-      // restart quiz
-      document.getElementById("resultPage").style.display = "none";
-      document.getElementById("questionCard").style.display = "block";
+      // restart quiz with same subject
+      hide(document.getElementById("resultPage"));
+      show(document.getElementById("questionCard"));
       document.querySelector(".quiz-controls").style.display = "flex";
-      // shuffle if you like or keep order
+      // optionally reshuffle:
       // questions = shuffleArray(questions);
       startQuiz();
     }
     if (e.target && e.target.id === "backHomeBtn") {
-      location.href = "index.html";
+      // go back to selector
+      hide(quizPage);
+      show(quizSelector);
     }
   });
 
@@ -219,5 +354,5 @@
     return arr;
   }
 
-  loadQuestions();
+  // Do NOT auto-load questions here. Quiz will start when a Play button is clicked.
 })();
