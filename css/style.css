@@ -101,12 +101,18 @@ body {
   font-size: 16px;
 }
 /* remove translate on hover to avoid overlap; use subtle shadow */
+.menu-item {
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
 .menu-item:hover {
   background: var(--btn-hover);
   color: #fff;
-  transform: none;
+  transform: translateY(-3px); /* slight lift */
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24);
 }
+
 .menu-item.active {
   background: var(--btn-color);
   color: #fff;

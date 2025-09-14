@@ -1,0 +1,154 @@
+:root {
+  --bg-1: #16002a;
+  --bg-2: #2a0b3f;
+  --card: rgba(255, 255, 255, 0.04);
+  --muted: rgba(255, 255, 255, 0.65);
+  --text: #ffffff;
+  --glass: rgba(255, 255, 255, 0.02);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --radius: 20px;
+
+  --btn-color: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
+  --btn-hover: #9b69ff;
+}
+
+.lessons-list li {
+  display: flex;
+  justify-content: space-between; /* left = name+count, right = arrow */
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 1.13rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lessons-list li:last-child {
+  border-bottom: none;
+}
+
+/* Stack name + count vertically */
+.lesson-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.lesson-name {
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Arrow styling */
+.lesson-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--btn-color);
+  transition: color 0.2s;
+}
+
+.lessons-list li:hover .lesson-arrow {
+  color: gainsboro;
+  animation: bounce 0.4s;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+:root {
+  --bg-1: #16002a;
+  --bg-2: #2a0b3f;
+  --card: rgba(255, 255, 255, 0.04);
+  --muted: rgba(255, 255, 255, 0.65);
+  --text: #ffffff;
+  --glass: rgba(255, 255, 255, 0.02);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --radius: 20px;
+
+  --btn-color: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
+  --btn-hover: #9b69ff;
+}
+
+.lessons-list li {
+  display: flex;
+  justify-content: space-between; /* left = name+count, right = arrow */
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 1.13rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lessons-list li:last-child {
+  border-bottom: none;
+}
+
+/* Stack name + count vertically */
+.lesson-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.lesson-name {
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Arrow styling */
+.lesson-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--btn-color);
+  transition: color 0.2s;
+}
+
+.lessons-list li:hover .lesson-arrow {
+  color: gainsboro;
+  animation: bounce 0.4s;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
