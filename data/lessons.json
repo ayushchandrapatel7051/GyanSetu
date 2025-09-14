@@ -1,0 +1,76 @@
+[
+  {
+    "id": "math-6-fractions",
+    "title": "Introduction to Fractions",
+    "grade": 6,
+    "subject": "Maths",
+    "duration_minutes": 12,
+    "thumbnail": "../assets/thumbs/fractions.png",
+    "description": "Learn what fractions are, how to read them, and simple examples.",
+    "content": [
+      { "type": "heading", "level": 1, "text": "Fractions — what are they?" },
+      {
+        "type": "paragraph",
+        "text": "A fraction represents a part of a whole. It has a numerator and a denominator."
+      },
+      {
+        "type": "image",
+        "src": "../assets/fraction-pizza.png",
+        "alt": "Pizza slices example",
+        "caption": "3/4 of a pizza"
+      },
+      { "type": "heading", "level": 2, "text": "How to read fractions" },
+      {
+        "type": "list",
+        "ordered": false,
+        "items": [
+          "Numerator: top number",
+          "Denominator: bottom number",
+          "Example: 3/4 = three parts of four"
+        ]
+      },
+      {
+        "type": "code",
+        "language": "js",
+        "text": "// fraction example\nfunction toDecimal(num, den) { return num/den; }\nconsole.log(toDecimal(3,4));"
+      },
+      { "type": "quiz", "quiz_id": "quiz-math-001" },
+      {
+        "type": "paragraph",
+        "text": "Summary: Fractions break a whole into parts."
+      }
+    ]
+  },
+  {
+    "id": "science-7-photosynthesis",
+    "title": "Photosynthesis Basics",
+    "grade": 7,
+    "subject": "Science",
+    "duration_minutes": 15,
+    "thumbnail": "../assets/thumbs/photosynthesis.png",
+    "description": "Understand how plants make food via photosynthesis.",
+    "content": [
+      { "type": "heading", "level": 1, "text": "Photosynthesis" },
+      {
+        "type": "paragraph",
+        "text": "Photosynthesis is the process by which plants use sunlight to produce food (glucose)."
+      },
+      {
+        "type": "video",
+        "src": "../assets/videos/photosynthesis.mp4",
+        "caption": "Short explainer"
+      },
+      { "type": "heading", "level": 2, "text": "Equation" },
+      { "type": "paragraph", "text": "6CO2 + 6H2O -> C6H12O6 + 6O2" },
+      {
+        "type": "list",
+        "ordered": true,
+        "items": [
+          "Occurs in chloroplasts",
+          "Uses sunlight energy",
+          "Produces oxygen"
+        ]
+      }
+    ]
+  }
+]

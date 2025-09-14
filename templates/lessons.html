@@ -25,7 +25,7 @@
               <li class="menu-item" data-page="home">
                 <i class="fas fa-house"></i><span>Home</span>
               </li>
-              <li class="menu-item" data-page="lessons">
+              <li class="menu-item active" data-page="lessons">
                 <i class="fas fa-book-open"></i><span>Lessons</span>
               </li>
               <li class="menu-item" data-page="games">
@@ -63,74 +63,81 @@
 
         <section id="lessons" class="page active">
           <h2 class="page-title">Lessons</h2>
-          <div class="grid-2">
-            <div class="panel">
-    <div class="panel-img-wrap">
-      <img src="../assets/math.png" class="panel-img" alt="Mathematics" />
-    </div>
-    <h3>Mathematics</h3>
-    <ul class="list-plain lessons-list">
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Algebra</span>
-      <span class="muted">5 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Geometry</span>
-      <span class="muted">4 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Fractions</span>
-      <span class="muted">6 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-</ul>
-  </div>
 
-  <!-- Science Panel -->
-  <div class="panel">
-    <div class="panel-img-wrap">
-      <img src="../assets/science.png" class="panel-img" alt="Science" />
-    </div>
-    <h3>Science</h3>
-    <ul class="list-plain lessons-list">
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Physics</span>
-      <span class="muted">7 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Biology</span>
-      <span class="muted">5 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-  <li>
-    <span class="lesson-text">
-      <span class="lesson-name">Chemistry</span>
-      <span class="muted">6 lessons</span>
-    </span>
-    <span class="lesson-arrow"><i class="fas fa-arrow-right"></i></span>
-  </li>
-</ul>
-  </div>
-</div>
+          <div class="grid-2">
+            <!-- Left: categories / listing -->
+            <div class="panel">
+              <div class="panel-img-wrap">
+                <img
+                  src="../assets/math.png"
+                  class="panel-img"
+                  alt="Mathematics"
+                />
+              </div>
+              <h3>All Lessons</h3>
+
+              <!-- FILTER ROW (simple) -->
+              <div style="display: flex; gap: 8px; margin: 12px 0 6px 0">
+                <select id="filterGrade">
+                  <option value="">All grades</option>
+                  <option value="6">Grade 6</option>
+                  <option value="7">Grade 7</option>
+                  <option value="8">Grade 8</option>
+                  <option value="9">Grade 9</option>
+                  <option value="10">Grade 10</option>
+                  <option value="11">Grade 11</option>
+                  <option value="12">Grade 12</option>
+                </select>
+
+                <select id="filterSubject">
+                  <option value="">All subjects</option>
+                  <option value="Maths">Maths</option>
+                  <option value="Science">Science</option>
+                  <option value="English">English</option>
+                </select>
+
+                <input
+                  id="searchLessons"
+                  placeholder="Search lessons..."
+                  style="
+                    flex: 1;
+                    padding: 8px;
+                    border-radius: 8px;
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(255, 255, 255, 0.03);
+                    color: #fff;
+                    font-weight: 600;
+                  "
+                />
+              </div>
+
+              <!-- dynamic list goes here -->
+              <ul
+                id="lessonsList"
+                class="list-plain lessons-list"
+                style="margin-top: 12px"
+              ></ul>
+            </div>
+
+            <!-- Right: spotlight / details -->
+            <div class="panel" id="lessonSpotlight">
+              <h3>Lesson Preview</h3>
+              <p class="muted" id="spot-title">
+                Select a lesson to see preview
+              </p>
+              <div id="spot-body" style="margin-top: 14px; color: var(--muted)">
+                Preview will appear here.
+              </div>
+            </div>
           </div>
         </section>
       </main>
     </div>
+
+    <!-- core helpers -->
+    <script src="../js/db.js"></script>
     <script src="../main.js"></script>
+    <script src="../js/lessons.js"></script>
     <script src="../js/nav.js"></script>
-    <script src="../js/script.js"></script>
   </body>
 </html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GyanSetu — Lesson</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/lessons.css" />
+    <style>
+      /* small viewer-specific tweaks */
+      .lesson-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .lesson-meta {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .lesson-content {
+        background: var(--card);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+      }
+      .block {
+        margin-bottom: 18px;
+      }
+      .block h1,
+      .block h2,
+      .block h3 {
+        margin: 6px 0;
+      }
+      .lesson-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+        align-items: center;
+      }
+      .progress-inline {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .small-muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      pre.code-block {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 12px;
+        border-radius: 8px;
+        overflow: auto;
+        color: #dbeafe;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">GyanSetu</h1>
+          <nav>
+            <ul class="menu">
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+            </ul>
+          </nav>
+          <div class="sidebar-bottom">
+            <button class="login" id="logoutBtn" style="background: none">
+              <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="lang-fixed">
+          <i class="fas fa-globe"></i>
+          <label for="language" class="lang-label">Language:</label>
+          <select id="language" class="lang-select">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
+        </div>
+
+        <section id="lessonView" class="page active">
+          <div class="lesson-header">
+            <div>
+              <button
+                id="backToLessons"
+                class="btn btn-purple"
+                style="border-radius: 12px; padding: 8px 12px"
+              >
+                Back
+              </button>
+            </div>
+            <div class="lesson-meta" id="metaContainer">Loading...</div>
+          </div>
+
+          <div id="lessonCard" class="lesson-content">
+            <h1 id="lessonTitle">Loading lesson...</h1>
+            <p id="lessonDescription" class="muted small-muted"></p>
+
+            <div class="lesson-controls">
+              <div class="progress-inline">
+                <div style="width: 180px" class="bar">
+                  <div
+                    id="lessonProgressFill"
+                    class="fill"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div id="lessonPercent" class="small-muted">0%</div>
+              </div>
+
+              <div style="margin-left: auto" class="small-muted">
+                Time spent: <span id="timeSpent">0s</span>
+              </div>
+
+              <div>
+                <button id="markComplete" class="btn btn-orange">
+                  Mark Complete
+                </button>
+              </div>
+            </div>
+
+            <hr
+              style="border-color: rgba(255, 255, 255, 0.03); margin: 16px 0"
+            />
+
+            <div id="lessonContent"></div>
+
+            <div style="margin-top: 18px" id="lessonActions">
+              <button id="bookmarkBtn" class="btn btn-purple">Bookmark</button>
+              <button id="reportBtn" class="btn btn-link muted">
+                Report issue
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../main.js"></script>
+    <script src="../js/lesson.js"></script>
+    <script src="../js/nav.js"></script>
+  </body>
+</html>
