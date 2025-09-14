@@ -283,7 +283,7 @@
     );
     // small delay then go to index
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "../index.html";
     }, 700);
   }
 
