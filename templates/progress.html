@@ -14,7 +14,6 @@
     />
     <link rel="stylesheet" href="../css/style.css" />
     <style>
-      /* small local tweaks for dynamic elements */
       .panel {
         padding: 16px;
         border-radius: 10px;
@@ -117,12 +116,7 @@
       <main class="content">
         <div
           class="lang-fixed"
-          style="
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-          "
+          style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;"
         >
           <i class="fas fa-globe"></i>
           <label for="language" class="lang-label">Language:</label>
@@ -136,7 +130,6 @@
         <section id="progress" class="page active">
           <h2 class="page-title">My Progress</h2>
 
-          <!-- header: XP + refresh -->
           <div class="xp-header">
             <div>
               <div class="muted">Total XP</div>
@@ -148,7 +141,6 @@
           <div class="grid-2">
             <div class="panel">
               <h3>Subject Progress</h3>
-
               <div class="progress-row">
                 <span>Mathematics</span>
                 <span class="muted" id="mathPercentLabel">0%</span>
@@ -165,16 +157,12 @@
                 <div id="scienceFill" class="fill" style="width: 0%"></div>
               </div>
 
-              <!-- optional: other subjects can be appended dynamically -->
               <div id="otherSubjects"></div>
             </div>
 
             <div class="panel">
               <h3>Badges & Streaks</h3>
-              <ul class="badges-list" id="badgesList">
-                <!-- badges rendered here from IndexedDB -->
-              </ul>
-
+              <ul class="badges-list" id="badgesList"></ul>
               <div style="margin-top: 12px">
                 <h4>Streak</h4>
                 <div id="streakInfo" class="muted">—</div>
@@ -185,224 +173,178 @@
       </main>
     </div>
 
-    <!-- use your existing SettingsDB wrapper -->
-    <script src="../js/settings-db.js"></script>
-    <script>
-      (function () {
-        const DEFAULT_EMAIL = "johndoe@email.com";
+   <script src="../js/settings-db.js"></script>
+<script src="../js/db.js"></script> <!-- ✅ ensure LessonDB is loaded -->
+<script>
+  (function () {
+    const DEFAULT_EMAIL = "johndoe@email.com";
 
-        const xpNumberEl = document.getElementById("xpNumber");
-        const mathFill = document.getElementById("mathFill");
-        const scienceFill = document.getElementById("scienceFill");
-        const mathLabel = document.getElementById("mathPercentLabel");
-        const scienceLabel = document.getElementById("sciencePercentLabel");
-        const otherSubjectsRoot = document.getElementById("otherSubjects");
-        const badgesListEl = document.getElementById("badgesList");
-        const streakInfoEl = document.getElementById("streakInfo");
-        const refreshBtn = document.getElementById("refreshProgressBtn");
+    const xpNumberEl = document.getElementById("xpNumber");
+    const mathFill = document.getElementById("mathFill");
+    const scienceFill = document.getElementById("scienceFill");
+    const mathLabel = document.getElementById("mathPercentLabel");
+    const scienceLabel = document.getElementById("sciencePercentLabel");
+    const otherSubjectsRoot = document.getElementById("otherSubjects");
+    const badgesListEl = document.getElementById("badgesList");
+    const streakInfoEl = document.getElementById("streakInfo");
+    const refreshBtn = document.getElementById("refreshProgressBtn");
 
-        let currentEmail = null;
-        let settings = null;
+    let currentEmail = null;
+    let settings = null;
 
-        async function getCurrentEmail() {
-          if (window.currentUser && window.currentUser.email)
-            return window.currentUser.email;
-          try {
-            const raw = localStorage.getItem("gyan_current_user");
-            if (raw) {
-              const parsed = JSON.parse(raw);
-              if (parsed && parsed.email) return parsed.email;
-            }
-          } catch (e) {
-            console.warn("localStorage parse failed", e);
-          }
-          return DEFAULT_EMAIL;
+    async function getCurrentEmail() {
+      if (window.currentUser && window.currentUser.email)
+        return window.currentUser.email;
+      try {
+        const raw = localStorage.getItem("gyan_current_user");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.email) return parsed.email;
         }
+      } catch {}
+      return DEFAULT_EMAIL;
+    }
 
-        function applyPercentToFill(el, labelEl, val) {
-          const pct = Math.max(0, Math.min(100, Number(val) || 0));
-          el.style.width = pct + "%";
-          labelEl.textContent = pct + "%";
-        }
+    function applyPercentToFill(el, labelEl, val) {
+      const pct = Math.max(0, Math.min(100, Number(val) || 0));
+      el.style.width = pct + "%";
+      labelEl.textContent = pct + "%";
+    }
 
-        function renderBadges(badges) {
-          badgesListEl.innerHTML = "";
-          (badges || []).forEach((b) => {
-            const li = document.createElement("li");
-            li.className = "badge-item";
-            li.innerHTML = `<strong>${escapeHtml(
-              String(b)
-            )}</strong><div class="muted" style="font-size:0.85rem">Badge</div>`;
-            badgesListEl.appendChild(li);
-          });
-        }
+    function renderBadges(badges) {
+      badgesListEl.innerHTML = "";
+      (badges || []).forEach((b) => {
+        const li = document.createElement("li");
+        li.className = "badge-item";
+        li.innerHTML = `<strong>${String(
+          b
+        )}</strong><div class="muted" style="font-size:0.85rem">Badge</div>`;
+        badgesListEl.appendChild(li);
+      });
+    }
 
-        function escapeHtml(s) {
-          return String(s).replace(
-            /[&<>"']/g,
-            (m) =>
-              ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;",
-              }[m])
+    function canonicalSubject(raw) {
+      if (!raw) return "Other";
+      const s = String(raw).trim().toLowerCase();
+      if (!s) return "Other";
+      const map = {
+        math: "Mathematics",
+        maths: "Mathematics",
+        mathematics: "Mathematics",
+        science: "Science",
+        sci: "Science",
+      };
+      if (map[s]) return map[s];
+      if (s.startsWith("math")) return "Mathematics";
+      if (s.startsWith("sci")) return "Science";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    async function loadAndRender() {
+      try {
+        if (SettingsDB.openDB) await SettingsDB.openDB();
+        if (LessonDB.openDB) await LessonDB.openDB();
+      } catch (e) {
+        console.warn("DB open failed", e);
+      }
+
+      currentEmail = await getCurrentEmail();
+
+      // Load settings (XP, badges, grade)
+      try {
+        const s = await SettingsDB.getSettings(currentEmail);
+        settings = s || {
+          email: currentEmail,
+          xp: 0,
+          badges: [],
+          progress: {},
+          streak: null,
+          grade: "8",
+        };
+        if (!s) await SettingsDB.saveSettings(settings);
+
+        xpNumberEl.textContent = (Number(settings.xp) || 0).toLocaleString();
+        renderBadges(settings.badges || []);
+        streakInfoEl.textContent =
+          (settings.streak && String(settings.streak)) || "No active streak";
+      } catch (e) {
+        console.error("Settings load failed", e);
+      }
+
+      // Compute subject progress
+      try {
+        const res = await fetch("../data/lessons.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("Could not fetch lessons.json");
+        let lessons = await res.json();
+
+        // 🔥 only keep lessons matching user grade
+        if (settings && settings.grade) {
+          lessons = lessons.filter(
+            (l) => String(l.grade) === String(settings.grade)
           );
         }
 
-        // canonicalize subject names (map variants to consistent keys)
-        function canonicalSubject(raw) {
-          if (!raw && raw !== 0) return "Other";
-          const s = String(raw).trim().toLowerCase();
-          if (!s) return "Other";
-
-          // synonyms map - update if you add more subject variants
-          const map = {
-            math: "Mathematics",
-            maths: "Mathematics",
-            mathematics: "Mathematics",
-            mth: "Mathematics",
-
-            science: "Science",
-            sci: "Science",
-            sciences: "Science",
-          };
-
-          if (map[s]) return map[s];
-
-          // try basic startsWith rules
-          if (s.startsWith("math")) return "Mathematics";
-          if (s.startsWith("sci")) return "Science";
-
-          // fallback: capitalize first letter
-          return s.charAt(0).toUpperCase() + s.slice(1);
+        const bySubject = {};
+        for (const lesson of lessons) {
+          const subject = canonicalSubject(lesson.subject);
+          if (!bySubject[subject]) bySubject[subject] = [];
+          bySubject[subject].push(lesson);
         }
 
-        async function loadAndRender() {
-          try {
-            // open DBs (if available)
-            if (window.SettingsDB && SettingsDB.openDB)
-              await SettingsDB.openDB();
-            if (window.LessonDB && LessonDB.openDB) await LessonDB.openDB();
-          } catch (e) {
-            console.warn("DB open failed", e);
-          }
-
-          currentEmail = await getCurrentEmail();
-
-          // load settings (xp, badges)
-          try {
-            const s =
-              window.SettingsDB && SettingsDB.getSettings
-                ? await SettingsDB.getSettings(currentEmail)
-                : null;
-            if (s) settings = s;
-            else {
-              settings = {
-                email: currentEmail,
-                xp: 0,
-                badges: [],
-                progress: {},
-                streak: null,
-                grade: "8",
-              };
-              if (window.SettingsDB && SettingsDB.saveSettings)
-                await SettingsDB.saveSettings(settings);
-            }
-            xpNumberEl.textContent = (
-              Number(settings.xp) || 0
-            ).toLocaleString();
-            renderBadges(settings.badges || []);
-            streakInfoEl.textContent =
-              (settings.streak && String(settings.streak)) ||
-              "No active streak";
-          } catch (e) {
-            console.error("Settings load failed", e);
-          }
-
-          // compute subject progress by scanning lessons.json and reading lesson progress
-          try {
-            const res = await fetch("../data/lessons.json", {
-              cache: "no-store",
-            });
-            if (!res.ok) throw new Error("Could not fetch lessons.json");
-            const lessons = await res.json();
-
-            // group lessons by canonical subject
-            const bySubject = Object.create(null);
-            for (const lesson of lessons) {
-              const canonical = canonicalSubject(lesson.subject);
-              if (!bySubject[canonical]) bySubject[canonical] = [];
-              bySubject[canonical].push(lesson);
-            }
-
-            // compute average percent per canonical subject
-            const subjectAverages = Object.create(null);
-            for (const [subject, lessonList] of Object.entries(bySubject)) {
-              let sum = 0,
-                count = 0;
-              for (const l of lessonList) {
-                try {
-                  let progress = null;
-                  if (window.LessonDB && LessonDB.getProgress) {
-                    progress = await LessonDB.getProgress(currentEmail, l.id);
-                  } else {
-                    const cached = localStorage.getItem(
-                      "lesson_progress_" + l.id
-                    );
-                    progress = cached ? JSON.parse(cached) : null;
-                  }
-                  if (progress && typeof progress.percent === "number") {
-                    sum += Number(progress.percent);
-                    count++;
-                  }
-                } catch (e) {
-                  console.warn("Error reading progress for", l.id, e);
-                }
+        const subjectAverages = {};
+        for (const [subject, list] of Object.entries(bySubject)) {
+          let sum = 0,
+            count = 0;
+          for (const l of list) {
+            try {
+              const progress = await LessonDB.getProgress(currentEmail, l.id);
+              if (progress && typeof progress.percent === "number") {
+                sum += Number(progress.percent);
+                count++;
               }
-              const avg = count ? Math.round(sum / count) : 0;
-              subjectAverages[subject] = {
-                avg,
-                lessons: lessonList.length,
-                filled: count,
-              };
+            } catch (e) {
+              console.warn("Lesson progress read failed", l.id, e);
             }
-
-            // apply to UI: pick canonical names for Math & Science
-            const mathAvg = subjectAverages["Mathematics"]?.avg ?? 0;
-            const scienceAvg = subjectAverages["Science"]?.avg ?? 0;
-            applyPercentToFill(mathFill, mathLabel, mathAvg);
-            applyPercentToFill(scienceFill, scienceLabel, scienceAvg);
-
-            // render other subjects sorted (excluding the two shown above)
-            otherSubjectsRoot.innerHTML = "";
-            const otherEntries = Object.entries(subjectAverages)
-              .filter(([k]) => k !== "Mathematics" && k !== "Science")
-              .sort((a, b) => a[0].localeCompare(b[0]));
-            for (const [subject, info] of otherEntries) {
-              const container = document.createElement("div");
-              container.style.marginTop = "12px";
-              container.innerHTML = `
-          <div class="progress-row"><span>${escapeHtml(
-            subject
-          )}</span><span class="muted">${Number(info.avg || 0)}%</span></div>
-          <div class="bar"><div class="fill" style="width:${Math.max(
-            0,
-            Math.min(100, Number(info.avg || 0))
-          )}%"></div></div>
-        `;
-              otherSubjectsRoot.appendChild(container);
-            }
-          } catch (e) {
-            console.error("Failed to compute subject progress", e);
           }
+          const avg = count ? Math.round(sum / count) : 0;
+          subjectAverages[subject] = { avg, lessons: list.length };
         }
 
-        refreshBtn.addEventListener("click", loadAndRender);
-        window.addEventListener("DOMContentLoaded", loadAndRender);
-      })();
-    </script>
+        applyPercentToFill(
+          mathFill,
+          mathLabel,
+          subjectAverages["Mathematics"]?.avg || 0
+        );
+        applyPercentToFill(
+          scienceFill,
+          scienceLabel,
+          subjectAverages["Science"]?.avg || 0
+        );
+
+        otherSubjectsRoot.innerHTML = "";
+        Object.entries(subjectAverages)
+          .filter(([k]) => k !== "Mathematics" && k !== "Science")
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .forEach(([subject, info]) => {
+            const div = document.createElement("div");
+            div.style.marginTop = "12px";
+            div.innerHTML = `
+              <div class="progress-row"><span>${subject}</span>
+              <span class="muted">${info.avg}%</span></div>
+              <div class="bar"><div class="fill" style="width:${info.avg}%"></div></div>
+            `;
+            otherSubjectsRoot.appendChild(div);
+          });
+      } catch (e) {
+        console.error("Progress load failed", e);
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadAndRender);
+    window.addEventListener("DOMContentLoaded", loadAndRender);
+  })();
+</script>
+
 
     <script src="../main.js"></script>
     <script src="../js/nav.js"></script>
