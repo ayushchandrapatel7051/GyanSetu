@@ -139,20 +139,12 @@
           <h2 class="page-title">Settings</h2>
 
           <div class="settings-grid">
-            <!-- Profile, language, grade, badges & xp -->
+            <!-- Profile, language, grade -->
             <div>
               <div class="setting-card profile-card">
-                <div
-                  class="profile-card-content"
-                  style="display: flex; gap: 12px; align-items: center"
-                >
+                <div class="profile-card-content" style="display:flex;gap:12px;align-items:center">
                   <div class="profile-info">
-                    <img
-                      id="profileAvatar"
-                      src="../assets/avatar.jpg"
-                      alt="Profile"
-                      class="avatar"
-                    />
+                    <img id="profileAvatar" src="../assets/avatar.jpg" alt="Profile" class="avatar"/>
                     <div class="profile-text">
                       <h3 id="profileName">John Doe</h3>
                       <p class="muted" id="profileEmail">johndoe@email.com</p>
@@ -160,15 +152,13 @@
                   </div>
                 </div>
                 <div>
-                  <button class="edit-profile-btn" id="openEditBtn">
-                    Edit Profile
-                  </button>
+                  <button class="edit-profile-btn" id="openEditBtn">Edit Profile</button>
                 </div>
               </div>
 
-              <div class="setting-card" style="margin-top: 16px">
+              <div class="setting-card" style="margin-top:16px">
                 <h4>Language</h4>
-                <div class="dropdown-row" style="margin-top: 12px">
+                <div class="dropdown-row" style="margin-top:12px">
                   <select id="cardLanguage" class="input">
                     <option value="en">English</option>
                     <option value="hi">Hindi</option>
@@ -177,9 +167,9 @@
                 </div>
               </div>
 
-              <div class="setting-card" style="margin-top: 12px">
+              <div class="setting-card" style="margin-top:12px">
                 <h4>Grade</h4>
-                <div class="dropdown-row" style="margin-top: 12px">
+                <div class="dropdown-row" style="margin-top:12px">
                   <select id="cardGrade" class="input small">
                     <option value="6">6</option>
                     <option value="7">7</option>
@@ -187,29 +177,6 @@
                     <option value="9">9</option>
                     <option value="10">10</option>
                   </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right column -->
-            <div style="display: none">
-              <div class="setting-card">
-                <h4>Quick Actions</h4>
-                <div style="display: flex; flex-direction: column; gap: 8px">
-                  <button class="btn" id="exportBtn">
-                    Export Current Profile (JSON)
-                  </button>
-                  <button class="btn" id="listProfilesBtn">
-                    List Saved Profiles
-                  </button>
-                </div>
-              </div>
-
-              <div class="setting-card" style="margin-top: 12px">
-                <h4>Info</h4>
-                <div class="muted" style="font-size: 0.95rem">
-                  Click Edit Profile to open the popup and change name, email,
-                  grade, language, avatar and profile text.
                 </div>
               </div>
             </div>
@@ -221,38 +188,21 @@
     <!-- EDIT PROFILE MODAL -->
     <div id="editModal" class="modal" role="dialog" aria-hidden="true">
       <div class="modal-card" role="document">
-        <div
-          style="
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-          "
-        >
-          <img
-            id="modalAvatar"
-            src="../assets/avatar.jpg"
-            alt="avatar preview"
-            class="modal-avatar"
-          />
+        <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+          <img id="modalAvatar" src="../assets/avatar.jpg" alt="avatar preview" class="modal-avatar"/>
           <input type="file" id="modalAvatarFile" accept="image/*" />
           <button class="btn" id="modalUploadAvatar">Preview Image</button>
         </div>
-
         <div>
           <h3>Edit profile</h3>
-
           <label class="muted">Name</label>
-          <input id="modalName" class="input" />
-
-          <label class="muted" style="margin-top: 8px">Email</label>
-          <input id="modalEmail" class="input" />
-
-          <label class="muted" style="margin-top: 8px">Profile text</label>
+          <input id="modalName" class="input"/>
+          <label class="muted" style="margin-top:8px">Email</label>
+          <input id="modalEmail" class="input"/>
+          <label class="muted" style="margin-top:8px">Profile text</label>
           <textarea id="modalProfile" rows="3" class="input"></textarea>
-
-          <div style="display: flex; gap: 8px; margin-top: 8px">
-            <div style="flex: 1">
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1">
               <label class="muted">Grade</label>
               <select id="modalGrade" class="input small">
                 <option value="6">6</option>
@@ -262,7 +212,7 @@
                 <option value="10">10</option>
               </select>
             </div>
-            <div style="flex: 1">
+            <div style="flex:1">
               <label class="muted">Language</label>
               <select id="modalLanguage" class="input">
                 <option value="en">English</option>
@@ -271,13 +221,10 @@
               </select>
             </div>
           </div>
-
           <div class="modal-footer">
             <button class="btn" id="modalCancelBtn">Cancel</button>
             <button class="btn edit-profile-btn" id="modalSaveBtn">Save</button>
-            <button class="btn danger" id="modalDeleteBtn">
-              Delete Profile
-            </button>
+            <button class="btn danger" id="modalDeleteBtn">Delete Profile</button>
           </div>
         </div>
       </div>
@@ -288,34 +235,20 @@
 
     <!-- Integration script -->
     <script>
-      (function () {
+      (function(){
         const profileAvatar = document.getElementById("profileAvatar");
         const profileName = document.getElementById("profileName");
         const profileEmail = document.getElementById("profileEmail");
-
         const cardLanguage = document.getElementById("cardLanguage");
         const cardGrade = document.getElementById("cardGrade");
-        const badgesList = document.getElementById("badgesList");
-        const newBadgeInput = document.getElementById("newBadgeInput");
-        const addBadgeBtn = document.getElementById("addBadgeBtn");
-        const xpValue = document.getElementById("xpValue");
-        const xpInput = document.getElementById("xpInput");
-        const setXpBtn = document.getElementById("setXpBtn");
-
-        const exportBtn = document.getElementById("exportBtn");
-        const listProfilesBtn = document.getElementById("listProfilesBtn");
-
-        // modal refs
-        const editModal = document.getElementById("editModal");
         const openEditBtn = document.getElementById("openEditBtn");
+        const editModal = document.getElementById("editModal");
         const modalName = document.getElementById("modalName");
         const modalEmail = document.getElementById("modalEmail");
         const modalProfile = document.getElementById("modalProfile");
         const modalGrade = document.getElementById("modalGrade");
         const modalLanguage = document.getElementById("modalLanguage");
         const modalAvatar = document.getElementById("modalAvatar");
-        const modalAvatarFile = document.getElementById("modalAvatarFile");
-        const modalUploadAvatar = document.getElementById("modalUploadAvatar");
         const modalCancelBtn = document.getElementById("modalCancelBtn");
         const modalSaveBtn = document.getElementById("modalSaveBtn");
         const modalDeleteBtn = document.getElementById("modalDeleteBtn");
@@ -328,120 +261,56 @@
           grade: "8",
           profile: "Learner",
           avatar: "../assets/avatar.jpg",
-          badges: ["starter"],
-          xp: 100,
+          badges: [],
+          xp: 0,
         };
 
         let currentSettings = null;
 
-        // render into page
-        function renderSettings(s) {
-          const settings = s || DEFAULT_SETTINGS;
-          currentSettings = settings;
-
-          profileName.textContent = settings.name || "Unknown";
-          profileEmail.textContent = settings.email || "";
-          cardLanguage.value = settings.language || "en";
-          cardGrade.value = settings.grade || "8";
-          xpValue.textContent = settings.xp != null ? settings.xp : 0;
-
-          profileAvatar.src = settings.avatar || "../assets/avatar.jpg";
-
-          badgesList.innerHTML = "";
-          (settings.badges || []).forEach((b) => {
-            const el = document.createElement("div");
-            el.className = "badge-chip";
-            el.textContent = b;
-            el.title = "Click to remove";
-            el.style.cursor = "pointer";
-            el.addEventListener("click", async () => {
-              currentSettings.badges = (currentSettings.badges || []).filter(
-                (x) => x !== b
-              );
-              await SettingsDB.saveSettings(currentSettings);
-              renderSettings(currentSettings);
-            });
-            badgesList.appendChild(el);
-          });
-
-          const topLang = document.getElementById("language");
-          if (topLang) topLang.value = settings.language || "en";
+        // normalize helper
+        function normalizeLanguage(lang){
+          if(!lang) return "en";
+          const l = String(lang).toLowerCase();
+          if(l==="en"||l==="english") return "en";
+          if(l==="hi"||l==="hindi") return "hi";
+          if(l==="or"||l==="odia"||l==="oriya") return "or";
+          return "en";
         }
 
-        function readFileAsDataURL(file) {
-          return new Promise((resolve, reject) => {
-            const fr = new FileReader();
-            fr.onload = () => resolve(fr.result);
-            fr.onerror = (e) => reject(e);
-            fr.readAsDataURL(file);
-          });
-        }
-
-        async function loadSettings(email) {
+        async function loadSettings(email){
           const key = (email && email.trim()) || DEFAULT_EMAIL;
           try {
             const s = await SettingsDB.getSettings(key);
-            if (s) {
-              renderSettings(s);
-            } else {
-              // try to take name from logged-in user
-              let defaultName = "Unknown";
-              try {
-                if (window.currentUser && window.currentUser.name) {
-                  defaultName = window.currentUser.name;
-                } else {
-                  const raw = localStorage.getItem("gyan_current_user");
-                  if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed.name) defaultName = parsed.name;
-                  }
-                }
-              } catch (e) {
-                console.warn("Could not get name from login info", e);
-              }
+            const logged = JSON.parse(localStorage.getItem("gyan_current_user")||"{}");
+            const merged = Object.assign({}, DEFAULT_SETTINGS, s||{}, logged||{});
+            merged.language = normalizeLanguage(merged.language);
+            currentSettings = merged;
 
-              const init = Object.assign({}, DEFAULT_SETTINGS, {
-                email: key,
-                name: defaultName,
-              });
-              await SettingsDB.saveSettings(init);
-              renderSettings(init);
-            }
-          } catch (e) {
+            profileName.textContent = merged.name || "Unknown";
+            profileEmail.textContent = merged.email || "";
+            profileAvatar.src = merged.avatar || "../assets/avatar.jpg";
+            cardLanguage.value = merged.language;
+            cardGrade.value = merged.grade || "8";
+
+            const topLang = document.getElementById("language");
+            if(topLang) topLang.value = merged.language;
+          } catch(e){
             console.error("loadSettings err", e);
-            renderSettings(DEFAULT_SETTINGS);
           }
         }
 
-        // --- INIT ---
-        window.addEventListener("DOMContentLoaded", async () => {
-          try {
-            await SettingsDB.openDB();
-          } catch (e) {
-            console.warn("SettingsDB open failed", e);
+        window.addEventListener("DOMContentLoaded", async()=>{
+          await SettingsDB.openDB();
+          const raw = localStorage.getItem("gyan_current_user");
+          let email = DEFAULT_EMAIL;
+          if(raw){
+            try{ email = JSON.parse(raw).email || DEFAULT_EMAIL; }catch{}
           }
-
-          let email = null;
-          if (window.currentUser && window.currentUser.email) {
-            email = window.currentUser.email;
-          } else {
-            try {
-              const raw = localStorage.getItem("gyan_current_user");
-              if (raw) {
-                const parsed = JSON.parse(raw);
-                email = parsed.email;
-              }
-            } catch (e) {
-              console.warn("localStorage parse failed", e);
-            }
-          }
-          if (!email) email = DEFAULT_EMAIL;
           await loadSettings(email);
         });
 
-        // modal open
-        openEditBtn.addEventListener("click", () => {
-          if (!currentSettings) return;
+        openEditBtn.addEventListener("click", ()=>{
+          if(!currentSettings) return;
           modalName.value = currentSettings.name || "";
           modalEmail.value = currentSettings.email || "";
           modalProfile.value = currentSettings.profile || "";
@@ -449,141 +318,44 @@
           modalLanguage.value = currentSettings.language || "en";
           modalAvatar.src = currentSettings.avatar || "../assets/avatar.jpg";
           editModal.classList.add("show");
-          editModal.setAttribute("aria-hidden", "false");
         });
 
-        modalCancelBtn.addEventListener("click", () => {
+        modalCancelBtn.addEventListener("click", ()=>{
           editModal.classList.remove("show");
-          editModal.setAttribute("aria-hidden", "true");
         });
 
-        modalUploadAvatar.addEventListener("click", async (ev) => {
-          ev.preventDefault();
-          if (!modalAvatarFile.files || modalAvatarFile.files.length === 0)
-            return alert("Choose an image first");
-          try {
-            const dataUrl = await readFileAsDataURL(modalAvatarFile.files[0]);
-            modalAvatar.src = dataUrl;
-            alert("Preview updated. Click Save to persist.");
-          } catch (e) {
-            console.error(e);
-            alert("Failed to read image");
-          }
-        });
-
-        // modal save
-        modalSaveBtn.addEventListener("click", async () => {
-          const newEmail = (modalEmail.value || "").trim();
-          if (!newEmail) return alert("Email is required");
-          const updated = {
+        modalSaveBtn.addEventListener("click", async()=>{
+          const newEmail = (modalEmail.value||"").trim();
+          if(!newEmail) return alert("Email is required");
+          const updated = Object.assign({}, currentSettings, {
             email: newEmail,
-            name: modalName.value || "Unknown",
-            language: modalLanguage.value || "en",
-            grade: modalGrade.value || "8",
-            profile: modalProfile.value || "",
-            avatar:
-              modalAvatar.src ||
-              (currentSettings && currentSettings.avatar) ||
-              "../assets/avatar.jpg",
-            badges:
-              currentSettings && currentSettings.badges
-                ? currentSettings.badges.slice()
-                : [],
-            xp:
-              currentSettings && currentSettings.xp != null
-                ? currentSettings.xp
-                : 0,
-          };
-
-          try {
-            await SettingsDB.saveSettings(updated);
-            localStorage.setItem(
-              "gyan_current_user",
-              JSON.stringify({ email: newEmail, name: updated.name })
-            ); // update login cache
-            await loadSettings(newEmail);
-            editModal.classList.remove("show");
-            alert("Profile saved");
-          } catch (e) {
-            console.error(e);
-            alert("Save failed: " + (e && e.message ? e.message : e));
-          }
+            name: modalName.value||"Unknown",
+            profile: modalProfile.value||"",
+            grade: modalGrade.value||"8",
+            language: normalizeLanguage(modalLanguage.value),
+            avatar: modalAvatar.src || "../assets/avatar.jpg"
+          });
+          await SettingsDB.saveSettings(updated);
+          localStorage.setItem("gyan_current_user", JSON.stringify(updated));
+          await loadSettings(newEmail);
+          editModal.classList.remove("show");
+          alert("Profile saved");
         });
 
-        // modal delete
-        modalDeleteBtn.addEventListener("click", async () => {
-          if (!currentSettings || !currentSettings.email)
-            return alert("No profile loaded");
-          if (
-            !confirm(
-              "Delete stored settings for " + currentSettings.email + " ?"
-            )
-          )
-            return;
-          try {
-            const req = indexedDB.open("gyansetu-settings");
-            req.onsuccess = function (e) {
-              const db = e.target.result;
-              const tx = db.transaction("settings", "readwrite");
-              tx.objectStore("settings").delete(currentSettings.email);
-              tx.oncomplete = function () {
-                localStorage.removeItem("gyan_current_user");
-                loadSettings(DEFAULT_EMAIL);
-                editModal.classList.remove("show");
-                alert("Profile deleted");
-              };
+        modalDeleteBtn.addEventListener("click", async()=>{
+          if(!currentSettings||!currentSettings.email) return;
+          const req = indexedDB.open("gyansetu-settings");
+          req.onsuccess = function(e){
+            const db = e.target.result;
+            const tx = db.transaction("settings","readwrite");
+            tx.objectStore("settings").delete(currentSettings.email);
+            tx.oncomplete = ()=>{
+              localStorage.removeItem("gyan_current_user");
+              loadSettings(DEFAULT_EMAIL);
+              editModal.classList.remove("show");
+              alert("Profile deleted");
             };
-          } catch (e) {
-            console.error(e);
-            alert("Delete failed");
           }
-        });
-
-        // badges
-        addBadgeBtn.addEventListener("click", async () => {
-          const b = (newBadgeInput.value || "").trim();
-          if (!b) return;
-          currentSettings.badges = currentSettings.badges || [];
-          if (!currentSettings.badges.includes(b)) {
-            currentSettings.badges.push(b);
-            await SettingsDB.saveSettings(currentSettings);
-            newBadgeInput.value = "";
-            renderSettings(currentSettings);
-          }
-        });
-
-        // XP set
-        setXpBtn.addEventListener("click", async () => {
-          const n = Number(xpInput.value || 0);
-          if (isNaN(n) || n < 0) return alert("Enter valid XP");
-          currentSettings.xp = n;
-          await SettingsDB.saveSettings(currentSettings);
-          renderSettings(currentSettings);
-        });
-
-        // Quick actions
-        exportBtn.addEventListener("click", () => {
-          if (!currentSettings) return alert("No profile loaded");
-          const data = JSON.stringify(currentSettings, null, 2);
-          const blob = new Blob([data], { type: "application/json" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = (currentSettings.email || "profile") + ".json";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-        });
-
-        listProfilesBtn.addEventListener("click", async () => {
-          const all = await SettingsDB.getAllSettings();
-          alert(
-            "Saved profiles:\n" +
-              all
-                .map((p) => p.email + " (" + (p.name || "Unknown") + ")")
-                .join("\n")
-          );
         });
       })();
     </script>
