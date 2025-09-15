@@ -20,8 +20,6 @@
     <!-- Quiz-specific styles -->
     <link rel="stylesheet" href="../css/quiz.css" />
   </head>
-  <script src="../js/settings-db.js" defer></script>
-  <script src="../js/profile-widget.js" defer></script>
   <body>
     <div class="app">
       <!-- Sidebar omitted (same as before) -->
@@ -86,14 +84,21 @@
           <h2 class="page-title">Games</h2>
           <div class="cards small">
             <article class="card card-game card-orange">
-              <div class="tile">Math</div>
+              <div class="tile">
+                <img
+                  src="../assets/img/math-quiz.png"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
               <h3>Maths Quiz</h3>
               <p>Challenge yourself with Maths questions.</p>
               <button class="btn btn-purple" id="playMathBtn">Play Now</button>
             </article>
 
             <article class="card card-game card-purple">
-              <div class="tile">Science</div>
+              <div class="tile">
+                <img src="../assets/img/science-quiz.png" />
+              </div>
               <h3>Science Quiz</h3>
               <p>Challenge yourself with Science questions.</p>
               <button class="btn btn-purple" id="playScienceBtn">
