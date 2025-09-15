@@ -1,5 +1,66 @@
 // js/quiz.js — dropdown selector + reliable restart
 (() => {
+  // small WebAudio helper and toast helper (insert near top so other functions can use them)
+  const audioCtx = (function createAudioContext() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      return AC ? new AC() : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  function playSound(isCorrect = true) {
+    // short beep: correct -> higher pitch, quick envelope; wrong -> lower pitch + minor dissonance
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    if (isCorrect) {
+      o.type = "sine";
+      o.frequency.setValueAtTime(900, now);
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.12, now + 0.01);
+      o.frequency.exponentialRampToValueAtTime(1400, now + 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      o.start(now);
+      o.stop(now + 0.35);
+    } else {
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(220, now);
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.15, now + 0.01);
+      o.frequency.exponentialRampToValueAtTime(160, now + 0.18);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      o.start(now);
+      o.stop(now + 0.45);
+    }
+  }
+
+  function showXpToast(n) {
+    if (!n || n <= 0) return;
+    // create or reuse
+    let t = document.querySelector(".xp-toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.className = "xp-toast";
+      t.innerHTML = `<strong>+<span class="value">${n}</span> XP</strong>`;
+      document.body.appendChild(t);
+    } else {
+      t.querySelector(".value").textContent = n;
+    }
+    // force reflow then show
+    void t.offsetWidth;
+    t.classList.add("show");
+    // hide after 1.6s
+    clearTimeout(t._hideTimeout);
+    t._hideTimeout = setTimeout(() => {
+      t.classList.remove("show");
+    }, 1600);
+  }
+
   // DOM refs
   const qIndexEl = document.getElementById("qIndex");
   const qTotalEl = document.getElementById("qTotal");
@@ -109,6 +170,30 @@
     });
   });
 
+  // helper: dedupe by question_id or question text
+  function uniqueQuestions(arr) {
+    const seen = new Set();
+    const out = [];
+    for (const q of arr) {
+      const id = q.question_id ?? q.id ?? (q.question && q.question.trim());
+      const key = String(id || "").trim();
+      if (!key) {
+        // fallback: stringify question text
+        const txt = (q.question || "").trim();
+        if (!seen.has(txt) && txt) {
+          seen.add(txt);
+          out.push(q);
+        }
+      } else {
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(q);
+        }
+      }
+    }
+    return out;
+  }
+
   // Load questions file based on subject
   async function loadQuestions(subject = "all", count = 10) {
     try {
@@ -141,7 +226,10 @@
         if (filtered.length > 0) data = filtered;
       }
 
-      // shuffle pool then slice to requested count
+      // dedupe first to avoid duplicated questions from source
+      data = uniqueQuestions(data);
+
+      // shuffle pool then slice to requested count (but ensure we don't pick duplicates)
       let pool = shuffleArray(data);
       if (count && count > 0 && count < pool.length)
         pool = pool.slice(0, count);
@@ -242,20 +330,95 @@
     if (idx === correctIdx) {
       li.classList.add("correct");
       score++;
+      playSound(true); // sound for correct
     } else {
       li.classList.add("wrong");
       if (optionsList.children[correctIdx])
         optionsList.children[correctIdx].classList.add("correct");
+      playSound(false); // sound for wrong
     }
     perQuestion.push({
       id: q.question_id ?? currentIndex,
       tookSeconds: took.toFixed(2),
       correct: idx === correctIdx,
     });
+
+    // update last time & score UI
     lastAnswerTime.textContent = `Answered in ${took.toFixed(2)}s`;
     scoreEl.textContent = score;
     nextBtn.disabled = false;
     updateProgress();
+
+    // ---- XP awarding: faster correct answers earn up to 20 XP per question ----
+    (async function awardXpIfNeeded() {
+      try {
+        // only award XP for correct answers
+        const wasCorrect = idx === correctIdx;
+        if (!wasCorrect) return;
+
+        // mapping: 0s => 20 XP, maxSeconds => 0 XP (linear)
+        const maxSeconds = 30; // adjust to your per-question target (in seconds)
+        const timeTaken = Number(took);
+        // compute proportional XP: remaining fraction of maxSeconds * 20
+        const frac = Math.max(0, (maxSeconds - timeTaken) / maxSeconds);
+        const rawXp = Math.round(frac * 20);
+        const xpToAdd = Math.max(0, Math.min(20, rawXp));
+        if (xpToAdd <= 0) return;
+
+        // ensure SettingsDB available
+        if (!window.SettingsDB || !SettingsDB.getSettings) return;
+
+        // determine current email consistently with other pages
+        let email = null;
+        try {
+          if (window.currentUser && window.currentUser.email) {
+            email = window.currentUser.email;
+          } else {
+            const raw = localStorage.getItem("gyan_current_user");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed.email) email = parsed.email;
+            }
+          }
+        } catch (e) {
+          console.warn("Could not read current user email for XP award", e);
+        }
+        if (!email) email = "johndoe@email.com";
+
+        // fetch settings, update xp, save
+        const s = await SettingsDB.getSettings(email);
+        const settings = s || {
+          email,
+          name: email.split("@")[0],
+          xp: 0,
+          badges: [],
+        };
+        settings.xp = (Number(settings.xp) || 0) + xpToAdd;
+        await SettingsDB.saveSettings(settings);
+        console.log("Awarded XP", xpToAdd, "to", email, "new xp:", settings.xp);
+
+        // show toast and update visible xp element if exists
+        showXpToast(xpToAdd);
+        const xpDisplay =
+          document.getElementById("xpNumber") ||
+          document.getElementById("xpValue") ||
+          document.getElementById("xp") ||
+          null;
+        if (xpDisplay)
+          xpDisplay.textContent = (Number(settings.xp) || 0).toLocaleString();
+      } catch (e) {
+        console.warn("Failed to award XP", e);
+      }
+    })();
+
+    // If this was the last question, auto-finish after a short delay so user sees feedback
+    if (currentIndex >= questions.length - 1) {
+      // small delay so the correct/wrong UI is visible before showing results
+      setTimeout(() => {
+        finishQuiz();
+      }, 700);
+      return; // do not enable "Next" to proceed — auto-finish
+    }
   }
 
   function updateProgress() {

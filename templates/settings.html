@@ -17,18 +17,75 @@
 
     <style>
       /* minimal helpers (rest is in style.css) */
-      .settings-grid { display:grid; grid-template-columns: 1fr 320px; gap:18px; align-items:start; }
-      .setting-card { background: var(--card); padding:18px; border-radius:12px; box-shadow: var(--shadow); }
-      .profile-card { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-      .profile-info { display:flex; gap:12px; align-items:center; }
-      .avatar { width:64px; height:64px; object-fit:cover; border-radius:10px; background: rgba(255,255,255,0.03); }
-      .muted { color: var(--muted); }
-      .btn { padding:8px 12px; border-radius:8px; cursor:pointer; }
-      .small { width:120px; }
-      .badges-list { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-      .badge-chip { padding:6px 8px; border-radius:999px; background: rgba(255,255,255,0.03); }
-      input.input, select.input, textarea.input { width:100%; padding:8px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--text); }
-      .modal-avatar { width:160px; height:160px; border-radius:12px; object-fit:cover; background: rgba(255,255,255,0.02); }
+      .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 18px;
+        align-items: start;
+      }
+      .setting-card {
+        background: var(--card);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+      }
+      .profile-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .profile-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .avatar {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .btn {
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .small {
+        width: 120px;
+      }
+      .badges-list {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .badge-chip {
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      input.input,
+      select.input,
+      textarea.input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 8px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text);
+      }
+      .modal-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.02);
+      }
     </style>
   </head>
 
@@ -39,16 +96,30 @@
           <h1 class="logo">GyanSetu</h1>
           <nav>
             <ul class="menu">
-              <li class="menu-item" data-page="home"><i class="fas fa-house"></i><span>Home</span></li>
-              <li class="menu-item" data-page="lessons"><i class="fas fa-book-open"></i><span>Lessons</span></li>
-              <li class="menu-item" data-page="games"><i class="fas fa-gamepad"></i><span>Games</span></li>
-              <li class="menu-item" data-page="progress"><i class="fas fa-chart-simple"></i><span>Progress</span></li>
-              <li class="menu-item" data-page="rewards"><i class="fas fa-award"></i><span>Rewards</span></li>
-              <li class="menu-item active" data-page="settings"><i class="fas fa-gear"></i><span>Settings</span></li>
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item active" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
             </ul>
           </nav>
           <div class="sidebar-bottom">
-            <button class="login" id="loginBtn" style="background:none"><i class="fas fa-right-from-bracket"></i><span>Log Out</span></button>
+            <button class="login" id="loginBtn" style="background: none">
+              <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+            </button>
           </div>
         </div>
       </aside>
@@ -71,9 +142,17 @@
             <!-- Profile, language, grade, badges & xp -->
             <div>
               <div class="setting-card profile-card">
-                <div class="profile-card-content" style="display:flex; gap:12px; align-items:center;">
+                <div
+                  class="profile-card-content"
+                  style="display: flex; gap: 12px; align-items: center"
+                >
                   <div class="profile-info">
-                    <img id="profileAvatar" src="../assets/avatar.jpg" alt="Profile" class="avatar" />
+                    <img
+                      id="profileAvatar"
+                      src="../assets/avatar.jpg"
+                      alt="Profile"
+                      class="avatar"
+                    />
                     <div class="profile-text">
                       <h3 id="profileName">John Doe</h3>
                       <p class="muted" id="profileEmail">johndoe@email.com</p>
@@ -81,13 +160,15 @@
                   </div>
                 </div>
                 <div>
-                  <button class="edit-profile-btn" id="openEditBtn">Edit Profile</button>
+                  <button class="edit-profile-btn" id="openEditBtn">
+                    Edit Profile
+                  </button>
                 </div>
               </div>
 
-              <div class="setting-card" style="margin-top:16px;">
+              <div class="setting-card" style="margin-top: 16px">
                 <h4>Language</h4>
-                <div class="dropdown-row" style="margin-top:12px;">
+                <div class="dropdown-row" style="margin-top: 12px">
                   <select id="cardLanguage" class="input">
                     <option value="en">English</option>
                     <option value="hi">Hindi</option>
@@ -96,9 +177,9 @@
                 </div>
               </div>
 
-              <div class="setting-card" style="margin-top:12px;">
+              <div class="setting-card" style="margin-top: 12px">
                 <h4>Grade</h4>
-                <div class="dropdown-row" style="margin-top:12px;">
+                <div class="dropdown-row" style="margin-top: 12px">
                   <select id="cardGrade" class="input small">
                     <option value="6">6</option>
                     <option value="7">7</option>
@@ -108,43 +189,27 @@
                   </select>
                 </div>
               </div>
-
-              <div class="setting-card" style="margin-top:12px;">
-                <h4>Badges & XP</h4>
-                <div style="display:flex; gap:12px; align-items:center;">
-                  <div style="flex:1;">
-                    <div id="badgesList" class="badges-list"></div>
-                    <div style="display:flex; gap:8px; margin-top:8px;">
-                      <input id="newBadgeInput" class="input small" placeholder="Add badge" />
-                      <button class="btn" id="addBadgeBtn">Add</button>
-                    </div>
-                  </div>
-                  <div style="margin-left:auto; text-align:right;">
-                    <div class="muted">XP</div>
-                    <div id="xpValue" style="font-weight:700; font-size:1.2rem;">0</div>
-                    <div style="display:flex; gap:8px; margin-top:8px; justify-content:flex-end;">
-                      <input id="xpInput" class="input small" type="number" min="0" />
-                      <button class="btn" id="setXpBtn">Set</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- Right column -->
-            <div>
+            <div style="display: none">
               <div class="setting-card">
                 <h4>Quick Actions</h4>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                  <button class="btn" id="exportBtn">Export Current Profile (JSON)</button>
-                  <button class="btn" id="listProfilesBtn">List Saved Profiles</button>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <button class="btn" id="exportBtn">
+                    Export Current Profile (JSON)
+                  </button>
+                  <button class="btn" id="listProfilesBtn">
+                    List Saved Profiles
+                  </button>
                 </div>
               </div>
 
-              <div class="setting-card" style="margin-top:12px;">
+              <div class="setting-card" style="margin-top: 12px">
                 <h4>Info</h4>
-                <div class="muted" style="font-size:0.95rem;">
-                  Click Edit Profile to open the popup and change name, email, grade, language, avatar and profile text.
+                <div class="muted" style="font-size: 0.95rem">
+                  Click Edit Profile to open the popup and change name, email,
+                  grade, language, avatar and profile text.
                 </div>
               </div>
             </div>
@@ -156,8 +221,20 @@
     <!-- EDIT PROFILE MODAL -->
     <div id="editModal" class="modal" role="dialog" aria-hidden="true">
       <div class="modal-card" role="document">
-        <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-          <img id="modalAvatar" src="../assets/avatar.jpg" alt="avatar preview" class="modal-avatar" />
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+          "
+        >
+          <img
+            id="modalAvatar"
+            src="../assets/avatar.jpg"
+            alt="avatar preview"
+            class="modal-avatar"
+          />
           <input type="file" id="modalAvatarFile" accept="image/*" />
           <button class="btn" id="modalUploadAvatar">Preview Image</button>
         </div>
@@ -168,20 +245,24 @@
           <label class="muted">Name</label>
           <input id="modalName" class="input" />
 
-          <label class="muted" style="margin-top:8px;">Email</label>
+          <label class="muted" style="margin-top: 8px">Email</label>
           <input id="modalEmail" class="input" />
 
-          <label class="muted" style="margin-top:8px;">Profile text</label>
+          <label class="muted" style="margin-top: 8px">Profile text</label>
           <textarea id="modalProfile" rows="3" class="input"></textarea>
 
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <div style="flex:1;">
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <div style="flex: 1">
               <label class="muted">Grade</label>
               <select id="modalGrade" class="input small">
-                <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
               </select>
             </div>
-            <div style="flex:1;">
+            <div style="flex: 1">
               <label class="muted">Language</label>
               <select id="modalLanguage" class="input">
                 <option value="en">English</option>
@@ -194,7 +275,9 @@
           <div class="modal-footer">
             <button class="btn" id="modalCancelBtn">Cancel</button>
             <button class="btn edit-profile-btn" id="modalSaveBtn">Save</button>
-            <button class="btn danger" id="modalDeleteBtn">Delete Profile</button>
+            <button class="btn danger" id="modalDeleteBtn">
+              Delete Profile
+            </button>
           </div>
         </div>
       </div>
@@ -246,7 +329,7 @@
           profile: "Learner",
           avatar: "../assets/avatar.jpg",
           badges: ["starter"],
-          xp: 100
+          xp: 100,
         };
 
         let currentSettings = null;
@@ -265,14 +348,16 @@
           profileAvatar.src = settings.avatar || "../assets/avatar.jpg";
 
           badgesList.innerHTML = "";
-          (settings.badges || []).forEach(b => {
+          (settings.badges || []).forEach((b) => {
             const el = document.createElement("div");
             el.className = "badge-chip";
             el.textContent = b;
             el.title = "Click to remove";
             el.style.cursor = "pointer";
             el.addEventListener("click", async () => {
-              currentSettings.badges = (currentSettings.badges || []).filter(x => x !== b);
+              currentSettings.badges = (currentSettings.badges || []).filter(
+                (x) => x !== b
+              );
               await SettingsDB.saveSettings(currentSettings);
               renderSettings(currentSettings);
             });
@@ -311,11 +396,13 @@
                     if (parsed.name) defaultName = parsed.name;
                   }
                 }
-              } catch(e) { console.warn("Could not get name from login info", e); }
+              } catch (e) {
+                console.warn("Could not get name from login info", e);
+              }
 
-              const init = Object.assign({}, DEFAULT_SETTINGS, { 
+              const init = Object.assign({}, DEFAULT_SETTINGS, {
                 email: key,
-                name: defaultName
+                name: defaultName,
               });
               await SettingsDB.saveSettings(init);
               renderSettings(init);
@@ -328,7 +415,11 @@
 
         // --- INIT ---
         window.addEventListener("DOMContentLoaded", async () => {
-          try { await SettingsDB.openDB(); } catch (e) { console.warn("SettingsDB open failed", e); }
+          try {
+            await SettingsDB.openDB();
+          } catch (e) {
+            console.warn("SettingsDB open failed", e);
+          }
 
           let email = null;
           if (window.currentUser && window.currentUser.email) {
@@ -368,7 +459,8 @@
 
         modalUploadAvatar.addEventListener("click", async (ev) => {
           ev.preventDefault();
-          if (!modalAvatarFile.files || modalAvatarFile.files.length === 0) return alert("Choose an image first");
+          if (!modalAvatarFile.files || modalAvatarFile.files.length === 0)
+            return alert("Choose an image first");
           try {
             const dataUrl = await readFileAsDataURL(modalAvatarFile.files[0]);
             modalAvatar.src = dataUrl;
@@ -389,14 +481,26 @@
             language: modalLanguage.value || "en",
             grade: modalGrade.value || "8",
             profile: modalProfile.value || "",
-            avatar: modalAvatar.src || (currentSettings && currentSettings.avatar) || "../assets/avatar.jpg",
-            badges: currentSettings && currentSettings.badges ? currentSettings.badges.slice() : [],
-            xp: currentSettings && currentSettings.xp != null ? currentSettings.xp : 0
+            avatar:
+              modalAvatar.src ||
+              (currentSettings && currentSettings.avatar) ||
+              "../assets/avatar.jpg",
+            badges:
+              currentSettings && currentSettings.badges
+                ? currentSettings.badges.slice()
+                : [],
+            xp:
+              currentSettings && currentSettings.xp != null
+                ? currentSettings.xp
+                : 0,
           };
 
           try {
             await SettingsDB.saveSettings(updated);
-            localStorage.setItem("gyan_current_user", JSON.stringify({ email: newEmail, name: updated.name })); // update login cache
+            localStorage.setItem(
+              "gyan_current_user",
+              JSON.stringify({ email: newEmail, name: updated.name })
+            ); // update login cache
             await loadSettings(newEmail);
             editModal.classList.remove("show");
             alert("Profile saved");
@@ -408,8 +512,14 @@
 
         // modal delete
         modalDeleteBtn.addEventListener("click", async () => {
-          if (!currentSettings || !currentSettings.email) return alert("No profile loaded");
-          if (!confirm("Delete stored settings for " + currentSettings.email + " ?")) return;
+          if (!currentSettings || !currentSettings.email)
+            return alert("No profile loaded");
+          if (
+            !confirm(
+              "Delete stored settings for " + currentSettings.email + " ?"
+            )
+          )
+            return;
           try {
             const req = indexedDB.open("gyansetu-settings");
             req.onsuccess = function (e) {
@@ -468,7 +578,12 @@
 
         listProfilesBtn.addEventListener("click", async () => {
           const all = await SettingsDB.getAllSettings();
-          alert("Saved profiles:\n" + all.map(p => p.email + " (" + (p.name || "Unknown") + ")").join("\n"));
+          alert(
+            "Saved profiles:\n" +
+              all
+                .map((p) => p.email + " (" + (p.name || "Unknown") + ")")
+                .join("\n")
+          );
         });
       })();
     </script>

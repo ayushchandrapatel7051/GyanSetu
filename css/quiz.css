@@ -220,3 +220,50 @@
 .bar {
   margin-top: 20px;
 }
+/* ---- UI tweaks: place Next on the right and make controls responsive ---- */
+.quiz-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* ensure Next floats to the right by using a flexible spacer (we use a flex:1 spacer in HTML) */
+.quiz-controls .btn {
+  min-width: 88px;
+}
+
+/* toast styles for +N XP */
+.xp-toast {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  background: linear-gradient(
+    90deg,
+    rgba(123, 97, 255, 0.95),
+    rgba(63, 209, 201, 0.95)
+  );
+  color: #fff;
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transform: translateY(-6px);
+  opacity: 0;
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 220ms ease;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* show state */
+.xp-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* small XP bubble label inside toast */
+.xp-toast .value {
+  font-size: 1.1rem;
+  margin-left: 8px;
+}

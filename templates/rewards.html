@@ -13,7 +13,65 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      /* local styles */
+      :root {
+        --text: #ffffff;
+      }
+      .xp-big {
+        font-size: 2rem;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .xp-number {
+        font-weight: 700;
+      }
+      .bar {
+        height: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        width: 0%;
+        transition: width 300ms ease;
+        background: linear-gradient(90deg, #7b61ff, #3fd1c9);
+      }
+      .xp-controls {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .xp-controls input {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: var(--text);
+      }
+      .xp-controls button {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 0;
+        cursor: pointer;
+        background: #2b1060;
+        color: white;
+      }
+      .leaderboard .you {
+        font-weight: 700;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 6px 8px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
   </head>
+
   <body>
     <div class="app">
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
@@ -65,30 +123,149 @@
           <div class="grid-2">
             <div class="panel">
               <h3>XP & Milestones</h3>
+
+              <!-- XP display (populated from IndexedDB) -->
               <div class="xp-big">
-                <span class="xp-number">1,250</span
-                ><span class="muted"> XP</span>
+                <span id="xpNumber" class="xp-number">0</span>
+                <span class="muted"> XP</span>
               </div>
               <div class="muted">Progress to next milestone (2,000 XP)</div>
               <div class="bar" style="margin-top: 12px">
-                <div class="fill" style="width: 62.5%"></div>
+                <div id="xpFill" class="fill" style="width: 0%"></div>
+              </div>
+
+              <!-- controls: only Refresh + debug input (input kept optional) -->
+              <div class="xp-controls">
+                <input
+                  id="xpChange"
+                  type="number"
+                  placeholder="+100 or -50 (debug only)"
+                />
+                <button id="refreshXpBtn" title="Reload from DB">
+                  Refresh
+                </button>
+                <div
+                  style="margin-left: auto"
+                  class="muted"
+                  id="currentProfile"
+                >
+                  Profile: —
+                </div>
               </div>
             </div>
 
             <div class="panel">
               <h3>Leaderboard</h3>
-              <ol class="leaderboard">
+              <ol class="leaderboard" id="leaderboardRoot">
                 <li>
                   <span>Aditi</span><span class="xp-small">2,200 XP</span>
                 </li>
                 <li><span>Raj</span><span class="xp-small">1,900 XP</span></li>
-                <li><span>You</span><span class="xp-small">1,250 XP</span></li>
+                <!-- "You" will be replaced with actual user's XP from IndexedDB -->
+                <li id="youRow" class="you">
+                  <span>You</span><span id="youXp" class="xp-small">0 XP</span>
+                </li>
               </ol>
             </div>
           </div>
         </section>
       </main>
     </div>
+
+    <!-- uses your existing settings-db.js -->
+    <script src="../js/settings-db.js"></script>
+
+    <script>
+      (function () {
+        // match the defaults used elsewhere in your app
+        const DEFAULT_EMAIL = "johndoe@email.com";
+        const MILESTONE = 2000;
+
+        const xpNumberEl = document.getElementById("xpNumber");
+        const xpFillEl = document.getElementById("xpFill");
+        const youXpEl = document.getElementById("youXp");
+        const currentProfileEl = document.getElementById("currentProfile");
+
+        const xpChangeInput = document.getElementById("xpChange");
+        const refreshXpBtn = document.getElementById("refreshXpBtn");
+
+        let currentEmail = null;
+        let currentSettings = null;
+
+        async function getCurrentEmail() {
+          if (window.currentUser && window.currentUser.email)
+            return window.currentUser.email;
+          try {
+            const raw = localStorage.getItem("gyan_current_user");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed.email) return parsed.email;
+            }
+          } catch (e) {
+            console.warn("localStorage parse failed", e);
+          }
+          return DEFAULT_EMAIL;
+        }
+
+        function updateUIFromSettings(s) {
+          const xp = (s && Number(s.xp)) || 0;
+          xpNumberEl.textContent = xp.toLocaleString();
+          const pct = Math.max(0, Math.min(100, (xp / MILESTONE) * 100));
+          xpFillEl.style.width = pct + "%";
+          youXpEl.textContent = xp.toLocaleString() + " XP";
+          currentProfileEl.textContent =
+            "Profile: " + ((s && (s.name || s.email)) || "—");
+        }
+
+        async function loadAndRender() {
+          try {
+            await SettingsDB.openDB();
+          } catch (e) {
+            console.error("Failed to open SettingsDB", e);
+            return;
+          }
+
+          currentEmail = await getCurrentEmail();
+
+          try {
+            const s = await SettingsDB.getSettings(currentEmail);
+            if (s) {
+              currentSettings = s;
+            } else {
+              // seed a minimal record so future reads succeed
+              currentSettings = {
+                email: currentEmail,
+                name:
+                  currentEmail === DEFAULT_EMAIL
+                    ? "John Doe"
+                    : currentEmail.split("@")[0],
+                xp: 0,
+                badges: [],
+                language: "en",
+                grade: "8",
+              };
+              try {
+                await SettingsDB.saveSettings(currentSettings);
+              } catch (err) {
+                console.warn("seed failed", err);
+              }
+            }
+            updateUIFromSettings(currentSettings);
+          } catch (e) {
+            console.error("load settings error", e);
+          }
+        }
+
+        // refresh button reloads XP from DB
+        refreshXpBtn.addEventListener("click", async () => {
+          await loadAndRender();
+        });
+
+        // initial render
+        window.addEventListener("DOMContentLoaded", loadAndRender);
+      })();
+    </script>
+
     <script src="../main.js"></script>
     <script src="../js/nav.js"></script>
     <script src="../js/script.js"></script>

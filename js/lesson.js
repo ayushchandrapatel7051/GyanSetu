@@ -44,12 +44,27 @@
     lesson.duration_minutes || "—"
   } mins`;
 
-  // load saved progress
+  // find current user email (same approach used elsewhere)
   const currentRaw = localStorage.getItem("gyan_current_user");
   const email = currentRaw ? JSON.parse(currentRaw).email || null : null;
   const idKey = (email || "anon") + "__" + lessonId;
 
-  let savedProgress = await window.LessonDB.getProgress(email, lessonId);
+  // ensure LessonDB open (if the wrapper supports open)
+  try {
+    if (window.LessonDB && LessonDB.openDB) await LessonDB.openDB();
+  } catch (e) {
+    /* ignore */
+  }
+
+  // load saved progress
+  let savedProgress = null;
+  try {
+    savedProgress = await window.LessonDB.getProgress(email, lessonId);
+  } catch (e) {
+    console.warn("LessonDB.getProgress failed:", e);
+    savedProgress = null;
+  }
+
   if (!savedProgress) {
     savedProgress = {
       id: idKey,
@@ -60,6 +75,70 @@
       timeSpentSeconds: 0,
       lastViewedAt: Date.now(),
     };
+    try {
+      // create initial entry immediately so other pages can read it
+      await window.LessonDB.saveProgress(savedProgress);
+    } catch (e) {
+      console.warn("Initial saveProgress failed", e);
+    }
+  }
+
+  // If lesson already completed, reflect that in UI and disable the mark button
+  function setCompletedUI() {
+    markBtn.textContent = "Completed ✓";
+    markBtn.disabled = true;
+    savedProgress.completed = true;
+    savedProgress.percent = 100;
+    updateUI(100);
+  }
+  if (savedProgress.completed) {
+    setCompletedUI();
+  } else if (savedProgress.percent && savedProgress.percent >= 100) {
+    // normalization: if percent recorded as 100 but completed false, mark completed
+    savedProgress.completed = true;
+    try {
+      await window.LessonDB.saveProgress(savedProgress);
+    } catch (e) {}
+    setCompletedUI();
+  } else {
+    updateUI(savedProgress.percent || 0);
+  }
+
+  // Also store last opened lesson into SettingsDB so app remembers last lesson
+  try {
+    if (
+      window.SettingsDB &&
+      SettingsDB.getSettings &&
+      SettingsDB.saveSettings
+    ) {
+      const DEFAULT_EMAIL = "johndoe@email.com";
+      let settingsEmail = email || DEFAULT_EMAIL;
+      let s = await SettingsDB.getSettings(settingsEmail);
+      if (!s) {
+        // seed minimal settings record if not present
+        s = {
+          email: settingsEmail,
+          name:
+            settingsEmail === DEFAULT_EMAIL
+              ? "John Doe"
+              : settingsEmail.split("@")[0],
+          language: "en",
+          grade: String(lesson.grade || "8"),
+          avatar: "../assets/avatar.jpg",
+          badges: [],
+          xp: 0,
+        };
+      }
+      s.lastLesson = {
+        lessonId,
+        viewedAt: Date.now(),
+        subject: lesson.subject,
+        grade: lesson.grade,
+      };
+      await SettingsDB.saveSettings(s);
+    }
+  } catch (e) {
+    console.warn("Could not save lastLesson to SettingsDB", e);
   }
 
   // timer
@@ -200,6 +279,13 @@
   function updateUI(percent) {
     progressFill.style.width = Math.min(Math.max(percent, 0), 100) + "%";
     percentEl.textContent = Math.round(percent) + "%";
+    // if 100% consider completed (but do not auto-disable unless markComplete clicked)
+    if (percent >= 100) {
+      // reflect visual complete but keep button enabled until user explicitly marks complete
+      progressFill.classList.add("completed");
+    } else {
+      progressFill.classList.remove("completed");
+    }
   }
 
   markBtn.addEventListener("click", async () => {
@@ -207,15 +293,58 @@
     savedProgress.completed = true;
     savedProgress.lastViewedAt = Date.now();
     stopTimer();
-    await window.LessonDB.saveProgress(savedProgress);
-    localStorage.setItem(
-      "lesson_progress_" + lessonId,
-      JSON.stringify(savedProgress)
-    );
-    startTimer();
-    updateUI(100);
+    try {
+      await window.LessonDB.saveProgress(savedProgress);
+      localStorage.setItem(
+        "lesson_progress_" + lessonId,
+        JSON.stringify(savedProgress)
+      );
+    } catch (e) {
+      console.warn("Save on markComplete failed", e);
+    }
+    // also update lastLesson in SettingsDB
+    try {
+      if (
+        window.SettingsDB &&
+        SettingsDB.getSettings &&
+        SettingsDB.saveSettings
+      ) {
+        const DEFAULT_EMAIL = "johndoe@email.com";
+        let settingsEmail = email || DEFAULT_EMAIL;
+        let s = await SettingsDB.getSettings(settingsEmail);
+        if (!s) {
+          s = {
+            email: settingsEmail,
+            name:
+              settingsEmail === DEFAULT_EMAIL
+                ? "John Doe"
+                : settingsEmail.split("@")[0],
+            language: "en",
+            grade: lesson.grade ? String(lesson.grade) : "8",
+            avatar: "../assets/avatar.jpg",
+            badges: [],
+            xp: 0,
+          };
+        }
+        s.lastLesson = {
+          lessonId,
+          completed: true,
+          viewedAt: Date.now(),
+          subject: lesson.subject,
+          grade: lesson.grade,
+        };
+        await SettingsDB.saveSettings(s);
+      }
+    } catch (e) {
+      console.warn("Failed saving lastLesson to SettingsDB", e);
+    }
+
+    // update UI and disable button so it doesn't show again
     markBtn.textContent = "Completed ✓";
     markBtn.disabled = true;
+    // resume timer if you want (we stopped it before saving)
+    startTimer();
+    updateUI(100);
   });
 
   backBtn.addEventListener("click", () => (location.href = "lessons.html"));

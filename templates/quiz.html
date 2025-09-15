@@ -22,14 +22,12 @@
   </head>
   <body>
     <div class="app">
-      <!-- Sidebar -->
+      <!-- Sidebar omitted (same as before) -->
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-inner">
           <h1 class="logo">GyanSetu</h1>
-
           <nav>
             <ul class="menu">
-              <!-- Home: keep data-page="home" for nav.js highlight, but use anchor so click goes to index.html -->
               <li class="menu-item" data-page="home">
                 <a
                   href="index.html"
@@ -45,7 +43,6 @@
                   <i class="fas fa-house"></i><span>Home</span>
                 </a>
               </li>
-
               <li class="menu-item" data-page="lessons">
                 <i class="fas fa-book-open"></i><span>Lessons</span>
               </li>
@@ -63,7 +60,6 @@
               </li>
             </ul>
           </nav>
-
           <div class="sidebar-bottom">
             <button class="login" id="loginBtn" style="background: none">
               <i class="fas fa-right-to-bracket"></i><span>Log In</span>
@@ -135,16 +131,21 @@
             </div>
 
             <div class="quiz-controls">
-              <button id="nextBtn" class="btn btn-purple" disabled>Next</button>
+              <!-- Next is visually right aligned through CSS; Quit remains left when space allows -->
               <button id="quitBtn" class="btn btn-orange">Quit</button>
-              <div id="lastAnswerTime"></div>
+              <div
+                id="lastAnswerTime"
+                style="margin-left: 12px; align-self: center"
+              ></div>
+              <div style="flex: 1"></div>
+              <button id="nextBtn" class="btn btn-purple" disabled>Next</button>
             </div>
 
             <div id="progressBar" class="bar">
               <div id="progressFill" class="fill" style="width: 0%"></div>
             </div>
 
-            <!-- Old summary (still kept) -->
+            <!-- summary and result page same as before -->
             <div id="summary" style="display: none">
               <h3>Quiz finished</h3>
               <p>Score: <strong id="finalScore"></strong></p>
@@ -152,8 +153,8 @@
               <ol id="perQuestionTimes"></ol>
             </div>
 
-            <!-- New Result Page -->
             <div id="resultPage" class="result-page" style="display: none">
+              <!-- result content unchanged -->
               <div class="marks-card">
                 <h3>Marks Obtained</h3>
                 <div class="marks-value">
@@ -204,8 +205,15 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Make sure SettingsDB is loaded BEFORE quiz.js so XP saving works -->
+    <script src="../js/settings-db.js"></script>
+
+    <!-- main, nav, quiz -->
     <script src="../main.js"></script>
     <script src="../js/nav.js"></script>
     <script src="../js/quiz.js"></script>
+
+    <!-- small inline: a11y for toast (optional) -->
   </body>
 </html>

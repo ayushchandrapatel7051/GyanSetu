@@ -1,6 +1,4 @@
-// js/lessons.js
-// Renders lessons list, filter, preview, and links to lesson.html?id=...
-
+// js/lessons.js — lessons list with robust auto-grade selection and lastLesson
 (async () => {
   const lessonsListEl = document.getElementById("lessonsList");
   const spotTitle = document.getElementById("spot-title");
@@ -8,19 +6,86 @@
   const filterGrade = document.getElementById("filterGrade");
   const filterSubject = document.getElementById("filterSubject");
   const searchLessons = document.getElementById("searchLessons");
+  const continueCard = document.getElementById("continueLastLesson"); // optional; check HTML
 
   let lessons = [];
 
-  async function fetchLessons() {
+  async function getCurrentEmail() {
+    if (window.currentUser && window.currentUser.email)
+      return window.currentUser.email;
     try {
+      const raw = localStorage.getItem("gyan_current_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.email) return parsed.email;
+      }
+    } catch (e) {
+      console.warn("localStorage parse failed", e);
+    }
+    return "johndoe@email.com";
+  }
+
+  async function fetchLessonsAndInit() {
+    try {
+      // fetch lessons.json
       const res = await fetch("../data/lessons.json", { cache: "no-store" });
-      if (!res.ok) throw new Error("Could not fetch lessons");
+      if (!res.ok) throw new Error("Could not fetch lessons.json");
       lessons = await res.json();
+
+      // populate subject dropdown dynamically (use canonical subjects)
+      const subjSet = new Set();
+      for (const l of lessons) {
+        const s = (l.subject || "Other").toString().trim();
+        if (s) subjSet.add(s);
+      }
+      filterSubject.innerHTML = '<option value="">All subjects</option>';
+      Array.from(subjSet)
+        .sort()
+        .forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s;
+          opt.textContent = s;
+          filterSubject.appendChild(opt);
+        });
+
+      // open SettingsDB and read settings
+      if (window.SettingsDB && SettingsDB.openDB) await SettingsDB.openDB();
+      const email = await getCurrentEmail();
+      let s = null;
+      if (window.SettingsDB && SettingsDB.getSettings) {
+        s = await SettingsDB.getSettings(email);
+      }
+      if (s && s.grade != null) {
+        // grade might be stored as number/string — coerce to string for comparison with filter options
+        filterGrade.value = String(s.grade);
+      }
+
+      // show continue card if lastLesson present
+      if (s && s.lastLesson && continueCard) {
+        const last = s.lastLesson;
+        const lessonObj = lessons.find((l) => l.id === last.lessonId);
+        if (lessonObj) {
+          continueCard.style.display = "";
+          const titleEl = continueCard.querySelector(".title");
+          const metaEl = continueCard.querySelector(".meta");
+          const openBtn = continueCard.querySelector(".open");
+          if (titleEl) titleEl.textContent = `Continue: ${lessonObj.title}`;
+          if (metaEl)
+            metaEl.textContent = `${lessonObj.subject} • Grade ${lessonObj.grade}`;
+          if (openBtn)
+            openBtn.onclick = () =>
+              (window.location.href = `lesson.html?id=${encodeURIComponent(
+                lessonObj.id
+              )}`);
+        }
+      }
+
+      // finally render list
       renderList();
     } catch (err) {
+      console.error("fetchLessonsAndInit failed", err);
       lessonsListEl.innerHTML =
         "<li class='muted'>Failed to load lessons.</li>";
-      console.error(err);
     }
   }
 
@@ -28,7 +93,6 @@
     const li = document.createElement("li");
     li.className = "lesson-item";
     li.style.cursor = "pointer";
-
     const left = document.createElement("span");
     left.className = "lesson-text";
     const name = document.createElement("span");
@@ -37,46 +101,38 @@
     const meta = document.createElement("span");
     meta.className = "muted";
     meta.textContent = `${lesson.grade} • ${lesson.subject}`;
-
     left.appendChild(name);
     left.appendChild(meta);
 
     const right = document.createElement("span");
     right.className = "lesson-arrow";
-
-    // show progress inside arrow area optionally
     if (progress && typeof progress.percent === "number") {
-      right.innerHTML = `<div style="text-align:center;font-size:13px"></div><div style="font-size:10px;margin-top:4px">${progress.percent}%</div></div>`;
+      right.innerHTML = `<div style="text-align:center;font-size:13px">${
+        progress.completed ? "✓" : ""
+      }</div><div style="font-size:10px;margin-top:4px">${
+        progress.percent
+      }%</div>`;
     } else {
       right.innerHTML = `<i class="fas fa-arrow-right"></i>`;
     }
-
     li.appendChild(left);
     li.appendChild(right);
-
     li.addEventListener("click", () => {
-      // open lesson viewer
       window.location.href = `lesson.html?id=${encodeURIComponent(lesson.id)}`;
     });
-
-    // preview on hover / focus
     li.addEventListener("mouseenter", () => showPreview(lesson));
     li.addEventListener("focus", () => showPreview(lesson));
-
     return li;
   }
 
   async function getProgressForLesson(lessonId) {
     try {
-      const current = localStorage.getItem("gyan_current_user");
-      let email = null;
-      if (current) {
-        const parsed = JSON.parse(current);
-        if (parsed && parsed.email) email = parsed.email;
-      }
-      const p = await window.LessonDB.getProgress(email, lessonId);
-      return p || null;
+      if (!window.LessonDB) return null;
+      if (LessonDB.openDB) await LessonDB.openDB();
+      const email = await getCurrentEmail();
+      return await LessonDB.getProgress(email, lessonId);
     } catch (e) {
+      console.warn("getProgressForLesson failed", e);
       return null;
     }
   }
@@ -85,17 +141,17 @@
     lessonsListEl.innerHTML = "";
     const g = filterGrade.value;
     const s = filterSubject.value;
-    const q = searchLessons.value.trim().toLowerCase();
+    const q = (searchLessons.value || "").trim().toLowerCase();
 
-    const visible = lessons.filter((L) => {
-      if (g && String(L.grade) !== String(g)) return false;
-      if (s && L.subject !== s) return false;
+    const visible = lessons.filter((l) => {
+      if (g && String(l.grade) !== String(g)) return false;
+      if (s && l.subject !== s) return false;
       if (
         q &&
         !(
-          (L.title || "").toLowerCase().includes(q) ||
-          (L.description || "").toLowerCase().includes(q) ||
-          (L.subject || "").toLowerCase().includes(q)
+          (l.title || "").toLowerCase().includes(q) ||
+          (l.description || "").toLowerCase().includes(q) ||
+          (l.subject || "").toLowerCase().includes(q)
         )
       )
         return false;
@@ -107,7 +163,6 @@
       return;
     }
 
-    // render with progress loaded in parallel
     for (const l of visible) {
       const prog = await getProgressForLesson(l.id);
       const li = createLessonItem(l, prog);
@@ -116,6 +171,7 @@
   }
 
   function showPreview(lesson) {
+    if (!spotTitle || !spotBody) return;
     spotTitle.textContent = lesson.title;
     spotBody.innerHTML = `
       <p class="muted">${lesson.description || ""}</p>
@@ -131,11 +187,10 @@
   filterGrade.addEventListener("change", renderList);
   filterSubject.addEventListener("change", renderList);
   searchLessons.addEventListener("input", () => {
-    // debounce small
     if (window._lessonSearchTimer) clearTimeout(window._lessonSearchTimer);
     window._lessonSearchTimer = setTimeout(renderList, 200);
   });
 
-  // initial load
-  await fetchLessons();
+  // start
+  await fetchLessonsAndInit();
 })();

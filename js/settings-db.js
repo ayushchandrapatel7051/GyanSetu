@@ -13,7 +13,9 @@
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
-          const store = db.createObjectStore(STORE_SETTINGS, { keyPath: "email" });
+          const store = db.createObjectStore(STORE_SETTINGS, {
+            keyPath: "email",
+          });
           // optional indexes
           store.createIndex("by_name", "name", { unique: false });
           store.createIndex("by_language", "language", { unique: false });
