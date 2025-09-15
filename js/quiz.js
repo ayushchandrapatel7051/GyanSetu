@@ -1,4 +1,4 @@
-// js/quiz.js — dropdown selector + reliable restart
+// js/quiz.js — dropdown selector + reliable restart (patched to restore result UI sizing)
 (() => {
   // small WebAudio helper and toast helper (insert near top so other functions can use them)
   const audioCtx = (function createAudioContext() {
@@ -11,7 +11,6 @@
   })();
 
   function playSound(isCorrect = true) {
-    // short beep: correct -> higher pitch, quick envelope; wrong -> lower pitch + minor dissonance
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
     const o = audioCtx.createOscillator();
@@ -41,24 +40,34 @@
 
   function showXpToast(n) {
     if (!n || n <= 0) return;
-    // create or reuse
     let t = document.querySelector(".xp-toast");
     if (!t) {
       t = document.createElement("div");
       t.className = "xp-toast";
-      t.innerHTML = `<strong>+<span class="value">${n}</span> XP</strong>`;
+      // basic styles so it looks decent without needing CSS edits
+      t.style.position = "fixed";
+      t.style.right = "18px";
+      t.style.top = "18px";
+      t.style.background = "linear-gradient(90deg,#7b61ff,#3fd1c9)";
+      t.style.color = "white";
+      t.style.padding = "8px 12px";
+      t.style.borderRadius = "10px";
+      t.style.boxShadow = "0 6px 18px rgba(0,0,0,0.35)";
+      t.style.zIndex = 9999;
+      t.style.fontWeight = 700;
+      t.innerHTML = `<span class="value">${n}</span> XP`;
       document.body.appendChild(t);
     } else {
       t.querySelector(".value").textContent = n;
     }
-    // force reflow then show
-    void t.offsetWidth;
-    t.classList.add("show");
-    // hide after 1.6s
+    // animate show (simple)
+    t.style.transform = "translateY(-6px)";
+    t.style.opacity = "1";
     clearTimeout(t._hideTimeout);
     t._hideTimeout = setTimeout(() => {
-      t.classList.remove("show");
-    }, 1600);
+      t.style.transform = "translateY(-20px)";
+      t.style.opacity = "0";
+    }, 1400);
   }
 
   // DOM refs
@@ -87,7 +96,6 @@
   // insert dropdown chooser into the selector (above play cards)
   (function insertDropdown() {
     const container = quizSelector.querySelector(".cards") || quizSelector;
-    // avoid duplicate insertion
     if (document.getElementById("qsCountSelect")) return;
     const wrapper = document.createElement("div");
     wrapper.style =
@@ -178,7 +186,6 @@
       const id = q.question_id ?? q.id ?? (q.question && q.question.trim());
       const key = String(id || "").trim();
       if (!key) {
-        // fallback: stringify question text
         const txt = (q.question || "").trim();
         if (!seen.has(txt) && txt) {
           seen.add(txt);
@@ -359,13 +366,11 @@
         // mapping: 0s => 20 XP, maxSeconds => 0 XP (linear)
         const maxSeconds = 30; // adjust to your per-question target (in seconds)
         const timeTaken = Number(took);
-        // compute proportional XP: remaining fraction of maxSeconds * 20
         const frac = Math.max(0, (maxSeconds - timeTaken) / maxSeconds);
         const rawXp = Math.round(frac * 20);
         const xpToAdd = Math.max(0, Math.min(20, rawXp));
         if (xpToAdd <= 0) return;
 
-        // ensure SettingsDB available
         if (!window.SettingsDB || !SettingsDB.getSettings) return;
 
         // determine current email consistently with other pages
@@ -413,11 +418,10 @@
 
     // If this was the last question, auto-finish after a short delay so user sees feedback
     if (currentIndex >= questions.length - 1) {
-      // small delay so the correct/wrong UI is visible before showing results
       setTimeout(() => {
         finishQuiz();
       }, 700);
-      return; // do not enable "Next" to proceed — auto-finish
+      return; // auto-finish
     }
   }
 
@@ -482,35 +486,76 @@
     // draw chart if Chart.js available
     if (typeof Chart !== "undefined") {
       try {
+        // destroy previous chart if exists
         if (window._attemptsChart) {
-          window._attemptsChart.destroy();
+          try {
+            window._attemptsChart.destroy();
+          } catch (e) {
+            // ignore
+          }
           window._attemptsChart = null;
         }
-        const ctx = document.getElementById("attemptsChart").getContext("2d");
+
+        const canvas = document.getElementById("attemptsChart");
+        // ensure the canvas is a fixed compact size to avoid giant donut
+        canvas.width = 200;
+        canvas.height = 200;
+        canvas.style.width = "200px";
+        canvas.style.height = "200px";
+        // ensure parent container does not stretch canvas: set a reasonable max-width
+        const parent = canvas.closest(".attempts-analysis");
+        if (parent) {
+          parent.style.display = "flex";
+          parent.style.alignItems = "center";
+          parent.style.gap = "18px";
+          // also limit parent height so canvas is compact
+          parent.style.minHeight = "240px";
+        }
+
+        const ctx = canvas.getContext("2d");
         window._attemptsChart = new Chart(ctx, {
           type: "doughnut",
           data: {
             labels: ["Correct", "Incorrect", "Not Answered"],
-            datasets: [{ data: [correct, incorrect, notAnswered] }],
+            datasets: [
+              {
+                data: [correct, incorrect, notAnswered],
+                // provide some pleasant colors (keeps the compact look)
+                backgroundColor: ["#3b82f6", "#fb7185", "#9ca3af"],
+                borderWidth: 2,
+                borderColor: "#1f1b2e",
+              },
+            ],
           },
-          options: { plugins: { legend: { display: false } }, cutout: "70%" },
+          options: {
+            responsive: false, // we set fixed size above
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            cutout: "70%",
+          },
         });
       } catch (e) {
         console.warn("Chart render failed", e);
       }
     }
 
+    // Show result UI same as before
     hide(document.getElementById("questionCard"));
     if (document.querySelector(".quiz-controls"))
       document.querySelector(".quiz-controls").style.display = "none";
     hide(summary);
     show(document.getElementById("resultPage"));
+
+    // scroll result into view so user sees compact card immediately
+    try {
+      const rp = document.getElementById("resultPage");
+      if (rp && rp.scrollIntoView) rp.scrollIntoView({ behavior: "smooth" });
+    } catch (e) {}
   }
 
   // Play Again and Back Home handlers
   document.addEventListener("click", (e) => {
     if (e.target && e.target.id === "playAgainBtn") {
-      // restart quiz with same subject; read current dropdown value
       hide(document.getElementById("resultPage"));
       show(document.getElementById("questionCard"));
       if (document.querySelector(".quiz-controls"))
