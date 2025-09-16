@@ -221,3 +221,27 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* Welcome section (right side content) */
+.welcome-content {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text);
+}
+
+.welcome-content h2 {
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+
+.welcome-content .features p {
+  margin: 8px 0;
+  font-size: 15px;   
+  color: #ebe6e6;
+}
+
+.welcome-content .quote {
+  margin-top: 16px;
+  font-style: italic;
+  color: #aa80fd;
+}
+
