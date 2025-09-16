@@ -678,3 +678,8 @@ body {
   background: #ff8a8a;
   color: #fff;
 }
+/* to ensure text is visible in the dropdowns */
+select option {
+  background-color: #16002a;
+  color: #fff; 
+}
