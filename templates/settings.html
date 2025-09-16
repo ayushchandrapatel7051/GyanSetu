@@ -144,7 +144,7 @@
               <div class="setting-card profile-card">
                 <div class="profile-card-content" style="display:flex;gap:12px;align-items:center">
                   <div class="profile-info">
-                    <img id="profileAvatar" src="../assets/avatar.jpg" alt="Profile" class="avatar"/>
+                    <img id="profileAvatar" src="../assets/img/1.png" alt="Profile" class="avatar"/>
                     <div class="profile-text">
                       <h3 id="profileName">John Doe</h3>
                       <p class="muted" id="profileEmail">johndoe@email.com</p>
@@ -189,7 +189,7 @@
     <div id="editModal" class="modal" role="dialog" aria-hidden="true">
       <div class="modal-card" role="document">
         <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
-          <img id="modalAvatar" src="../assets/avatar.jpg" alt="avatar preview" class="modal-avatar"/>
+          <img id="modalAvatar" src="../assets/img/avatar.jpg" alt="avatar preview" class="modal-avatar"/>
           <input type="file" id="modalAvatarFile" accept="image/*" />
           <button class="btn" id="modalUploadAvatar">Preview Image</button>
         </div>
@@ -260,7 +260,7 @@
           language: "en",
           grade: "8",
           profile: "Learner",
-          avatar: "../assets/avatar.jpg",
+          avatar: "../assets/img/avatar.jpg",
           badges: [],
           xp: 0,
         };
@@ -288,7 +288,7 @@
 
             profileName.textContent = merged.name || "Unknown";
             profileEmail.textContent = merged.email || "";
-            profileAvatar.src = merged.avatar || "../assets/avatar.jpg";
+            profileAvatar.src = merged.avatar || "../assets/img/avatar.jpg";
             cardLanguage.value = merged.language;
             cardGrade.value = merged.grade || "8";
 
@@ -316,7 +316,7 @@
           modalProfile.value = currentSettings.profile || "";
           modalGrade.value = currentSettings.grade || "8";
           modalLanguage.value = currentSettings.language || "en";
-          modalAvatar.src = currentSettings.avatar || "../assets/avatar.jpg";
+          modalAvatar.src = currentSettings.avatar || "../assets/img/avatar.jpg";
           editModal.classList.add("show");
         });
 
@@ -333,7 +333,7 @@
             profile: modalProfile.value||"",
             grade: modalGrade.value||"8",
             language: normalizeLanguage(modalLanguage.value),
-            avatar: modalAvatar.src || "../assets/avatar.jpg"
+            avatar: modalAvatar.src || "../assets/img/avatar.jpg"
           });
           await SettingsDB.saveSettings(updated);
           localStorage.setItem("gyan_current_user", JSON.stringify(updated));

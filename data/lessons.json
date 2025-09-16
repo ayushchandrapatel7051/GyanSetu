@@ -620,7 +620,564 @@
       ]
     }
   ]
-}
-]
+},
+{
+  "id": "math-6-knowing-our-numbers",
+  "title": "Knowing Our Numbers",
+  "grade": 6,
+  "subject": "Maths",
+  "duration_minutes": 22,
+  "thumbnail": "../assets/thumbs/numbers.png",
+  "description": "Learn about large numbers, place value, comparison of numbers, and estimating sums and differences.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/numbers.png",
+      "alt": "Place value chart",
+      "caption": "Numbers can be represented in place value form.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Numbers" },
+    { "type": "paragraph", "text": "Numbers are the foundation of mathematics. They allow us to count objects, compare quantities, and measure values in real life. Large numbers often appear in population counts, distances in kilometres, or currency in lakhs and crores." },
+    { "type": "heading", "level": 2, "text": "Place Value System" },
+    { "type": "paragraph", "text": "The place of a digit in a number determines its value. For example, in 3,245 → 3 is in the thousands place, 2 in the hundreds place, 4 in the tens place, and 5 in the ones place. India follows the Indian Place Value System (ones, tens, hundreds, thousands, lakhs, crores), while the International System uses millions and billions." },
+    { "type": "heading", "level": 2, "text": "Comparing Large Numbers" },
+    { "type": "paragraph", "text": "To compare numbers, we first count the digits. The number with more digits is greater. If the digits are equal, we compare digit by digit from left to right. Example: 95,426 > 92,315 since the first two digits (95 vs 92) differ." },
+    { "type": "heading", "level": 2, "text": "Estimation and Rounding Off" },
+    { "type": "paragraph", "text": "Estimation helps us in quick calculations. Rounding off numbers to the nearest 10, 100, or 1000 makes it easier to add, subtract, or multiply. Example: 4,738 rounded to the nearest hundred is 4,700." },
+    { "type": "heading", "level": 2, "text": "Use of Large Numbers" },
+    { "type": "paragraph", "text": "Large numbers are used in population census, measuring distances between cities, or handling financial transactions involving lakhs and crores." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Write the number name for 5,43,217 in the Indian system. \nAns: Five lakh forty-three thousand two hundred seventeen.",
+      "Q2: Round off 6,452 to the nearest hundred. \nAns: 6,500.",
+      "Q3: Which is greater: 9,87,432 or 98,743? \nAns: 9,87,432 (since it has 6 digits compared to 5)."
+    ]}
+  ]
+},
+{
+  "id": "math-6-mensuration",
+  "title": "Mensuration",
+  "grade": 6,
+  "subject": "Maths",
+  "duration_minutes": 24,
+  "thumbnail": "../assets/thumbs/mensuration.png",
+  "description": "Mensuration deals with measurement of shapes, including perimeter and area of plane figures.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/mensuration.png",
+      "alt": "Geometric shapes with measurements",
+      "caption": "Mensuration helps us find perimeter and area of shapes.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Mensuration" },
+    { "type": "paragraph", "text": "Mensuration is the branch of mathematics that deals with measurement of lengths, areas, and volumes of 2D and 3D shapes. It is widely used in real life for construction, land measurement, and design." },
+    { "type": "heading", "level": 2, "text": "Perimeter of Plane Figures" },
+    { "type": "paragraph", "text": "Perimeter is the total length of the boundary of a figure. Example: Perimeter of rectangle = 2 × (length + breadth). Perimeter of a square = 4 × side." },
+    { "type": "heading", "level": 2, "text": "Area of Plane Figures" },
+    { "type": "paragraph", "text": "Area is the space enclosed within the boundary of a figure. Examples: Area of a rectangle = length × breadth; Area of a triangle = 1/2 × base × height." },
+    { "type": "heading", "level": 2, "text": "Units of Measurement" },
+    { "type": "paragraph", "text": "Perimeter is expressed in linear units (cm, m). Area is expressed in square units (cm², m²). Volume of solids is measured in cubic units (cm³, m³)." },
+    { "type": "heading", "level": 2, "text": "Real-Life Applications" },
+    { "type": "paragraph", "text": "Mensuration is applied in fencing fields, tiling floors, measuring land area, and determining the capacity of tanks." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Find the perimeter of a square of side 15 cm. \nAns: 4 × 15 = 60 cm.",
+      "Q2: Find the area of a rectangle with length 20 m and breadth 15 m. \nAns: 20 × 15 = 300 m².",
+      "Q3: A triangular park has base 50 m and height 40 m. Find its area. \nAns: 1/2 × 50 × 40 = 1000 m²."
+    ]}
+  ]
+},
+{
+  "id": "science-6-fibre-to-fabric",
+  "title": "Fibre to Fabric",
+  "grade": 6,
+  "subject": "Science",
+  "duration_minutes": 24,
+  "thumbnail": "../assets/thumbs/fibre.png",
+  "description": "Learn how fibres are obtained from plants and animals, and how they are converted into fabric.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/fibre.png",
+      "alt": "Cotton and wool fibres",
+      "caption": "Fibres are spun into yarn and woven into fabric.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Fibres" },
+    { "type": "paragraph", "text": "Fibres are thin strands that can be spun into yarn and woven into fabric. They can be natural (from plants and animals) or synthetic (made in factories)." },
+    { "type": "heading", "level": 2, "text": "Plant Fibres" },
+    { "type": "paragraph", "text": "Cotton is obtained from cotton plants, especially from the fruit (bolls). Jute is obtained from the stem of jute plants. These fibres are cleaned, combed, and spun into yarn." },
+    { "type": "heading", "level": 2, "text": "Animal Fibres" },
+    { "type": "paragraph", "text": "Wool is obtained from sheep, goat, and camel hair. Silk is obtained from silkworm cocoons. These fibres are soft, warm, and lustrous." },
+    { "type": "heading", "level": 2, "text": "Spinning and Weaving" },
+    { "type": "paragraph", "text": "Fibres are spun into yarns, which are then woven or knitted into fabrics. Traditional looms and modern machines are used for weaving." },
+    { "type": "heading", "level": 2, "text": "Uses of Fabrics" },
+    { "type": "paragraph", "text": "Fabrics are used in making clothes, upholstery, curtains, and industrial materials." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Name two plant fibres and two animal fibres. \nAns: Cotton, Jute (plant); Wool, Silk (animal).",
+      "Q2: From which part of the plant do we get jute? \nAns: From the stem of jute plants.",
+      "Q3: Why is silk considered luxurious? \nAns: It is shiny, smooth, and comfortable to wear."
+    ]}
+  ]
+},
+{
+  "id": "science-6-motion-and-measurement",
+  "title": "Motion and Measurement of Distances",
+  "grade": 6,
+  "subject": "Science",
+  "duration_minutes": 26,
+  "thumbnail": "../assets/thumbs/motion.png",
+  "description": "Introduction to motion, measurement of distance, units of measurement, and history of transport.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/motion.png",
+      "alt": "Objects in motion",
+      "caption": "Motion and measurement help us understand movement and distances.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Motion" },
+    { "type": "paragraph", "text": "Motion is the change in position of an object with time. Examples include a moving car, a swinging pendulum, and a spinning wheel." },
+    { "type": "heading", "level": 2, "text": "Types of Motion" },
+    { "type": "paragraph", "text": "Different objects exhibit different motions: Linear (car moving on road), Circular (hands of a clock), Periodic (swing of a pendulum), and Rotational (spinning top)." },
+    { "type": "heading", "level": 2, "text": "Measurement of Distances" },
+    { "type": "paragraph", "text": "Distances can be measured using rulers, metre scales, measuring tapes, or electronic devices. For large distances, kilometres are used." },
+    { "type": "heading", "level": 2, "text": "Standard Units of Measurement" },
+    { "type": "paragraph", "text": "To avoid confusion, scientists agreed on SI units. The SI unit of length is metre (m). 100 cm = 1 m, and 1000 m = 1 km." },
+    { "type": "heading", "level": 2, "text": "History of Transport" },
+    { "type": "paragraph", "text": "Transport evolved from walking and bullock carts to bicycles, trains, cars, and airplanes. Better understanding of motion and distance measurement helped in this progress." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Name the SI unit of length. \nAns: Metre (m).",
+      "Q2: Give an example of periodic motion. \nAns: Swinging of a pendulum.",
+      "Q3: How many metres are there in 5 km? \nAns: 5 × 1000 = 5000 metres."
+    ]}
+  ]
+},
+{
+  "id": "math-7-simple-equations",
+  "title": "Simple Equations",
+  "grade": 7,
+  "subject": "Maths",
+  "duration_minutes": 25,
+  "thumbnail": "../assets/thumbs/equations.png",
+  "description": "Learn how to form and solve simple linear equations with one variable.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/equations.png",
+      "alt": "Equation balance scale",
+      "caption": "Equations maintain balance between two sides.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Equations" },
+    { "type": "paragraph", "text": "An equation is a mathematical statement where two expressions are equal. It usually contains a variable (like x) whose value we need to find." },
+    { "type": "heading", "level": 2, "text": "Forming Simple Equations" },
+    { "type": "paragraph", "text": "Equations are formed from word problems. Example: 'A number increased by 5 is 9' → x + 5 = 9." },
+    { "type": "heading", "level": 2, "text": "Solving Equations by Inverse Operations" },
+    { "type": "paragraph", "text": "We solve equations by performing opposite operations on both sides to isolate the variable. Example: x + 5 = 9 → x = 9 - 5 = 4." },
+    { "type": "heading", "level": 2, "text": "Balancing Method" },
+    { "type": "paragraph", "text": "Think of an equation as a weighing scale. To keep balance, whatever is done to one side must also be done to the other." },
+    { "type": "heading", "level": 2, "text": "Applications of Equations" },
+    { "type": "paragraph", "text": "Equations are used in real life to solve problems involving ages, money, distances, and measurements." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Solve: x + 7 = 12. \nAns: x = 12 - 7 = 5.",
+      "Q2: A number multiplied by 3 gives 18. Find the number. \nAns: Let number = x. Equation: 3x = 18 → x = 6.",
+      "Q3: If 2x - 5 = 9, find x. \nAns: 2x = 14 → x = 7.",
+      "Q4: The sum of a number and twice the number is 36. Find the number. \nAns: Let number = x. Equation: x + 2x = 36 → 3x = 36 → x = 12."
+    ]}
+  ]
+},
+{
+  "id": "math-7-perimeter-area",
+  "title": "Perimeter and Area",
+  "grade": 7,
+  "subject": "Maths",
+  "duration_minutes": 28,
+  "thumbnail": "../assets/thumbs/perimeter.png",
+  "description": "Learn formulas to calculate the perimeter and area of various 2D shapes.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/perimeter.png",
+      "alt": "Shapes with perimeter and area",
+      "caption": "Perimeter measures boundary; area measures space inside.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Perimeter is the distance around a figure, while area is the surface enclosed within it. Both are essential in daily life applications like fencing land or tiling floors." },
+    { "type": "heading", "level": 2, "text": "Perimeter Formulas" },
+    { "type": "paragraph", "text": "Square = 4 × side; Rectangle = 2 × (l + b); Triangle = sum of three sides; Circle = 2πr." },
+    { "type": "heading", "level": 2, "text": "Area Formulas" },
+    { "type": "paragraph", "text": "Square = side²; Rectangle = length × breadth; Triangle = 1/2 × base × height; Circle = πr²." },
+    { "type": "heading", "level": 2, "text": "Units of Measurement" },
+    { "type": "paragraph", "text": "Perimeter is expressed in units (cm, m), while area is in square units (cm², m²)." },
+    { "type": "heading", "level": 2, "text": "Applications in Daily Life" },
+    { "type": "paragraph", "text": "Used in fencing gardens, calculating cost of flooring, designing fields, and planning layouts." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Find perimeter of a rectangle of length 12 cm and breadth 8 cm. \nAns: 2 × (12 + 8) = 40 cm.",
+      "Q2: Find area of a square plot of side 25 m. \nAns: 25² = 625 m².",
+      "Q3: Find circumference of a circle of radius 7 cm (π = 22/7). \nAns: 2 × 22/7 × 7 = 44 cm.",
+      "Q4: Find area of a triangle with base 10 cm and height 12 cm. \nAns: 1/2 × 10 × 12 = 60 cm²."
+    ]}
+  ]
+},
+{
+  "id": "science-7-heat",
+  "title": "Heat",
+  "grade": 7,
+  "subject": "Science",
+  "duration_minutes": 26,
+  "thumbnail": "../assets/thumbs/heat.png",
+  "description": "Learn about heat, temperature, transfer of heat, and applications in daily life.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/heat.png",
+      "alt": "Heat and thermometer",
+      "caption": "Heat flows from hot body to cold body.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Heat" },
+    { "type": "paragraph", "text": "Heat is a form of energy that makes substances hot or cold. It flows from a hotter object to a colder one until equilibrium is reached." },
+    { "type": "heading", "level": 2, "text": "Temperature and Thermometers" },
+    { "type": "paragraph", "text": "Temperature measures how hot or cold an object is. It is measured using a thermometer. Common units are Celsius (°C), Fahrenheit (°F), and Kelvin (K)." },
+    { "type": "heading", "level": 2, "text": "Methods of Heat Transfer" },
+    { "type": "paragraph", "text": "There are three modes of heat transfer: Conduction (heat through solids), Convection (heat in liquids and gases), and Radiation (heat without medium, e.g., Sun)." },
+    { "type": "heading", "level": 2, "text": "Conductors and Insulators" },
+    { "type": "paragraph", "text": "Materials like metals are good conductors of heat, while wood and plastic are poor conductors (insulators)." },
+    { "type": "heading", "level": 2, "text": "Applications in Daily Life" },
+    { "type": "paragraph", "text": "Heat transfer is used in cooking, thermos flasks, designing houses, and industrial processes." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: What is the SI unit of temperature? \nAns: Kelvin (K).",
+      "Q2: Name the three methods of heat transfer. \nAns: Conduction, Convection, Radiation.",
+      "Q3: Why are cooking utensils made of metal but handles made of wood? \nAns: Metals are good conductors of heat, wood is an insulator.",
+      "Q4: Give one example of radiation. \nAns: Heat received from the Sun."
+    ]}
+  ]
+},
+{
+  "id": "science-7-acids-bases-salts",
+  "title": "Acids, Bases and Salts",
+  "grade": 7,
+  "subject": "Science",
+  "duration_minutes": 29,
+  "thumbnail": "../assets/thumbs/acids.png",
+  "description": "Learn about acids, bases, and salts, their properties, and uses.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/acids.png",
+      "alt": "Acid and base indicators",
+      "caption": "Litmus paper is used to test acids and bases.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Substances are classified as acids, bases, or salts depending on their chemical nature. They are important in daily life, food, and industry." },
+    { "type": "heading", "level": 2, "text": "Acids" },
+    { "type": "paragraph", "text": "Acids taste sour and turn blue litmus red. Examples: Hydrochloric acid (HCl), Sulphuric acid (H₂SO₄), Citric acid in lemon." },
+    { "type": "heading", "level": 2, "text": "Bases" },
+    { "type": "paragraph", "text": "Bases taste bitter, feel soapy, and turn red litmus blue. Examples: Sodium hydroxide (NaOH), Calcium hydroxide (Ca(OH)₂)." },
+    { "type": "heading", "level": 2, "text": "Salts" },
+    { "type": "paragraph", "text": "Salts are formed when acids react with bases (neutralization). Example: NaOH + HCl → NaCl + H₂O." },
+    { "type": "heading", "level": 2, "text": "Indicators" },
+    { "type": "paragraph", "text": "Indicators like litmus, turmeric, and phenolphthalein help identify acids and bases." },
+    { "type": "heading", "level": 2, "text": "Applications in Daily Life" },
+    { "type": "paragraph", "text": "Acids and bases are used in food preservation, cleaning agents, medicine, and fertilizers." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: What happens to blue litmus when dipped in acid? \nAns: It turns red.",
+      "Q2: Give one example each of natural acid and base. \nAns: Citric acid (acid), Baking soda (base).",
+      "Q3: What is neutralization reaction? \nAns: Reaction between acid and base to form salt and water.",
+      "Q4: Why is turmeric used as an indicator? \nAns: It turns red in bases but remains yellow in acids."
+    ]}
+  ]
+},
+{
+  "id": "math-8-comparing-quantities",
+  "title": "Comparing Quantities",
+  "grade": 8,
+  "subject": "Maths",
+  "duration_minutes": 28,
+  "thumbnail": "../assets/thumbs/quantities.png",
+  "description": "Learn how to compare quantities using ratios, percentages, profit and loss, and simple interest.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/quantities.png",
+      "alt": "Comparison using percentages",
+      "caption": "Percentages are widely used for comparing quantities.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Comparing quantities is important in everyday life for discounts, interest rates, profit/loss, and percentages." },
+    { "type": "heading", "level": 2, "text": "Ratios and Proportions" },
+    { "type": "paragraph", "text": "A ratio compares two quantities. A proportion is when two ratios are equal. Example: 2:3 = 4:6." },
+    { "type": "heading", "level": 2, "text": "Percentages" },
+    { "type": "paragraph", "text": "Percentage means 'per hundred'. Example: 45% = 45/100. Used in marks, discounts, and statistics." },
+    { "type": "heading", "level": 2, "text": "Profit and Loss" },
+    { "type": "paragraph", "text": "Profit = Selling Price – Cost Price. Loss = Cost Price – Selling Price. Profit% = (Profit/CP)×100." },
+    { "type": "heading", "level": 2, "text": "Simple Interest" },
+    { "type": "paragraph", "text": "SI = (P × R × T)/100, where P = Principal, R = Rate, T = Time (years)." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Find 20% of 450. \nAns: (20/100)×450 = 90.",
+      "Q2: A shopkeeper buys a pen for ₹50 and sells it for ₹65. Find profit%.\nAns: Profit = 15; Profit% = (15/50)×100 = 30%.",
+      "Q3: Find SI on ₹5000 at 10% for 2 years.\nAns: (5000×10×2)/100 = ₹1000.",
+      "Q4: If 5 kg rice costs ₹250, what is the cost of 8 kg?\nAns: 250/5 = 50 per kg → 50×8 = ₹400."
+    ]}
+  ]
+},
+{
+  "id": "math-8-mensuration",
+  "title": "Mensuration",
+  "grade": 8,
+  "subject": "Maths",
+  "duration_minutes": 30,
+  "thumbnail": "../assets/thumbs/mensuration8.png",
+  "description": "Learn formulas for surface area and volume of 3D solids and solve real-life problems.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/mensuration8.png",
+      "alt": "3D shapes",
+      "caption": "Mensuration includes surface areas and volumes of solids.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Mensuration in Grade 8 extends to 3D figures, focusing on surface area and volume of cubes, cuboids, cylinders, cones, and spheres." },
+    { "type": "heading", "level": 2, "text": "Surface Area of Solids" },
+    { "type": "paragraph", "text": "Formulas: Cube = 6a², Cuboid = 2(lb + bh + hl), Cylinder = 2πr(h + r), Sphere = 4πr², Cone = πr(l + r)." },
+    { "type": "heading", "level": 2, "text": "Volume of Solids" },
+    { "type": "paragraph", "text": "Formulas: Cube = a³, Cuboid = l×b×h, Cylinder = πr²h, Sphere = (4/3)πr³, Cone = (1/3)πr²h." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Surface area is used in painting walls and wrapping gifts. Volume is used in finding storage capacity of tanks or boxes." },
+    { "type": "heading", "level": 2, "text": "Units" },
+    { "type": "paragraph", "text": "Surface area → square units (cm², m²). Volume → cubic units (cm³, m³)." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Find volume of a cube of side 7 cm. \nAns: 7³ = 343 cm³.",
+      "Q2: Find CSA of cylinder with r = 5 cm, h = 10 cm (π=3.14).\nAns: 2πrh = 2×3.14×5×10 = 314 cm².",
+      "Q3: A cone has r=3 cm, h=4 cm. Find volume. \nAns: (1/3)πr²h = (1/3)×3.14×9×4 = 37.68 cm³.",
+      "Q4: A spherical ball has radius 14 cm. Find its surface area.\nAns: 4πr² = 4×3.14×196 = 2464.64 cm²."
+    ]}
+  ]
+},
+{
+  "id": "science-8-microorganisms",
+  "title": "Microorganisms: Friend and Foe",
+  "grade": 8,
+  "subject": "Science",
+  "duration_minutes": 28,
+  "thumbnail": "../assets/thumbs/microorganisms.png",
+  "description": "Learn about microorganisms, their beneficial and harmful effects, and their applications.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/microorganisms.png",
+      "alt": "Microbes",
+      "caption": "Microorganisms are found everywhere around us.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Microorganisms are tiny living organisms not visible to the naked eye. They include bacteria, fungi, protozoa, algae, and viruses." },
+    { "type": "heading", "level": 2, "text": "Useful Microorganisms" },
+    { "type": "paragraph", "text": "Used in making curd, bread, antibiotics, and alcohol. Example: Lactobacillus bacteria help in curd formation." },
+    { "type": "heading", "level": 2, "text": "Harmful Microorganisms" },
+    { "type": "paragraph", "text": "Cause diseases like tuberculosis, cholera, malaria. They also spoil food and damage crops." },
+    { "type": "heading", "level": 2, "text": "Applications in Industry" },
+    { "type": "paragraph", "text": "Used in medicine (antibiotics, vaccines), agriculture (biofertilizers), and waste management." },
+    { "type": "heading", "level": 2, "text": "Food Preservation" },
+    { "type": "paragraph", "text": "Microorganisms spoil food. Preservation methods: salting, refrigeration, canning, and chemical preservatives." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Name two useful and two harmful microorganisms. \nAns: Useful – Lactobacillus, Penicillium; Harmful – Plasmodium, Salmonella.",
+      "Q2: Which microorganism is used in alcohol production? \nAns: Yeast.",
+      "Q3: State one method of food preservation. \nAns: Refrigeration.",
+      "Q4: Name a disease caused by protozoa. \nAns: Malaria."
+    ]}
+  ]
+},
+{
+  "id": "science-8-sound",
+  "title": "Sound",
+  "grade": 8,
+  "subject": "Science",
+  "duration_minutes": 30,
+  "thumbnail": "../assets/thumbs/sound.png",
+  "description": "Learn about production, propagation, characteristics, and applications of sound.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/sound.png",
+      "alt": "Sound waves",
+      "caption": "Sound travels as longitudinal waves.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Production of Sound" },
+    { "type": "paragraph", "text": "Sound is produced by vibrations of objects. Example: vibrating strings of guitar." },
+    { "type": "heading", "level": 2, "text": "Propagation of Sound" },
+    { "type": "paragraph", "text": "Sound travels as longitudinal waves through a medium like air, water, or solids but not through vacuum." },
+    { "type": "heading", "level": 2, "text": "Characteristics of Sound" },
+    { "type": "paragraph", "text": "Pitch (depends on frequency), Loudness (depends on amplitude), Quality (depends on waveform)." },
+    { "type": "heading", "level": 2, "text": "Human Voice and Hearing" },
+    { "type": "paragraph", "text": "Voice is produced in larynx due to vibration of vocal cords. The human ear detects sound frequencies roughly between 20 Hz to 20,000 Hz." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Used in communication, music, medical field (ultrasound), and echolocation in animals." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: What is the SI unit of frequency? \nAns: Hertz (Hz).",
+      "Q2: Why can’t sound travel through vacuum? \nAns: Because there are no particles to carry vibrations.",
+      "Q3: Name three characteristics of sound. \nAns: Pitch, Loudness, Quality.",
+      "Q4: Which range of sound can humans hear? \nAns: 20 Hz – 20,000 Hz."
+    ]}
+  ]
+},
+{
+  "id": "math-9-linear-equations",
+  "title": "Linear Equations in Two Variables",
+  "grade": 9,
+  "subject": "Maths",
+  "duration_minutes": 32,
+  "thumbnail": "../assets/thumbs/linear.png",
+  "description": "Learn how to represent and solve linear equations in two variables using algebraic and graphical methods.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/linear.png",
+      "alt": "Graph of linear equations",
+      "caption": "Linear equations in two variables represent straight lines.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "A linear equation in two variables has the form ax + by + c = 0. Its solution is a pair of values (x, y) that satisfies the equation." },
+    { "type": "heading", "level": 2, "text": "Graphical Representation" },
+    { "type": "paragraph", "text": "Each linear equation represents a straight line on a graph. Solutions are points lying on the line." },
+    { "type": "heading", "level": 2, "text": "Methods of Solving" },
+    { "type": "paragraph", "text": "Substitution, Elimination, and Cross-Multiplication methods are used to solve pairs of linear equations." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Used in word problems involving age, mixtures, distance-time, and financial planning." },
+    { "type": "heading", "level": 2, "text": "Types of Solutions" },
+    { "type": "paragraph", "text": "Two lines may intersect (unique solution), be parallel (no solution), or coincide (infinitely many solutions)." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Solve: x + y = 10, x – y = 4. \nAns: Adding → 2x=14 → x=7, y=3.",
+      "Q2: Write equation of line passing through (0,2) with slope 1. \nAns: y = x + 2.",
+      "Q3: If 2x + 3y = 12 and x=3, find y. \nAns: 2(3)+3y=12 → 6+3y=12 → y=2."
+    ]}
+  ]
+},
+{
+  "id": "math-9-surface-area-volume",
+  "title": "Surface Areas and Volumes",
+  "grade": 9,
+  "subject": "Maths",
+  "duration_minutes": 34,
+  "thumbnail": "../assets/thumbs/surface.png",
+  "description": "Learn formulas for surface areas and volumes of solid figures and solve practical problems.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/surface.png",
+      "alt": "3D figures surface area and volume",
+      "caption": "Solids have surface area and volume.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Surface area measures outer covering; volume measures space inside. Important for storage, construction, and packaging." },
+    { "type": "heading", "level": 2, "text": "Surface Area Formulas" },
+    { "type": "paragraph", "text": "Sphere=4πr², Cylinder=2πr(h+r), Cone=πr(l+r), Cuboid=2(lb+bh+hl)." },
+    { "type": "heading", "level": 2, "text": "Volume Formulas" },
+    { "type": "paragraph", "text": "Sphere=(4/3)πr³, Cylinder=πr²h, Cone=(1/3)πr²h, Cuboid=lbh." },
+    { "type": "heading", "level": 2, "text": "Combination of Solids" },
+    { "type": "paragraph", "text": "Complex solids are solved by breaking into basic shapes. Example: Ice-cream cone = cone + hemisphere." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Used in designing containers, storage tanks, packaging, and construction works." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Find volume of a sphere of radius 7 cm. \nAns: (4/3)π(7³)=1436.76 cm³.",
+      "Q2: A cuboid has l=10 cm, b=8 cm, h=6 cm. Find its surface area.\nAns: 2(lb+bh+hl)=2(80+48+60)=376 cm².",
+      "Q3: CSA of a cylinder with r=7 cm, h=14 cm (π=22/7). \nAns: 2πrh=2×22/7×7×14=616 cm²."
+    ]}
+  ]
+},
+{
+  "id": "science-9-matter-surroundings",
+  "title": "Matter in Our Surroundings",
+  "grade": 9,
+  "subject": "Science",
+  "duration_minutes": 32,
+  "thumbnail": "../assets/thumbs/matter.png",
+  "description": "Learn about matter, its states, properties, and interconversion.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/matter.png",
+      "alt": "States of matter",
+      "caption": "Matter exists in solid, liquid, and gaseous states.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction" },
+    { "type": "paragraph", "text": "Matter is anything that occupies space and has mass. It exists mainly in solid, liquid, and gaseous states." },
+    { "type": "heading", "level": 2, "text": "Characteristics of Particles of Matter" },
+    { "type": "paragraph", "text": "Particles are very small, have space between them, are constantly moving, and attract each other." },
+    { "type": "heading", "level": 2, "text": "States of Matter" },
+    { "type": "paragraph", "text": "Solids have fixed shape, liquids flow and take container’s shape, gases have neither definite shape nor volume." },
+    { "type": "heading", "level": 2, "text": "Change of State" },
+    { "type": "paragraph", "text": "Matter changes state on heating or cooling. Example: Ice → Water → Steam. Process involves melting, evaporation, condensation, sublimation." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Used in refrigeration, air conditioning, cooking, and industry." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: Define matter. \nAns: Anything that has mass and occupies space.",
+      "Q2: Name three characteristics of particles of matter. \nAns: Small size, movement, interparticle space.",
+      "Q3: What is sublimation? \nAns: Change of solid directly into gas (e.g., camphor, dry ice).",
+      "Q4: Why do solids have definite shape? \nAns: Because particles are tightly packed."
+    ]}
+  ]
+},
+{
+  "id": "science-9-work-energy",
+  "title": "Work and Energy",
+  "grade": 9,
+  "subject": "Science",
+  "duration_minutes": 34,
+  "thumbnail": "../assets/thumbs/work.png",
+  "description": "Learn the concept of work, energy, their forms, and the law of conservation of energy.",
+  "content": [
+    {
+      "type": "image",
+      "src": "../assets/img/work.png",
+      "alt": "Work and energy",
+      "caption": "Work is done when force displaces an object.",
+      "width": "350px"
+    },
+    { "type": "heading", "level": 1, "text": "Introduction to Work" },
+    { "type": "paragraph", "text": "Work is done when a force is applied on an object and the object gets displaced in the direction of force. Work = Force × Displacement × cosθ." },
+    { "type": "heading", "level": 2, "text": "Positive and Negative Work" },
+    { "type": "paragraph", "text": "If displacement is in direction of force → positive work. If opposite → negative work." },
+    { "type": "heading", "level": 2, "text": "Energy" },
+    { "type": "paragraph", "text": "Energy is the capacity to do work. Two main forms: Kinetic Energy (due to motion) and Potential Energy (due to position)." },
+    { "type": "heading", "level": 2, "text": "Work-Energy Theorem" },
+    { "type": "paragraph", "text": "The work done on an object is equal to the change in its kinetic energy." },
+    { "type": "heading", "level": 2, "text": "Law of Conservation of Energy" },
+    { "type": "paragraph", "text": "Energy can neither be created nor destroyed; it only changes from one form to another." },
+    { "type": "heading", "level": 2, "text": "Applications" },
+    { "type": "paragraph", "text": "Used in machines, electricity generation, hydroelectric power, and daily activities." },
+    { "type": "heading", "level": 2, "text": "Questions for Practice" },
+    { "type": "list", "ordered": true, "items": [
+      "Q1: When is work said to be done? \nAns: When force is applied and the body is displaced in the direction of force.",
+      "Q2: Write the formula for kinetic energy. \nAns: KE = 1/2 mv².",
+      "Q3: State the law of conservation of energy. \nAns: Energy can neither be created nor destroyed; it transforms from one form to another.",
+      "Q4: A force of 20 N displaces an object by 3 m in direction of force. Find work done.\nAns: W = F×d = 20×3 = 60 J."
+    ]}
+  ]
+}]
 
   
