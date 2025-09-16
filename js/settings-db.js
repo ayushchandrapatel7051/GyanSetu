@@ -1,4 +1,4 @@
-// js/settings-db.js (improved)
+// js/settings-db.js (improved with updatedAt + exported normalize)
 (function (window) {
   const DB_NAME = "gyansetu-settings";
   const DB_VERSION = 1;
@@ -16,19 +16,13 @@
           const store = db.createObjectStore(STORE_SETTINGS, {
             keyPath: "email",
           });
-          // optional indexes
           store.createIndex("by_name", "name", { unique: false });
           store.createIndex("by_language", "language", { unique: false });
+          store.createIndex("by_updatedAt", "updatedAt", { unique: false });
         }
       };
-      req.onsuccess = (e) => {
-        console.debug("SettingsDB: open OK");
-        resolve(e.target.result);
-      };
-      req.onerror = (e) => {
-        console.error("SettingsDB: open ERROR", e.target.error);
-        reject(e.target.error);
-      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = (e) => reject(e.target.error);
     });
     return dbPromise;
   }
@@ -42,8 +36,12 @@
     if (!settings || !settings.email) {
       return Promise.reject(new Error("saveSettings: settings.email required"));
     }
+    const normalizedEmail = normalizeEmail(settings.email);
+    // ensure updatedAt for conflict resolution
+    const now = Date.now();
     const normalized = Object.assign({}, settings, {
-      email: normalizeEmail(settings.email),
+      email: normalizedEmail,
+      updatedAt: settings.updatedAt && Number(settings.updatedAt) > 0 ? Number(settings.updatedAt) : now,
     });
 
     const db = await openDB();
@@ -51,14 +49,8 @@
       const tx = db.transaction(STORE_SETTINGS, "readwrite");
       const st = tx.objectStore(STORE_SETTINGS);
       const putReq = st.put(normalized);
-      putReq.onsuccess = () => {
-        console.debug("SettingsDB: saved", normalized.email);
-        resolve(putReq.result);
-      };
-      putReq.onerror = (e) => {
-        console.error("SettingsDB: save ERROR", e.target.error);
-        reject(e.target.error);
-      };
+      putReq.onsuccess = () => resolve(putReq.result);
+      putReq.onerror = (e) => reject(e.target.error);
     });
   }
 
@@ -70,14 +62,8 @@
       const tx = db.transaction(STORE_SETTINGS, "readonly");
       const st = tx.objectStore(STORE_SETTINGS);
       const req = st.get(key);
-      req.onsuccess = (e) => {
-        console.debug("SettingsDB: get", key, "->", e.target.result);
-        resolve(e.target.result);
-      };
-      req.onerror = (e) => {
-        console.error("SettingsDB: get ERROR", e.target.error);
-        reject(e.target.error);
-      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = (e) => reject(e.target.error);
     });
   }
 
@@ -87,14 +73,11 @@
       const tx = db.transaction(STORE_SETTINGS, "readonly");
       const st = tx.objectStore(STORE_SETTINGS);
       const req = st.getAll();
-      req.onsuccess = (e) => {
-        resolve(e.target.result || []);
-      };
+      req.onsuccess = (e) => resolve(e.target.result || []);
       req.onerror = (e) => reject(e.target.error);
     });
   }
 
-  // bonus helpers
   async function deleteSettings(email) {
     const key = normalizeEmail(email);
     if (!key) return;
@@ -102,14 +85,8 @@
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_SETTINGS, "readwrite");
       tx.objectStore(STORE_SETTINGS).delete(key);
-      tx.oncomplete = () => {
-        console.debug("SettingsDB: deleted", key);
-        resolve();
-      };
-      tx.onerror = (e) => {
-        console.error("SettingsDB: delete ERROR", e);
-        reject(e.target.error);
-      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
     });
   }
 
@@ -118,14 +95,8 @@
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_SETTINGS, "readwrite");
       tx.objectStore(STORE_SETTINGS).clear();
-      tx.oncomplete = () => {
-        console.debug("SettingsDB: cleared all");
-        resolve();
-      };
-      tx.onerror = (e) => {
-        console.error("SettingsDB: clear ERROR", e);
-        reject(e.target.error);
-      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
     });
   }
 
@@ -136,5 +107,6 @@
     getAllSettings,
     deleteSettings,
     clearAllSettings,
+    normalizeEmail, // exported so UI code can reuse same normalization
   };
 })(window);

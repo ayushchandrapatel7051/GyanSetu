@@ -1,10 +1,7 @@
-// js/auth.js
+// js/auth.js (safe session, updatedAt, merged writes)
 // Authentication helpers + form wiring.
-// Requires settings-db.js to be loaded before this file (so SettingsDB exists).
+// Requires settings-db.js to be loaded before this file (so SettingsDB is available).
 
-/* -----------------------
-   Simple auth IndexedDB helpers
-   ----------------------- */
 const AUTH_DB = "gyansetu-auth";
 const AUTH_STORE = "users";
 const AUTH_VERSION = 1;
@@ -29,7 +26,7 @@ async function addUserToDB(user) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(AUTH_STORE, "readwrite");
     const st = tx.objectStore(AUTH_STORE);
-    const addReq = st.add(user); // will fail if email already exists
+    const addReq = st.add(user);
     addReq.onsuccess = () => resolve(addReq.result);
     addReq.onerror = (e) => reject(e.target.error);
   });
@@ -58,59 +55,85 @@ async function updateUserInDB(user) {
   });
 }
 
-function saveUserLocal(user) {
+/* -----------------------
+   Session helpers (local merge)
+   ----------------------- */
+function normalizeEmailLocal(email) {
+  if (!email) return email;
+  return String(email).trim().toLowerCase();
+}
+
+function mergeSession(existing, incoming) {
+  // canonical session shape:
+  // { email, name, profile, avatar, grade, language, phone, updatedAt }
+  const now = Date.now();
+  const a = existing || {};
+  const b = incoming || {};
+
+  if (a.email) a.email = normalizeEmailLocal(a.email);
+  if (b.email) b.email = normalizeEmailLocal(b.email);
+
+  const aTime = a.updatedAt ? Number(a.updatedAt) : 0;
+  const bTime = b.updatedAt ? Number(b.updatedAt) : 0;
+  const newer = bTime > aTime ? b : a;
+  const older = bTime > aTime ? a : b;
+
+  const merged = {
+    email: newer.email || older.email || "",
+    name: newer.name || older.name || (newer.firstName ? `${newer.firstName} ${newer.lastName || ""}`.trim() : "Unknown"),
+    profile: newer.profile || older.profile || "",
+    avatar: newer.avatar || older.avatar || "../assets/img/avatar.jpg",
+    grade: newer.grade || older.grade || "",
+    language: newer.language || older.language || "en",
+    phone: newer.phone || older.phone || "",
+    updatedAt: Math.max(aTime, bTime, now)
+  };
+
+  return merged;
+}
+
+function readLoginSession() {
   try {
-    localStorage.setItem(
-      "gyan_current_user",
-      JSON.stringify({
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        name: user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        grade: user.grade,
-        language: user.language,
-        phone: user.phone,
-      })
-    );
+    const raw = localStorage.getItem("gyan_current_user");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.email) parsed.email = normalizeEmailLocal(parsed.email);
+    if (parsed && parsed.updatedAt) parsed.updatedAt = Number(parsed.updatedAt) || Date.now();
+    return parsed;
   } catch (e) {
-    console.warn("saveUserLocal failed", e);
+    return null;
   }
 }
 
-function normalizeLanguage(l) {
-  if (!l) return "en";
-  const v = String(l).toLowerCase();
-  if (v.startsWith("en")) return "en";
-  if (v.startsWith("hi")) return "hi";
-  if (v.startsWith("or")) return "or";
-  return v;
+function writeLoginSessionSafely(obj) {
+  try {
+    const existing = readLoginSession();
+    const merged = mergeSession(existing, obj);
+    localStorage.setItem("gyan_current_user", JSON.stringify(merged));
+    console.debug("gyan_current_user written (merged)", merged);
+  } catch (e) {
+    console.warn("writeLoginSessionSafely failed", e);
+  }
 }
 
 /* -----------------------
-   ensureSettingsForUser (uses your existing SettingsDB wrapper)
-   (kept your implementation but with a small defensive guard)
+   ensureSettingsForUser (sync auth -> settings)
    ----------------------- */
 async function ensureSettingsForUser(user) {
   if (!window.SettingsDB || !SettingsDB.openDB) return;
   try {
     await SettingsDB.openDB();
-    const email = (user && user.email) ? String(user.email).toLowerCase() : null;
+    const email = (user && user.email) ? normalizeEmailLocal(String(user.email)) : null;
     if (!email) return;
 
+    // load existing settings
     let s = null;
-    try {
-      s = await SettingsDB.getSettings(email);
-    } catch (e) {
-      s = null;
-    }
+    try { s = await SettingsDB.getSettings(email); } catch (e) { s = null; }
 
+    // ensure fields and prefer existing settings values where reasonable
     const merged = Object.assign({}, s || {}, {
       email,
-      name:
-        user.name ||
-        `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-        (s && s.name) ||
-        "",
+      name: user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim() || (s && s.name) || "",
       grade: user.grade || (s && s.grade) || "8",
       language: (function (l) {
         const v = String(l || (s && s.language) || "en").toLowerCase();
@@ -119,10 +142,11 @@ async function ensureSettingsForUser(user) {
         if (v.startsWith("or")) return "or";
         return v;
       })(user.language),
-      avatar: (s && s.avatar) || user.avatar || "../assets/avatar.jpg",
+      avatar: (s && s.avatar) || user.avatar || "../assets/img/avatar.jpg",
       badges: (s && s.badges) || [],
       xp: s && s.xp != null ? s.xp : 0,
       lastLesson: (s && s.lastLesson) || null,
+      updatedAt: Date.now()
     });
 
     await SettingsDB.saveSettings(merged);
@@ -133,33 +157,28 @@ async function ensureSettingsForUser(user) {
 }
 
 /* -----------------------
-   signup and login flows
+   Signup / Login flows
    ----------------------- */
 async function signupUser(user) {
   try {
-    // normalise
-    user.email = String(user.email || "").toLowerCase();
-    // create createdAt metadata
+    user.email = normalizeEmailLocal(user.email || "");
     user.createdAt = Date.now();
+    user.updatedAt = Date.now();
 
-    // attempt to add to DB; if email exists, addUserToDB will reject (ConstraintError)
+    // add to auth DB
     await addUserToDB(user);
 
-    // keep a short local copy (not marking logged-in automatically)
-    saveUserLocal(user);
+    // safe write to local session (not marking logged in yet)
+    writeLoginSessionSafely(user);
 
-    // sync settings record (best-effort)
-    await ensureSettingsForUser(user).catch((e) => {
-      console.warn("Settings sync after signup failed", e);
-    });
+    // sync settings record
+    await ensureSettingsForUser(user).catch((e) => console.warn("Settings sync after signup failed", e));
 
-    // Redirect to auth page with login tab active
-    // If auth.html is in templates/ use that path, otherwise adjust
+    // redirect to login tab
     const authPath = location.pathname.includes("/templates/") ? "auth.html?login=1" : "./auth.html?login=1";
     window.location.href = authPath;
   } catch (e) {
     console.error("Signup failed", e);
-    // show friendly error for common case
     if (e && e.name === "ConstraintError") {
       alert("An account with this email already exists. Please login instead.");
     } else {
@@ -169,34 +188,45 @@ async function signupUser(user) {
 }
 
 async function loginSuccess(user) {
-  // store minimal profile in localStorage (quick access for UI)
-  localStorage.setItem(
-    "gyan_current_user",
-    JSON.stringify({
+  try {
+    user.updatedAt = Date.now();
+    // mark logged in in auth DB
+    user.isLoggedIn = true;
+    await updateUserInDB(user).catch((e) => console.warn("updateUserInDB failed", e));
+
+    // write safe merged session
+    writeLoginSessionSafely({
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       name: user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
       grade: user.grade,
-      language: normalizeLanguage(user.language),
+      language: (function (l) {
+        const v = String(l || "en").toLowerCase();
+        if (v.startsWith("en")) return "en";
+        if (v.startsWith("hi")) return "hi";
+        if (v.startsWith("or")) return "or";
+        return v;
+      })(user.language),
       phone: user.phone,
-    })
-  );
+      updatedAt: user.updatedAt
+    });
 
-  // ensure settings record exists
-  await ensureSettingsForUser(user).catch((e) => {
-    console.warn("ensureSettingsForUser during login failed", e);
-  });
+    // ensure settings record exists and is up to date
+    await ensureSettingsForUser(user).catch((e) => console.warn("ensureSettingsForUser during login failed", e));
 
-  // redirect to root (adjust path depending on templates folder)
-  const redirectPath = location.pathname.includes("/templates/") ? "../index.html" : "../index.html";
-  setTimeout(() => {
-    window.location.href = redirectPath;
-  }, 300);
+    // redirect to index
+    const redirectPath = location.pathname.includes("/templates/") ? "../index.html" : "../index.html";
+    setTimeout(() => window.location.href = redirectPath, 300);
+  } catch (err) {
+    console.error("loginSuccess failed", err);
+    // fallback: still redirect
+    window.location.href = "../index.html";
+  }
 }
 
 /* -----------------------
-   DOM wiring: forms + tabs
+   DOM wiring (forms)
    ----------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signupForm");
@@ -219,14 +249,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (signupForm) signupForm.style.display = "";
   }
 
-  // if url contains ?login=1 we show login tab
   const params = new URLSearchParams(window.location.search);
-  if (params.get("login") === "1") {
-    showLoginTab();
-  } else {
-    // default show login
-    showLoginTab();
-  }
+  if (params.get("login") === "1") showLoginTab();
+  else showLoginTab();
 
   if (tabLogin) tabLogin.addEventListener("click", showLoginTab);
   if (tabSignup) tabSignup.addEventListener("click", showSignupTab);
@@ -248,7 +273,6 @@ document.addEventListener("DOMContentLoaded", () => {
         isLoggedIn: false
       };
 
-      // basic validation
       if (!user.email || !user.password) {
         if (signupMsg) signupMsg.textContent = "Please provide email and password.";
         return;
@@ -257,7 +281,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await signupUser(user);
       } catch (err) {
-        // signupUser already shows alerts; but keep fallback message
         if (signupMsg) signupMsg.textContent = "Signup failed. Please try again.";
       }
     });
@@ -281,6 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const user = await getUserFromDB(email);
         if (user && user.password === password) {
           user.isLoggedIn = true;
+          user.updatedAt = Date.now();
           await updateUserInDB(user);
           await loginSuccess(user);
         } else {

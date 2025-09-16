@@ -235,130 +235,224 @@
 
     <!-- Integration script -->
     <script>
-      (function(){
-        const profileAvatar = document.getElementById("profileAvatar");
-        const profileName = document.getElementById("profileName");
-        const profileEmail = document.getElementById("profileEmail");
-        const cardLanguage = document.getElementById("cardLanguage");
-        const cardGrade = document.getElementById("cardGrade");
-        const openEditBtn = document.getElementById("openEditBtn");
-        const editModal = document.getElementById("editModal");
-        const modalName = document.getElementById("modalName");
-        const modalEmail = document.getElementById("modalEmail");
-        const modalProfile = document.getElementById("modalProfile");
-        const modalGrade = document.getElementById("modalGrade");
-        const modalLanguage = document.getElementById("modalLanguage");
-        const modalAvatar = document.getElementById("modalAvatar");
-        const modalCancelBtn = document.getElementById("modalCancelBtn");
-        const modalSaveBtn = document.getElementById("modalSaveBtn");
-        const modalDeleteBtn = document.getElementById("modalDeleteBtn");
+  (function(){
+    const profileAvatar = document.getElementById("profileAvatar");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const cardLanguage = document.getElementById("cardLanguage");
+    const cardGrade = document.getElementById("cardGrade");
+    const openEditBtn = document.getElementById("openEditBtn");
+    const editModal = document.getElementById("editModal");
+    const modalName = document.getElementById("modalName");
+    const modalEmail = document.getElementById("modalEmail");
+    const modalProfile = document.getElementById("modalProfile");
+    const modalGrade = document.getElementById("modalGrade");
+    const modalLanguage = document.getElementById("modalLanguage");
+    const modalAvatar = document.getElementById("modalAvatar");
+    const modalCancelBtn = document.getElementById("modalCancelBtn");
+    const modalSaveBtn = document.getElementById("modalSaveBtn");
+    const modalDeleteBtn = document.getElementById("modalDeleteBtn");
 
-        const DEFAULT_EMAIL = "johndoe@email.com";
-        const DEFAULT_SETTINGS = {
-          email: DEFAULT_EMAIL,
-          name: "John Doe",
-          language: "en",
-          grade: "8",
-          profile: "Learner",
-          avatar: "../assets/img/avatar.jpg",
-          badges: [],
-          xp: 0,
-        };
+    const DEFAULT_EMAIL = "johndoe@email.com";
+    const DEFAULT_SETTINGS = {
+      email: DEFAULT_EMAIL,
+      name: "John Doe",
+      language: "en",
+      grade: "8",
+      profile: "Learner",
+      avatar: "../assets/img/avatar.jpg",
+      badges: [],
+      xp: 0,
+      updatedAt: Date.now()
+    };
 
-        let currentSettings = null;
+    let currentSettings = null;
 
-        // normalize helper
-        function normalizeLanguage(lang){
-          if(!lang) return "en";
-          const l = String(lang).toLowerCase();
-          if(l==="en"||l==="english") return "en";
-          if(l==="hi"||l==="hindi") return "hi";
-          if(l==="or"||l==="odia"||l==="oriya") return "or";
-          return "en";
+    function normalizeLanguage(lang){
+      if(!lang) return "en";
+      const l = String(lang).toLowerCase();
+      if(l==="en"||l==="english") return "en";
+      if(l==="hi"||l==="hindi") return "hi";
+      if(l==="or"||l==="odia"||l==="oriya") return "or";
+      return "en";
+    }
+
+    // merge function: choose newest for each whole object (DB vs login)
+    function pickNewest(dbRec, loginRec) {
+      if(!dbRec && !loginRec) return null;
+      if(!dbRec) return loginRec;
+      if(!loginRec) return dbRec;
+      const dbTime = dbRec.updatedAt ? Number(dbRec.updatedAt) : 0;
+      const loginTime = loginRec.updatedAt ? Number(loginRec.updatedAt) : 0;
+      return dbTime >= loginTime ? dbRec : loginRec;
+    }
+
+    // read login session (localStorage)
+    function readLoginSession() {
+      const raw = localStorage.getItem("gyan_current_user");
+      if(!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if(parsed && parsed.email && window.SettingsDB && window.SettingsDB.normalizeEmail) {
+          parsed.email = window.SettingsDB.normalizeEmail(parsed.email);
         }
+        // ensure numeric updatedAt
+        if(parsed && parsed.updatedAt) parsed.updatedAt = Number(parsed.updatedAt) || Date.now();
+        return parsed;
+      } catch(e) {
+        console.warn("failed to parse gyan_current_user", e);
+        return null;
+      }
+    }
 
-        async function loadSettings(email){
-          const key = (email && email.trim()) || DEFAULT_EMAIL;
-          try {
-            const s = await SettingsDB.getSettings(key);
-            const logged = JSON.parse(localStorage.getItem("gyan_current_user")||"{}");
-            const merged = Object.assign({}, DEFAULT_SETTINGS, s||{}, logged||{});
-            merged.language = normalizeLanguage(merged.language);
-            currentSettings = merged;
+    // write session
+    function writeLoginSession(obj){
+      try {
+        localStorage.setItem("gyan_current_user", JSON.stringify(obj));
+      } catch(e){
+        console.warn("failed to write gyan_current_user", e);
+      }
+    }
 
-            profileName.textContent = merged.name || "Unknown";
-            profileEmail.textContent = merged.email || "";
-            profileAvatar.src = merged.avatar || "../assets/img/avatar.jpg";
-            cardLanguage.value = merged.language;
-            cardGrade.value = merged.grade || "8";
+    async function loadAndSync(emailFromLogin) {
+      // ensure DB ready
+      await SettingsDB.openDB();
+      const loginRec = readLoginSession() || {};
+      const emailCandidate = emailFromLogin || loginRec.email || DEFAULT_SETTINGS.email;
+      const normalizedEmail = SettingsDB.normalizeEmail(emailCandidate || DEFAULT_SETTINGS.email);
 
-            const topLang = document.getElementById("language");
-            if(topLang) topLang.value = merged.language;
-          } catch(e){
-            console.error("loadSettings err", e);
-          }
+      // fetch DB record
+      const dbRec = await SettingsDB.getSettings(normalizedEmail);
+
+      // if no dbRec but loginRec has data, save loginRec into DB (initial save)
+      if(!dbRec && loginRec && loginRec.email) {
+        // fill with defaults
+        const toSave = Object.assign({}, DEFAULT_SETTINGS, loginRec, { email: normalizedEmail, updatedAt: loginRec.updatedAt || Date.now() });
+        await SettingsDB.saveSettings(toSave).catch(err => console.warn("initial save failed", err));
+        writeLoginSession(toSave);
+        currentSettings = toSave;
+      } else {
+        // pick latest between db and login (based on updatedAt)
+        const dbProcessed = dbRec ? Object.assign({}, DEFAULT_SETTINGS, dbRec) : null;
+        const loginProcessed = loginRec ? Object.assign({}, DEFAULT_SETTINGS, loginRec) : null;
+        const winner = pickNewest(dbProcessed, loginProcessed) || DEFAULT_SETTINGS;
+        // ensure normalized email and language
+        winner.email = SettingsDB.normalizeEmail(winner.email || DEFAULT_SETTINGS.email);
+        winner.language = normalizeLanguage(winner.language);
+        currentSettings = winner;
+        // make DB and localStorage consistent: if localStorage older than DB, update it; if DB older and login newer, save to DB
+        const dbTime = dbProcessed && dbProcessed.updatedAt ? Number(dbProcessed.updatedAt) : 0;
+        const winTime = winner.updatedAt ? Number(winner.updatedAt) : Date.now();
+        if(!dbRec || winTime > dbTime) {
+          try { await SettingsDB.saveSettings(winner); } catch(e){ console.warn("sync save to DB failed", e); }
         }
+        writeLoginSession(winner);
+      }
 
-        window.addEventListener("DOMContentLoaded", async()=>{
-          await SettingsDB.openDB();
-          const raw = localStorage.getItem("gyan_current_user");
-          let email = DEFAULT_EMAIL;
-          if(raw){
-            try{ email = JSON.parse(raw).email || DEFAULT_EMAIL; }catch{}
+      applyToUI(currentSettings);
+      console.debug("Loaded settings:", currentSettings);
+    }
+
+    function applyToUI(s) {
+      profileName.textContent = s.name || "Unknown";
+      profileEmail.textContent = s.email || "";
+      profileAvatar.src = s.avatar || "../assets/img/avatar.jpg";
+      cardLanguage.value = s.language || "en";
+      cardGrade.value = s.grade || "8";
+      const topLang = document.getElementById("language");
+      if(topLang) topLang.value = s.language || "en";
+    }
+
+    // Watch for other scripts changing gyan_current_user in localStorage (helps debug overwrite sources)
+    window.addEventListener("storage", (ev) => {
+      if(ev.key === "gyan_current_user") {
+        console.warn("localStorage gyan_current_user changed (storage event). Old:", ev.oldValue, "New:", ev.newValue);
+        // optionally reload / re-sync if you want immediate response
+        try {
+          const parsed = JSON.parse(ev.newValue || "{}");
+          // quick sanity: if new value is older than our current settings, log suspicious
+          const newTime = parsed && parsed.updatedAt ? Number(parsed.updatedAt) : 0;
+          const curTime = currentSettings && currentSettings.updatedAt ? Number(currentSettings.updatedAt) : 0;
+          if(newTime < curTime) {
+            console.warn("A stale localStorage value replaced a newer profile. That is likely the cause of reverts.");
+          } else {
+            // otherwise, apply it
+            applyToUI(parsed);
+            currentSettings = parsed;
           }
-          await loadSettings(email);
-        });
+        } catch(e) { console.warn("failed to parse new storage value", e); }
+      }
+    });
 
-        openEditBtn.addEventListener("click", ()=>{
-          if(!currentSettings) return;
-          modalName.value = currentSettings.name || "";
-          modalEmail.value = currentSettings.email || "";
-          modalProfile.value = currentSettings.profile || "";
-          modalGrade.value = currentSettings.grade || "8";
-          modalLanguage.value = currentSettings.language || "en";
-          modalAvatar.src = currentSettings.avatar || "../assets/img/avatar.jpg";
-          editModal.classList.add("show");
-        });
+    // boot
+    window.addEventListener("DOMContentLoaded", async () => {
+      await SettingsDB.openDB();
+      // load login session email if any
+      const login = readLoginSession();
+      const email = login && login.email ? login.email : DEFAULT_SETTINGS.email;
+      await loadAndSync(email);
+    });
 
-        modalCancelBtn.addEventListener("click", ()=>{
-          editModal.classList.remove("show");
-        });
+    // open edit modal
+    openEditBtn.addEventListener("click", ()=>{
+      if(!currentSettings) return;
+      modalName.value = currentSettings.name || "";
+      modalEmail.value = currentSettings.email || "";
+      modalProfile.value = currentSettings.profile || "";
+      modalGrade.value = currentSettings.grade || "8";
+      modalLanguage.value = currentSettings.language || "en";
+      modalAvatar.src = currentSettings.avatar || "../assets/img/avatar.jpg";
+      editModal.classList.add("show");
+    });
 
-        modalSaveBtn.addEventListener("click", async()=>{
-          const newEmail = (modalEmail.value||"").trim();
-          if(!newEmail) return alert("Email is required");
-          const updated = Object.assign({}, currentSettings, {
-            email: newEmail,
-            name: modalName.value||"Unknown",
-            profile: modalProfile.value||"",
-            grade: modalGrade.value||"8",
-            language: normalizeLanguage(modalLanguage.value),
-            avatar: modalAvatar.src || "../assets/img/avatar.jpg"
-          });
-          await SettingsDB.saveSettings(updated);
-          localStorage.setItem("gyan_current_user", JSON.stringify(updated));
-          await loadSettings(newEmail);
-          editModal.classList.remove("show");
-          alert("Profile saved");
-        });
+    modalCancelBtn.addEventListener("click", ()=> editModal.classList.remove("show"));
 
-        modalDeleteBtn.addEventListener("click", async()=>{
-          if(!currentSettings||!currentSettings.email) return;
-          const req = indexedDB.open("gyansetu-settings");
-          req.onsuccess = function(e){
-            const db = e.target.result;
-            const tx = db.transaction("settings","readwrite");
-            tx.objectStore("settings").delete(currentSettings.email);
-            tx.oncomplete = ()=>{
-              localStorage.removeItem("gyan_current_user");
-              loadSettings(DEFAULT_EMAIL);
-              editModal.classList.remove("show");
-              alert("Profile deleted");
-            };
-          }
-        });
-      })();
-    </script>
+    modalSaveBtn.addEventListener("click", async()=>{
+      const newEmailRaw = (modalEmail.value||"").trim();
+      if(!newEmailRaw) return alert("Email is required");
+
+      const normalizedEmail = SettingsDB.normalizeEmail(newEmailRaw);
+
+      const updated = Object.assign({}, currentSettings, {
+        email: normalizedEmail,
+        name: modalName.value||"Unknown",
+        profile: modalProfile.value||"",
+        grade: modalGrade.value||"8",
+        language: normalizeLanguage(modalLanguage.value),
+        avatar: modalAvatar.src || "../assets/img/avatar.jpg",
+        updatedAt: Date.now()
+      });
+
+      try {
+        await SettingsDB.saveSettings(updated);
+        writeLoginSession(updated);
+        await loadAndSync(normalizedEmail);
+        editModal.classList.remove("show");
+        alert("Profile saved");
+      } catch(e){
+        console.error("save error", e);
+        alert("Failed to save profile. See console for details.");
+      }
+    });
+
+    modalDeleteBtn.addEventListener("click", async()=>{
+      if(!currentSettings||!currentSettings.email) return;
+      const normalized = SettingsDB.normalizeEmail(currentSettings.email);
+      try {
+        await SettingsDB.deleteSettings(normalized);
+        localStorage.removeItem("gyan_current_user");
+        await loadAndSync(DEFAULT_SETTINGS.email);
+        editModal.classList.remove("show");
+        alert("Profile deleted");
+      } catch(e){
+        console.error("delete error", e);
+        alert("Failed to delete profile. See console.");
+      }
+    });
+
+  })();
+</script>
+
 
     <script src="../main.js"></script>
     <script src="../js/nav.js"></script>
