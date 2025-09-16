@@ -139,6 +139,13 @@ body {
   font-weight: 600;
   outline: none;
 }
+/* dropdown bg */
+.form-row select option {
+  background: #16002a;   
+  color: #ffffff;        
+  font-weight: 500;
+}
+
 .form-row input::placeholder {
   color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
