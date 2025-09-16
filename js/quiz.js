@@ -1,7 +1,16 @@
-// js/quiz.js — dropdown selector + reliable restart (patched to restore result UI sizing)
+// js/quiz.js — complete file with language support, XP awarding, sounds, and robust fallbacks.
+// Requirements: settings-db.js must be loaded before this file if you want XP persistence.
+// Optional: Chart.js for the results chart.
+
 (() => {
-  // small WebAudio helper and toast helper (insert near top so other functions can use them)
-  const audioCtx = (function createAudioContext() {
+  "use strict";
+
+  /* -----------------------------
+     Utilities & small UI helpers
+     ----------------------------- */
+
+  // WebAudio for short feedback sounds
+  const audioCtx = (() => {
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
       return AC ? new AC() : null;
@@ -10,67 +19,109 @@
     }
   })();
 
-  function playSound(isCorrect = true) {
+  function playSound(correct = true) {
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
     const o = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     o.connect(g);
     g.connect(audioCtx.destination);
-    if (isCorrect) {
+    if (correct) {
       o.type = "sine";
-      o.frequency.setValueAtTime(900, now);
+      o.frequency.setValueAtTime(880, now);
       g.gain.setValueAtTime(0, now);
       g.gain.linearRampToValueAtTime(0.12, now + 0.01);
-      o.frequency.exponentialRampToValueAtTime(1400, now + 0.12);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      o.frequency.exponentialRampToValueAtTime(1200, now + 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
       o.start(now);
-      o.stop(now + 0.35);
+      o.stop(now + 0.38);
     } else {
       o.type = "sawtooth";
       o.frequency.setValueAtTime(220, now);
       g.gain.setValueAtTime(0, now);
       g.gain.linearRampToValueAtTime(0.15, now + 0.01);
       o.frequency.exponentialRampToValueAtTime(160, now + 0.18);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
       o.start(now);
       o.stop(now + 0.45);
     }
   }
 
+  // small toast for XP
+  (function injectToastCSS() {
+    if (document.getElementById("gs-quiz-toast-css")) return;
+    const s = document.createElement("style");
+    s.id = "gs-quiz-toast-css";
+    s.textContent = `
+      .gs-xp-toast { position: fixed; right:18px; bottom:26px; z-index:99999;
+        padding:10px 14px; border-radius:10px; font-weight:700; color:#fff;
+        background: linear-gradient(90deg,#7b61ff,#3fd1c9); box-shadow:0 14px 40px rgba(0,0,0,0.45);
+        transform: translateY(8px); opacity:0; transition: transform .22s, opacity .22s;
+      }
+      .gs-xp-toast.show { transform: translateY(0); opacity:1; }
+    `;
+    document.head.appendChild(s);
+  })();
+
   function showXpToast(n) {
     if (!n || n <= 0) return;
-    let t = document.querySelector(".xp-toast");
+    let t = document.querySelector(".gs-xp-toast");
     if (!t) {
       t = document.createElement("div");
-      t.className = "xp-toast";
-      // basic styles so it looks decent without needing CSS edits
-      t.style.position = "fixed";
-      t.style.right = "18px";
-      t.style.top = "18px";
-      t.style.background = "linear-gradient(90deg,#7b61ff,#3fd1c9)";
-      t.style.color = "white";
-      t.style.padding = "8px 12px";
-      t.style.borderRadius = "10px";
-      t.style.boxShadow = "0 6px 18px rgba(0,0,0,0.35)";
-      t.style.zIndex = 9999;
-      t.style.fontWeight = 700;
-      t.innerHTML = `<span class="value">${n}</span> XP`;
+      t.className = "gs-xp-toast";
+      t.innerHTML = `+<strong style="margin:0 6px">${n}</strong> XP`;
       document.body.appendChild(t);
     } else {
-      t.querySelector(".value").textContent = n;
+      t.innerHTML = `+<strong style="margin:0 6px">${n}</strong> XP`;
     }
-    // animate show (simple)
-    t.style.transform = "translateY(-6px)";
-    t.style.opacity = "1";
-    clearTimeout(t._hideTimeout);
-    t._hideTimeout = setTimeout(() => {
-      t.style.transform = "translateY(-20px)";
-      t.style.opacity = "0";
-    }, 1400);
+    void t.offsetWidth;
+    t.classList.add("show");
+    clearTimeout(t._hide);
+    t._hide = setTimeout(() => t.classList.remove("show"), 1600);
   }
 
-  // DOM refs
+  // simple shuffle
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // dedupe questions by question_id or question text
+  function uniqueQuestions(list) {
+    const seen = new Set();
+    const out = [];
+    for (const q of list) {
+      const id = q.question_id ?? q.id ?? (q.question && q.question.trim());
+      const key = String(id || "").trim();
+      if (!key) {
+        const txt = (q.question || "").trim();
+        if (txt && !seen.has(txt)) {
+          seen.add(txt);
+          out.push(q);
+        }
+      } else {
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(q);
+        }
+      }
+    }
+    return out;
+  }
+
+  // safe value -> string
+  function safeStr(v) {
+    if (v === undefined || v === null) return "";
+    return String(v);
+  }
+
+  /* -----------------------------
+     DOM refs (must match your quiz.html)
+     ----------------------------- */
   const qIndexEl = document.getElementById("qIndex");
   const qTotalEl = document.getElementById("qTotal");
   const scoreEl = document.getElementById("score");
@@ -88,15 +139,26 @@
   const quizSelector = document.getElementById("quizSelector");
   const quizPage = document.getElementById("quiz-page");
 
-  // find play buttons inside cards
+  /* -----------------------------
+     Play button discovery & dropdown injection
+     ----------------------------- */
   const cardPlayButtons = Array.from(
     document.querySelectorAll(".card.card-game .btn")
-  );
+  ).length
+    ? Array.from(document.querySelectorAll(".card.card-game .btn"))
+    : [
+        ...(document.getElementById("playMathBtn")
+          ? [document.getElementById("playMathBtn")]
+          : []),
+        ...(document.getElementById("playScienceBtn")
+          ? [document.getElementById("playScienceBtn")]
+          : []),
+      ];
 
-  // insert dropdown chooser into the selector (above play cards)
-  (function insertDropdown() {
-    const container = quizSelector.querySelector(".cards") || quizSelector;
+  (function insertCountDropdown() {
+    if (!quizSelector) return;
     if (document.getElementById("qsCountSelect")) return;
+    const container = quizSelector.querySelector(".cards") || quizSelector;
     const wrapper = document.createElement("div");
     wrapper.style =
       "display:flex;gap:12px;align-items:center;margin-bottom:14px;";
@@ -113,101 +175,94 @@
 
   function getSelectedCount() {
     const sel = document.getElementById("qsCountSelect");
-    if (!sel) return 10;
-    return Number(sel.value || 10);
+    return sel ? Number(sel.value || 10) : 10;
   }
 
+  /* -----------------------------
+     State
+     ----------------------------- */
   let questions = [];
   let currentIndex = 0;
   let score = 0;
   let questionStart = null;
-  let perQuestion = [];
   let timerInterval = null;
   let quizStartTime = null;
-  let currentSubject = null;
-  let lastUsedCount = 10;
+  let perQuestion = [];
+  let currentSubject = "all";
 
-  function show(el) {
-    if (!el) return;
-    el.style.display = "";
-  }
-  function hide(el) {
-    if (!el) return;
-    el.style.display = "none";
-  }
+  // hide quiz page initially
+  if (quizPage) quizPage.style.display = "none";
 
-  // ensure quiz-page hidden initially
-  hide(quizPage);
-
-  // attach listeners to Play buttons
-  cardPlayButtons.forEach((btn) => {
-    if (btn.hasAttribute("onclick")) btn.removeAttribute("onclick");
-    btn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const card = btn.closest(".card");
-      let subject = null;
-      if (card) {
-        const tile = card.querySelector(".tile");
-        if (tile && tile.textContent)
-          subject = tile.textContent.trim().toLowerCase();
-        else {
-          const h3 = card.querySelector("h3");
-          if (h3 && h3.textContent)
-            subject = h3.textContent.trim().toLowerCase();
+  /* -----------------------------
+     Language detection & live re-render
+     Strategy:
+       1. Look for window.currentUser.email and SettingsDB.getSettings(email).language
+       2. Else look at localStorage.gyan_current_user.language
+       3. Else look for <select id="language"> on page
+       4. fallback 'en'
+  ----------------------------- */
+  async function getUserLanguage() {
+    try {
+      // 1) window.currentUser + SettingsDB
+      if (
+        window.currentUser &&
+        window.currentUser.email &&
+        window.SettingsDB &&
+        typeof SettingsDB.getSettings === "function"
+      ) {
+        try {
+          const s = await SettingsDB.getSettings(window.currentUser.email);
+          if (s && s.language)
+            return (String(s.language).toLowerCase() || "en").slice(0, 2);
+        } catch (e) {
+          /* ignore */
         }
       }
-      if (subject) {
-        if (subject.includes("math")) subject = "math";
-        else if (subject.includes("science")) subject = "science";
-        else subject = subject.split(" ")[0];
-      } else subject = "all";
 
-      const count = getSelectedCount();
-      lastUsedCount = count;
-      currentSubject = subject;
-
-      // show quiz page
-      hide(quizSelector);
-      show(quizPage);
-      hide(document.getElementById("resultPage"));
-      show(document.getElementById("questionCard"));
-      if (document.querySelector(".quiz-controls"))
-        document.querySelector(".quiz-controls").style.display = "flex";
-
-      loadQuestions(subject, count);
-    });
-  });
-
-  // helper: dedupe by question_id or question text
-  function uniqueQuestions(arr) {
-    const seen = new Set();
-    const out = [];
-    for (const q of arr) {
-      const id = q.question_id ?? q.id ?? (q.question && q.question.trim());
-      const key = String(id || "").trim();
-      if (!key) {
-        const txt = (q.question || "").trim();
-        if (!seen.has(txt) && txt) {
-          seen.add(txt);
-          out.push(q);
+      // 2) localStorage gyan_current_user
+      try {
+        const raw = localStorage.getItem("gyan_current_user");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.language)
+            return (String(parsed.language).toLowerCase() || "en").slice(0, 2);
         }
-      } else {
-        if (!seen.has(key)) {
-          seen.add(key);
-          out.push(q);
-        }
-      }
+      } catch (e) {}
+
+      // 3) language select on page
+      const sel = document.querySelector("#language, .lang-select");
+      if (sel && sel.value)
+        return (String(sel.value).toLowerCase() || "en").slice(0, 2);
+    } catch (e) {
+      console.warn("getUserLanguage failed", e);
     }
-    return out;
+    return "en";
   }
 
-  // Load questions file based on subject
+  // If user changes the page-wide language select we should re-render current question in new language
+  (function attachLanguageWatcher() {
+    const sel = document.querySelector("#language, .lang-select");
+    if (!sel) return;
+    sel.addEventListener("change", async () => {
+      // re-render current question in new language
+      if (questions && questions.length && currentIndex >= 0) {
+        await renderCurrent(); // re-render will call getUserLanguage() and pick right fields
+      }
+    });
+  })();
+
+  /* -----------------------------
+     Load questions file (maths.json/science.json/questions.json)
+     Accepts subject: 'math', 'science', 'all'
+  ----------------------------- */
   async function loadQuestions(subject = "all", count = 10) {
     try {
-      questionText.textContent = "Loading questions...";
-      optionsList.innerHTML = "";
-      qIndexEl.textContent = 0;
-      qTotalEl.textContent = 0;
+      currentSubject = subject || "all";
+      if (questionText) questionText.textContent = "Loading questions...";
+      if (optionsList) optionsList.innerHTML = "";
+      if (qIndexEl) qIndexEl.textContent = "0";
+      if (qTotalEl) qTotalEl.textContent = "0";
+
       let path = "../data/questions.json";
       if (subject === "math") path = "../data/maths.json";
       else if (subject === "science") path = "../data/science.json";
@@ -216,12 +271,12 @@
       if (!res.ok) throw new Error("Could not load " + path);
       let data = await res.json();
       if (!Array.isArray(data) || data.length === 0) {
-        questionText.textContent = "No questions available.";
+        if (questionText) questionText.textContent = "No questions available.";
         questions = [];
         return;
       }
 
-      // filter if data contains mixed subjects and user requested specific
+      // optional: filter by subject field when using mixed file
       if (subject && subject !== "all") {
         const normalized = subject.toLowerCase();
         const filtered = data.filter((q) => {
@@ -233,79 +288,174 @@
         if (filtered.length > 0) data = filtered;
       }
 
-      // dedupe first to avoid duplicated questions from source
       data = uniqueQuestions(data);
 
-      // shuffle pool then slice to requested count (but ensure we don't pick duplicates)
+      // shuffle and slice to count
       let pool = shuffleArray(data);
       if (count && count > 0 && count < pool.length)
         pool = pool.slice(0, count);
 
-      // normalize & shuffle options per question
+      // Prepare question objects with canonical data for runtime mapping
       questions = pool.map((q, idx) => {
         const clone = JSON.parse(JSON.stringify(q));
-        if (Array.isArray(clone.options) && clone.options.length > 1) {
-          const correctIdx = Number(clone.correct_option ?? clone.correct ?? 0);
-          const opts = clone.options.map((o, i) => ({ o, i }));
-          const shuffled = shuffleArray(opts);
-          clone.options = shuffled.map((s) => s.o);
-          clone.correct_option = shuffled.findIndex((s) => s.i === correctIdx);
-        }
+        // canonical english options source for mapping
+        const engOpts =
+          Array.isArray(q.options) && q.options.length
+            ? q.options.slice()
+            : Array.isArray(q.en_options) && q.en_options.length
+            ? q.en_options.slice()
+            : [];
+        clone._engOptions = engOpts.length
+          ? engOpts
+          : Array.isArray(q.options)
+          ? q.options.slice()
+          : [];
+        clone._canonicalCorrect = (function () {
+          // if there's an explicit numeric correct_option use it against the English options (if present)
+          const c = Number(q.correct_option ?? q.correct ?? -1);
+          if (c >= 0 && clone._engOptions.length > c)
+            return clone._engOptions[c];
+          // else try string match in english options using 'answer' or 'correctAnswer' if present
+          if (q.answer) return q.answer;
+          return clone._engOptions[0] ?? null;
+        })();
+        // ensure question_id
         if (!clone.question_id) clone.question_id = clone.id ?? idx;
         return clone;
       });
 
-      qTotalEl.textContent = questions.length;
+      if (qTotalEl) qTotalEl.textContent = String(questions.length);
       startQuiz();
     } catch (err) {
-      console.error(err);
-      questionText.textContent = "Error loading questions.";
+      console.error("loadQuestions error", err);
+      if (questionText) questionText.textContent = "Error loading questions.";
       questions = [];
     }
   }
 
+  /* -----------------------------
+     Start / render / timers
+  ----------------------------- */
   function startQuiz() {
     clearInterval(timerInterval);
     currentIndex = 0;
     score = 0;
     perQuestion = [];
     quizStartTime = Date.now();
-    scoreEl.textContent = 0;
+    if (scoreEl) scoreEl.textContent = "0";
     if (document.querySelector(".quiz-controls"))
-      document.querySelector(".quiz-controls").style.display = "flex";
+      document.querySelector(".quiz-controls").style.display = "";
     renderCurrent();
     updateProgress();
   }
 
-  function renderCurrent() {
+  async function renderCurrent() {
     clearInterval(timerInterval);
     if (!questions || questions.length === 0) {
-      questionText.textContent = "No questions available.";
-      optionsList.innerHTML = "";
+      if (questionText) questionText.textContent = "No questions available.";
+      if (optionsList) optionsList.innerHTML = "";
       return;
     }
     const q = questions[currentIndex];
-    qIndexEl.textContent = currentIndex + 1;
-    questionText.textContent = q.question || "No question text";
-    optionsList.innerHTML = "";
 
-    const qImageWrapper = document.getElementById("questionImage");
-    if (q.image) {
-      if (qImageWrapper) {
-        qImageWrapper.style.display = "";
-        const img = qImageWrapper.querySelector("img");
-        img.src = q.image;
-        img.alt = q.image_alt || "question image";
-      }
+    // pick language-aware question text & options
+    const lang = await getUserLanguage(); // 'en'|'hi'|'or' etc.
+    let qText =
+      q.question ||
+      q.en_question ||
+      q.hi_question ||
+      q.od_question ||
+      "No question text";
+    let opts = Array.isArray(q.options)
+      ? q.options.slice()
+      : Array.isArray(q.en_options)
+      ? q.en_options.slice()
+      : [];
+    // prefer hi/od fields if language asked
+    if (lang === "hi" && Array.isArray(q.hi_options) && q.hi_options.length) {
+      opts = q.hi_options.slice();
+      if (q.hi_question) qText = q.hi_question;
+    } else if (
+      (lang === "or" || lang === "od") &&
+      Array.isArray(q.od_options) &&
+      q.od_options.length
+    ) {
+      opts = q.od_options.slice();
+      if (q.od_question) qText = q.od_question;
     } else {
-      if (qImageWrapper) qImageWrapper.style.display = "none";
+      // fallback to en fields - prefer en_options if present
+      if (Array.isArray(q.en_options) && q.en_options.length)
+        opts = q.en_options.slice();
+      else if (Array.isArray(q.options) && q.options.length)
+        opts = q.options.slice();
     }
 
-    (q.options || []).forEach((opt, idx) => {
+    // compute runtime correct index using several fallbacks:
+    // 1) if q has language-specific correct index (hi_correct_option / od_correct_option) use it
+    // 2) else if canonical english correct value exists, try to find it inside this language's opts (exact match)
+    // 3) else fallback to provided numeric q.correct_option or q.correct
+    let runtimeCorrect = 0;
+    if (lang === "hi" && Number.isFinite(Number(q.hi_correct_option))) {
+      runtimeCorrect = Number(q.hi_correct_option);
+    } else if (
+      (lang === "or" || lang === "od") &&
+      Number.isFinite(Number(q.od_correct_option))
+    ) {
+      runtimeCorrect = Number(q.od_correct_option);
+    } else {
+      // try matching canonical value if available
+      if (q._canonicalCorrect != null) {
+        const found = opts.findIndex(
+          (o) => safeStr(o).trim() === safeStr(q._canonicalCorrect).trim()
+        );
+        if (found >= 0) runtimeCorrect = found;
+        else {
+          // fallback: try numeric correct_option
+          if (Number.isFinite(Number(q.correct_option)))
+            runtimeCorrect = Number(q.correct_option);
+          else if (Number.isFinite(Number(q.correct)))
+            runtimeCorrect = Number(q.correct);
+          else runtimeCorrect = 0;
+        }
+      } else {
+        if (Number.isFinite(Number(q.correct_option)))
+          runtimeCorrect = Number(q.correct_option);
+        else if (Number.isFinite(Number(q.correct)))
+          runtimeCorrect = Number(q.correct);
+        else runtimeCorrect = 0;
+      }
+    }
+
+    // save runtime correct for later checks
+    q._runtimeCorrect = runtimeCorrect;
+
+    // render UI
+    if (qIndexEl) qIndexEl.textContent = String(currentIndex + 1);
+    if (questionText) questionText.textContent = qText;
+    if (optionsList) optionsList.innerHTML = "";
+
+    // image support
+    const qImageWrapper = document.getElementById("questionImage");
+    const imgSrc = q.image || q.image_link || q.imageLink || null;
+    if (qImageWrapper) {
+      if (imgSrc && imgSrc.toLowerCase() !== "null") {
+        qImageWrapper.style.display = "";
+        const img = qImageWrapper.querySelector("img");
+        if (img) {
+          img.src = imgSrc;
+          img.alt = q.image_alt || "question image";
+        }
+      } else {
+        qImageWrapper.style.display = "none";
+      }
+    }
+
+    // render options
+    opts.forEach((opt, idx) => {
       const li = document.createElement("li");
       li.className = "option-item";
-      li.textContent = opt;
       li.tabIndex = 0;
+      li.textContent = opt;
       li.addEventListener("click", () => handleAnswer(li, idx));
       li.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -316,268 +466,299 @@
       optionsList.appendChild(li);
     });
 
+    // timer
     questionStart = Date.now();
-    timerDisplay.textContent = "0.0s";
+    timerDisplay && (timerDisplay.textContent = "0.0s");
     timerInterval = setInterval(() => {
-      timerDisplay.textContent =
-        ((Date.now() - questionStart) / 1000).toFixed(1) + "s";
+      timerDisplay &&
+        (timerDisplay.textContent =
+          ((Date.now() - questionStart) / 1000).toFixed(1) + "s");
     }, 100);
-    nextBtn.disabled = true;
+
+    // disable next until answer chosen
+    if (nextBtn) nextBtn.disabled = true;
   }
 
-  function handleAnswer(li, idx) {
-    if (!questions.length) return;
+  /* -----------------------------
+     Answer handling, XP awarding
+  ----------------------------- */
+  async function handleAnswer(li, pickedIdx) {
+    if (!questions || questions.length === 0) return;
     clearInterval(timerInterval);
+
     const q = questions[currentIndex];
-    const took = (Date.now() - questionStart) / 1000;
+    const timeTaken = (Date.now() - questionStart) / 1000;
+
+    // visually disable all options
     Array.from(optionsList.children).forEach((el) =>
       el.classList.add("disabled")
     );
-    const correctIdx = Number(q.correct_option);
-    if (idx === correctIdx) {
+
+    const correctIdx = Number(
+      q._runtimeCorrect ?? q.correct_option ?? q.correct ?? 0
+    );
+
+    // mark UI
+    if (pickedIdx === correctIdx) {
       li.classList.add("correct");
       score++;
-      playSound(true); // sound for correct
+      playSound(true);
     } else {
       li.classList.add("wrong");
       if (optionsList.children[correctIdx])
         optionsList.children[correctIdx].classList.add("correct");
-      playSound(false); // sound for wrong
+      playSound(false);
     }
+
+    // record
     perQuestion.push({
       id: q.question_id ?? currentIndex,
-      tookSeconds: took.toFixed(2),
-      correct: idx === correctIdx,
+      tookSeconds: timeTaken.toFixed(2),
+      correct: pickedIdx === correctIdx,
     });
 
-    // update last time & score UI
-    lastAnswerTime.textContent = `Answered in ${took.toFixed(2)}s`;
-    scoreEl.textContent = score;
-    nextBtn.disabled = false;
+    lastAnswerTime &&
+      (lastAnswerTime.textContent = `Answered in ${timeTaken.toFixed(2)}s`);
+    scoreEl && (scoreEl.textContent = String(score));
+    if (nextBtn) nextBtn.disabled = false;
     updateProgress();
 
-    // ---- XP awarding: faster correct answers earn up to 20 XP per question ----
-    (async function awardXpIfNeeded() {
+    // award XP for correct & faster answers
+    (async function awardXp() {
+      if (pickedIdx !== correctIdx) return;
       try {
-        // only award XP for correct answers
-        const wasCorrect = idx === correctIdx;
-        if (!wasCorrect) return;
-
-        // mapping: 0s => 20 XP, maxSeconds => 0 XP (linear)
-        const maxSeconds = 30; // adjust to your per-question target (in seconds)
-        const timeTaken = Number(took);
+        const maxSeconds = 30;
         const frac = Math.max(0, (maxSeconds - timeTaken) / maxSeconds);
         const rawXp = Math.round(frac * 20);
         const xpToAdd = Math.max(0, Math.min(20, rawXp));
-        if (xpToAdd <= 0) return;
+        if (!xpToAdd) return;
 
-        if (!window.SettingsDB || !SettingsDB.getSettings) return;
+        if (!window.SettingsDB || typeof SettingsDB.getSettings !== "function")
+          return;
 
-        // determine current email consistently with other pages
+        // find email consistent with your app
         let email = null;
-        try {
-          if (window.currentUser && window.currentUser.email) {
-            email = window.currentUser.email;
-          } else {
+        if (window.currentUser && window.currentUser.email)
+          email = window.currentUser.email;
+        else {
+          try {
             const raw = localStorage.getItem("gyan_current_user");
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (parsed.email) email = parsed.email;
+              if (parsed && parsed.email) email = parsed.email;
             }
-          }
-        } catch (e) {
-          console.warn("Could not read current user email for XP award", e);
+          } catch (e) {}
         }
         if (!email) email = "johndoe@email.com";
 
-        // fetch settings, update xp, save
         const s = await SettingsDB.getSettings(email);
-        const settings = s || {
-          email,
-          name: email.split("@")[0],
-          xp: 0,
-          badges: [],
-        };
+        const settings = s || { email, xp: 0, badges: [] };
         settings.xp = (Number(settings.xp) || 0) + xpToAdd;
         await SettingsDB.saveSettings(settings);
-        console.log("Awarded XP", xpToAdd, "to", email, "new xp:", settings.xp);
 
-        // show toast and update visible xp element if exists
-        showXpToast(xpToAdd);
-        const xpDisplay =
+        // update any on-screen XP display if present (id xpNumber used in progress page)
+        const xpEl =
           document.getElementById("xpNumber") ||
-          document.getElementById("xpValue") ||
-          document.getElementById("xp") ||
-          null;
-        if (xpDisplay)
-          xpDisplay.textContent = (Number(settings.xp) || 0).toLocaleString();
+          document.getElementById("xpValue");
+        if (xpEl)
+          xpEl.textContent = (Number(settings.xp) || 0).toLocaleString();
+
+        showXpToast(xpToAdd);
       } catch (e) {
-        console.warn("Failed to award XP", e);
+        console.warn("awardXp failed", e);
       }
     })();
 
-    // If this was the last question, auto-finish after a short delay so user sees feedback
+    // auto-finish if last question after a short delay to show feedback
     if (currentIndex >= questions.length - 1) {
-      setTimeout(() => {
-        finishQuiz();
-      }, 700);
-      return; // auto-finish
+      setTimeout(() => finishQuiz(), 700);
+      return;
     }
   }
 
+  /* -----------------------------
+     Progress UI and navigation
+  ----------------------------- */
   function updateProgress() {
-    const pct = questions.length
-      ? ((currentIndex + (nextBtn.disabled ? 0 : 1)) / questions.length) * 100
-      : 0;
-    progressFill.style.width = Math.min(Math.max(pct, 0), 100) + "%";
+    const total = questions.length || 1;
+    const pct =
+      ((currentIndex + (nextBtn && nextBtn.disabled ? 0 : 1)) / total) * 100;
+    if (progressFill)
+      progressFill.style.width = Math.min(Math.max(pct, 0), 100) + "%";
   }
 
-  nextBtn.addEventListener("click", () => {
-    if (currentIndex >= questions.length - 1) finishQuiz();
-    else {
-      currentIndex++;
-      renderCurrent();
-    }
-  });
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (!questions || currentIndex >= questions.length - 1) {
+        finishQuiz();
+      } else {
+        currentIndex++;
+        renderCurrent();
+      }
+    });
+  }
 
-  quitBtn.addEventListener("click", () => {
-    hide(quizPage);
-    show(quizSelector);
-    // ensure controls reset
-    if (document.getElementById("questionCard"))
-      document.getElementById("questionCard").style.display = "block";
-    if (document.querySelector(".quiz-controls"))
-      document.querySelector(".quiz-controls").style.display = "flex";
-  });
+  if (quitBtn) {
+    quitBtn.addEventListener("click", () => {
+      if (quizPage) quizPage.style.display = "none";
+      if (quizSelector) quizSelector.style.display = "";
+      if (document.getElementById("questionCard"))
+        document.getElementById("questionCard").style.display = "";
+      if (document.querySelector(".quiz-controls"))
+        document.querySelector(".quiz-controls").style.display = "";
+    });
+  }
 
+  /* -----------------------------
+     finish quiz & show results (Chart.js optional)
+  ----------------------------- */
   function finishQuiz() {
     clearInterval(timerInterval);
     const totalTime = ((Date.now() - quizStartTime) / 1000).toFixed(2);
-    finalScore.textContent = `${score}/${questions.length}`;
-    totalTimeEl.textContent = totalTime;
-    perQuestionTimes.innerHTML = "";
-    perQuestion.forEach((p, i) => {
-      const li = document.createElement("li");
-      li.textContent = `Q${i + 1} — ${p.tookSeconds}s — ${
-        p.correct ? "correct" : "wrong"
-      }`;
-      perQuestionTimes.appendChild(li);
-    });
+    finalScore && (finalScore.textContent = `${score}/${questions.length}`);
+    totalTimeEl && (totalTimeEl.textContent = totalTime);
+    perQuestionTimes && (perQuestionTimes.innerHTML = "");
+    if (perQuestionTimes) {
+      perQuestion.forEach((p, i) => {
+        const li = document.createElement("li");
+        li.textContent = `Q${i + 1} — ${p.tookSeconds}s — ${
+          p.correct ? "correct" : "wrong"
+        }`;
+        perQuestionTimes.appendChild(li);
+      });
+    }
 
     const attempted = perQuestion.length;
     const correct = perQuestion.filter((p) => p.correct).length;
     const incorrect = attempted - correct;
     const notAnswered = questions.length - attempted;
     const accuracy = questions.length
-      ? ((correct / questions.length) * 100).toFixed(0)
-      : "0";
+      ? Math.round((correct / questions.length) * 100)
+      : 0;
 
-    document.getElementById("marksObtained").textContent = correct;
-    document.getElementById("marksTotal").textContent = questions.length;
-    document.getElementById("qsAttempted").textContent =
-      attempted + "/" + questions.length;
-    document.getElementById("accuracy").textContent = accuracy + "%";
-    document.getElementById("timeTaken").textContent =
-      (totalTime / 60).toFixed(2) + " min";
-    document.getElementById("correctCount").textContent = correct;
-    document.getElementById("incorrectCount").textContent = incorrect;
-    document.getElementById("notAnsweredCount").textContent = notAnswered;
+    document.getElementById("marksObtained") &&
+      (document.getElementById("marksObtained").textContent = String(correct));
+    document.getElementById("marksTotal") &&
+      (document.getElementById("marksTotal").textContent = String(
+        questions.length
+      ));
+    document.getElementById("qsAttempted") &&
+      (document.getElementById(
+        "qsAttempted"
+      ).textContent = `${attempted}/${questions.length}`);
+    document.getElementById("accuracy") &&
+      (document.getElementById("accuracy").textContent = `${accuracy}%`);
+    document.getElementById("timeTaken") &&
+      (document.getElementById("timeTaken").textContent = `${(
+        totalTime / 60
+      ).toFixed(2)} min`);
+    document.getElementById("correctCount") &&
+      (document.getElementById("correctCount").textContent = String(correct));
+    document.getElementById("incorrectCount") &&
+      (document.getElementById("incorrectCount").textContent =
+        String(incorrect));
+    document.getElementById("notAnsweredCount") &&
+      (document.getElementById("notAnsweredCount").textContent =
+        String(notAnswered));
 
-    // draw chart if Chart.js available
+    // Chart.js if available and canvas exists
     if (typeof Chart !== "undefined") {
       try {
-        // destroy previous chart if exists
-        if (window._attemptsChart) {
-          try {
-            window._attemptsChart.destroy();
-          } catch (e) {
-            // ignore
-          }
-          window._attemptsChart = null;
-        }
-
         const canvas = document.getElementById("attemptsChart");
-        // ensure the canvas is a fixed compact size to avoid giant donut
-        canvas.width = 200;
-        canvas.height = 200;
-        canvas.style.width = "200px";
-        canvas.style.height = "200px";
-        // ensure parent container does not stretch canvas: set a reasonable max-width
-        const parent = canvas.closest(".attempts-analysis");
-        if (parent) {
-          parent.style.display = "flex";
-          parent.style.alignItems = "center";
-          parent.style.gap = "18px";
-          // also limit parent height so canvas is compact
-          parent.style.minHeight = "240px";
+        if (canvas && canvas.getContext) {
+          if (window._attemptsChart) {
+            window._attemptsChart.destroy();
+            window._attemptsChart = null;
+          }
+          const ctx = canvas.getContext("2d");
+          window._attemptsChart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Correct", "Incorrect", "Not Answered"],
+              datasets: [{ data: [correct, incorrect, notAnswered] }],
+            },
+            options: { plugins: { legend: { display: false } }, cutout: "70%" },
+          });
         }
-
-        const ctx = canvas.getContext("2d");
-        window._attemptsChart = new Chart(ctx, {
-          type: "doughnut",
-          data: {
-            labels: ["Correct", "Incorrect", "Not Answered"],
-            datasets: [
-              {
-                data: [correct, incorrect, notAnswered],
-                // provide some pleasant colors (keeps the compact look)
-                backgroundColor: ["#3b82f6", "#fb7185", "#9ca3af"],
-                borderWidth: 2,
-                borderColor: "#1f1b2e",
-              },
-            ],
-          },
-          options: {
-            responsive: false, // we set fixed size above
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            cutout: "70%",
-          },
-        });
       } catch (e) {
         console.warn("Chart render failed", e);
       }
     }
 
-    // Show result UI same as before
-    hide(document.getElementById("questionCard"));
+    if (document.getElementById("questionCard"))
+      document.getElementById("questionCard").style.display = "none";
     if (document.querySelector(".quiz-controls"))
       document.querySelector(".quiz-controls").style.display = "none";
-    hide(summary);
-    show(document.getElementById("resultPage"));
-
-    // scroll result into view so user sees compact card immediately
-    try {
-      const rp = document.getElementById("resultPage");
-      if (rp && rp.scrollIntoView) rp.scrollIntoView({ behavior: "smooth" });
-    } catch (e) {}
+    if (summary) summary.style.display = "none";
+    const rpage = document.getElementById("resultPage");
+    if (rpage) rpage.style.display = "";
   }
 
-  // Play Again and Back Home handlers
-  document.addEventListener("click", (e) => {
-    if (e.target && e.target.id === "playAgainBtn") {
-      hide(document.getElementById("resultPage"));
-      show(document.getElementById("questionCard"));
+  // Play again / back home
+  document.addEventListener("click", (ev) => {
+    const id = ev.target && ev.target.id;
+    if (id === "playAgainBtn") {
+      const rpage = document.getElementById("resultPage");
+      if (rpage) rpage.style.display = "none";
+      if (document.getElementById("questionCard"))
+        document.getElementById("questionCard").style.display = "";
       if (document.querySelector(".quiz-controls"))
-        document.querySelector(".quiz-controls").style.display = "flex";
+        document.querySelector(".quiz-controls").style.display = "";
       const count = getSelectedCount();
-      lastUsedCount = count;
-      if (!currentSubject) currentSubject = "all";
-      loadQuestions(currentSubject, count);
-    }
-    if (e.target && e.target.id === "backHomeBtn") {
-      hide(quizPage);
-      show(quizSelector);
+      const subj = currentSubject || "all";
+      loadQuestions(subj, count);
+    } else if (id === "backHomeBtn") {
+      if (quizPage) quizPage.style.display = "none";
+      if (quizSelector) quizSelector.style.display = "";
     }
   });
 
-  // shuffle helper
-  function shuffleArray(a) {
-    const arr = a.slice();
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
+  /* -----------------------------
+     Hook up Play buttons (cards)
+     ----------------------------- */
+  /* -----------------------------
+   Hook up Play buttons (cards)
+   ----------------------------- */
+  cardPlayButtons.forEach((btn) => {
+    if (!btn) return;
+    if (btn.hasAttribute("onclick")) btn.removeAttribute("onclick");
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // get subject from data-subject or fallback from button id/text
+      let subject = btn.dataset.subject;
+      if (!subject) {
+        if (btn.id.toLowerCase().includes("math")) subject = "math";
+        else if (btn.id.toLowerCase().includes("science")) subject = "science";
+        else subject = "all";
+      }
+
+      currentSubject = subject;
+      const count = getSelectedCount();
+
+      // show quiz area
+      if (quizSelector) quizSelector.style.display = "none";
+      if (quizPage) quizPage.style.display = "";
+      const rpage = document.getElementById("resultPage");
+      if (rpage) rpage.style.display = "none";
+      if (document.getElementById("questionCard"))
+        document.getElementById("questionCard").style.display = "";
+      if (document.querySelector(".quiz-controls"))
+        document.querySelector(".quiz-controls").style.display = "";
+
+      loadQuestions(subject, count);
+    });
+  });
+
+  /* -----------------------------
+     Expose some helpers for console
+     ----------------------------- */
+  window._quiz = {
+    loadQuestions,
+    startQuiz,
+    renderCurrent,
+    getUserLanguage,
+  };
+
+  // Done.
 })();

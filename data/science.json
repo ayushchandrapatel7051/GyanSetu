@@ -10,10 +10,10 @@
     "image_link": "Null",
     "options": ["Salt", "Water", "Sugar", "Oxygen"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "H2O को सामान्यतः किस नाम से जाना जाता है?",
+    "hi_options": ["नमक", "पानी", "चीनी", "ऑक्सीजन"],
+    "od_question": "H2O କୁ ସାଧାରଣତଃ କ'ଣ କୁହାଯାଏ?",
+    "od_options": ["ଲୁଣ", "ପାଣି", "ଚିନି", "ଅମ୍ଳଜାନ"]
   },
   {
     "question_id": 200015,
@@ -26,10 +26,10 @@
     "image_link": "Null",
     "options": ["Sight", "Smell", "Taste", "Touch"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सी इंद्रिय आपको भोजन का स्वाद लेने में मदद करती है?",
+    "hi_options": ["दृष्टि", "गंध", "स्वाद", "स्पर्श"],
+    "od_question": "କେଉଁ ଇନ୍ଦ୍ରିୟ ଆପଣଙ୍କୁ ଖାଦ୍ୟର ସ୍ୱାଦ ଚାଖିବାରେ ସାହାଯ୍ୟ କରେ?",
+    "od_options": ["ଦୃଷ୍ଟି", "ଗନ୍ଧ", "ସ୍ୱାଦ", "ସ୍ପର୍ଶ"]
   },
   {
     "question_id": 200019,
@@ -42,10 +42,10 @@
     "image_link": "Null",
     "options": ["Petal", "Stem", "Ovary", "Leaf"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "फूल का कौन सा हिस्सा फल बन जाता है?",
+    "hi_options": ["पंखुड़ी", "तना", "अंडाशय", "पत्ता"],
+    "od_question": "ଫୁଲର କେଉଁ ଅଂଶ ଫଳରେ ପରିଣତ ହୁଏ?",
+    "od_options": ["ପାଖୁଡ଼ା", "କାଣ୍ଡ", "ଡିମ୍ବାଣୁକୋଷ", "ପତ୍ର"]
   },
   {
     "question_id": 200003,
@@ -58,10 +58,10 @@
     "image_link": "Null",
     "options": ["Condensation", "Freezing", "Evaporation", "Sublimation"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "पानी किस प्रक्रिया से भाप में बदलता है?",
+    "hi_options": ["संक्षेपण", "जमना", "वाष्पीकरण", "उर्ध्वपातन"],
+    "od_question": "ପାଣି କେଉଁ ପ୍ରକ୍ରିୟାରେ ବାଷ୍ପରେ ପରିଣତ ହୁଏ?",
+    "od_options": ["ଘନୀଭୂତ", "ହିମାୟନ", "ବାଷ୍ପୀକରଣ", "ଉର୍ଦ୍ଧ୍ୱପାତନ"]
   },
   {
     "question_id": 200016,
@@ -74,10 +74,10 @@
     "image_link": "Null",
     "options": ["Solid", "Liquid", "Gas", "Energy"],
     "correct_option": 3,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "इनमें से कौन सी पदार्थ की अवस्था नहीं है?",
+    "hi_options": ["ठोस", "तरल", "गैस", "ऊर्जा"],
+    "od_question": "ଏଥିମଧ୍ୟରୁ କେଉଁଟି ପଦାର୍ଥର ଅବସ୍ଥା ନୁହେଁ?",
+    "od_options": ["କଠିନ", "ତରଳ", "ଗ୍ୟାସ", "ଶକ୍ତି"]
   },
   {
     "question_id": 200020,
@@ -90,10 +90,10 @@
     "image_link": "Null",
     "options": ["Core", "Mantle", "Crust", "Inner core"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "पृथ्वी की किस परत पर हम रहते हैं?",
+    "hi_options": ["क्रोड", "मैंटल", "भूपर्पटी", "आंतरिक क्रोड"],
+    "od_question": "ପୃଥିବୀର କେଉଁ ସ୍ତରରେ ଆମେ ବାସ କରୁ?",
+    "od_options": ["କୋର", "ମେଣ୍ଟେଲ", "କ୍ରଷ୍ଟ", "ଇନର୍ କୋର"]
   },
   {
     "question_id": 200011,
@@ -106,10 +106,10 @@
     "image_link": "Null",
     "options": ["Ear", "Tongue", "Eye", "Nose"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "शरीर का कौन सा अंग हमें देखने में मदद करता है?",
+    "hi_options": ["कान", "जीभ", "आँख", "नाक"],
+    "od_question": "ଶରୀରର କେଉଁ ଅଙ୍ଗ ଆମକୁ ଦେଖିବାକୁ ସାହାଯ୍ୟ କରେ?",
+    "od_options": ["କାନ", "ଜିଭ", "ଆଖି", "ନାକ"]
   },
   {
     "question_id": 200012,
@@ -122,10 +122,10 @@
     "image_link": "Null",
     "options": ["Nectar", "Water", "Roots", "Leaves"],
     "correct_option": 0,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "मधुमक्खियाँ फूलों से क्या इकट्ठा करती हैं?",
+    "hi_options": ["पराग", "पानी", "जड़ें", "पत्तियाँ"],
+    "od_question": "ମହୁମାଛି ଫୁଲରୁ କ'ଣ ସଂଗ୍ରହ କରନ୍ତି?",
+    "od_options": ["ପରାଗ", "ପାଣି", "ମୂଳ", "ପତ୍ର"]
   },
   {
     "question_id": 200017,
@@ -138,10 +138,10 @@
     "image_link": "Null",
     "options": ["Oxygen", "Nitrogen", "Helium", "Carbon monoxide"],
     "correct_option": 0,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "जलने के लिए कौन सी गैस आवश्यक है?",
+    "hi_options": ["ऑक्सीजन", "नाइट्रोजन", "हीलियम", "कार्बन मोनोऑक्साइड"],
+    "od_question": "ଜଳିବା ପାଇଁ କେଉଁ ଗ୍ୟାସ ଆବଶ୍ୟକ?",
+    "od_options": ["ଅମ୍ଳଜାନ", "ଯବକ୍ଷାରଜାନ", "ହିଲିୟମ", "କାର୍ବନ ମୋନୋକ୍ସାଇଡ"]
   },
   {
     "question_id": 200010,
@@ -154,10 +154,10 @@
     "image_link": "Null",
     "options": ["Venus", "Mars", "Jupiter", "Saturn"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "किस ग्रह को लाल ग्रह के नाम से जाना जाता है?",
+    "hi_options": ["शुक्र", "मंगल", "बृहस्पति", "शनि"],
+    "od_question": "କେଉଁ ଗ୍ରହକୁ ଲାଲ୍ ଗ୍ରହ ଭାବରେ ଜଣାଯାଏ?",
+    "od_options": ["ଶୁକ୍ର", "ମଙ୍ଗଳ", "ବୃହସ୍ପତି", "ଶନି"]
   },
   {
     "question_id": 200009,
@@ -170,10 +170,10 @@
     "image_link": "Null",
     "options": ["Plastic", "Wood", "Copper", "Rubber"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सा पदार्थ बिजली का अच्छा सुचालक है?",
+    "hi_options": ["प्लास्टिक", "लकड़ी", "तांबा", "रबर"],
+    "od_question": "କେଉଁ ପଦାର୍ଥ ବିଦ୍ୟୁତର ଏକ ଉତ୍ତମ ପରିବାହୀ?",
+    "od_options": ["ପ୍ଲାଷ୍ଟିକ୍", "କାଠ", "ତମ୍ବା", "ରବର"]
   },
   {
     "question_id": 200007,
@@ -186,10 +186,10 @@
     "image_link": "Null",
     "options": ["Barometer", "Thermometer", "Hygrometer", "Speedometer"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सा उपकरण तापमान मापता है?",
+    "hi_options": ["बैरोमीटर", "थर्मामीटर", "हाइग्रोमीटर", "स्पीडोमीटर"],
+    "od_question": "କେଉଁ ଯନ୍ତ୍ର ତାପମାତ୍ରା ମାପେ?",
+    "od_options": ["ବାରୋମିଟର", "ଥର୍ମୋମିଟର", "ହାଇଗ୍ରୋମିଟର", "ସ୍ପିଡୋମିଟର"]
   },
   {
     "question_id": 200008,
@@ -202,10 +202,10 @@
     "image_link": "Null",
     "options": ["Friction", "Magnetism", "Gravity", "Electricity"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सा बल वस्तुओं को पृथ्वी की ओर खींचता है?",
+    "hi_options": ["घर्षण", "चुंबकत्व", "गुरुत्वाकर्षण", "बिजली"],
+    "od_question": "କେଉଁ ବଳ ବସ୍ତୁକୁ ପୃଥିବୀ ଆଡକୁ ଟାଣେ?",
+    "od_options": ["ଘର୍ଷଣ", "ଚୁମ୍ବକୀୟ ଶକ୍ତି", "ମାଧ୍ୟାକର୍ଷଣ", "ବିଦ୍ୟୁତ୍"]
   },
   {
     "question_id": 200002,
@@ -218,10 +218,10 @@
     "image_link": "Null",
     "options": ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "जीवित रहने के लिए मनुष्य कौन सी गैस अंदर लेता है?",
+    "hi_options": ["कार्बन डाइऑक्साइड", "ऑक्सीजन", "नाइट्रोजन", "हाइड्रोजन"],
+    "od_question": "ମଣିଷ ବଞ୍ଚିବା ପାଇଁ କେଉଁ ଗ୍ୟାସ ନିଶ୍ୱାସ ନିଏ?",
+    "od_options": ["ଅଙ୍ଗାରକାମ୍ଳ", "ଅମ୍ଳଜାନ", "ଯବକ୍ଷାରଜାନ", "ଉଦଜାନ"]
   },
   {
     "question_id": 200006,
@@ -234,10 +234,10 @@
     "image_link": "Null",
     "options": ["Lungs", "Heart", "Liver", "Kidney"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सा अंग शरीर में रक्त पंप करता है?",
+    "hi_options": ["फेफड़े", "हृदय", "यकृत", "गुर्दा"],
+    "od_question": "ଶରୀରରେ ରକ୍ତକୁ କେଉଁ ଅଙ୍ଗ ପମ୍ପ କରେ?",
+    "od_options": ["ଫୁସଫୁସ", "ହୃଦୟ", "ଯକୃତ", "ବୃକକ୍"]
   },
   {
     "question_id": 200004,
@@ -250,10 +250,10 @@
     "image_link": "Null",
     "options": ["Leaf", "Root", "Stem", "Flower"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "पौधे का कौन सा हिस्सा पानी को अवशोषित करता है?",
+    "hi_options": ["पत्ता", "जड़", "तना", "फूल"],
+    "od_question": "ଉଦ୍ଭିଦର କେଉଁ ଅଂଶ ପାଣି ଶୋଷିଥାଏ?",
+    "od_options": ["ପତ୍ର", "ମୂଳ", "କାଣ୍ଡ", "ଫୁଲ"]
   },
   {
     "question_id": 200001,
@@ -266,10 +266,10 @@
     "image_link": "Null",
     "options": ["Respiration", "Photosynthesis", "Digestion", "Transpiration"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "जिस प्रक्रिया से पौधे अपना भोजन बनाते हैं उसे क्या कहते हैं?",
+    "hi_options": ["श्वसन", "प्रकाश संश्लेषण", "पाचन", "वाष्पोत्सर्जन"],
+    "od_question": "ଉଦ୍ଭିଦ ଯେଉଁ ପ୍ରକ୍ରିୟାରେ ଖାଦ୍ୟ ତିଆରି କରନ୍ତି, ତାହା କ'ଣ?",
+    "od_options": ["ଶ୍ୱାସକ୍ରିୟା", "ଆଲୋକ ସଂଶ୍ଳେଷଣ", "ହଜମ ପ୍ରକ୍ରିୟା", "ବାଷ୍ପୀକରଣ"]
   },
   {
     "question_id": 200018,
@@ -282,10 +282,10 @@
     "image_link": "Null",
     "options": ["Elephant", "Blue Whale", "Giraffe", "Hippopotamus"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "सबसे बड़ा स्तनपायी कौन सा है?",
+    "hi_options": ["हाथी", "नीली व्हेल", "जिराफ", "दरियाई घोड़ा"],
+    "od_question": "ସବୁଠାରୁ ବଡ ସ୍ତନ୍ୟପାୟୀ ପ୍ରାଣୀ କିଏ?",
+    "od_options": ["ହାତୀ", "ନୀଳ ତିମି", "ଜିରାଫ୍", "ହିପୋପୋଟାମସ୍"]
   },
   {
     "question_id": 200013,
@@ -298,10 +298,10 @@
     "image_link": "Null",
     "options": ["Electron", "Proton", "Nucleus", "Neutron"],
     "correct_option": 2,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "परमाणु के केंद्र को क्या कहते हैं?",
+    "hi_options": ["इलेक्ट्रॉन", "प्रोटॉन", "नाभिक", "न्यूट्रॉन"],
+    "od_question": "ଏକ ପରମାଣୁର କେନ୍ଦ୍ରକୁ କ'ଣ କୁହାଯାଏ?",
+    "od_options": ["ଇଲେକ୍ଟ୍ରନ୍", "ପ୍ରୋଟନ୍", "ନ୍ୟୁକ୍ଲିୟସ୍", "ନ୍ୟୁଟ୍ରନ୍"]
   },
   {
     "question_id": 200014,
@@ -314,9 +314,9 @@
     "image_link": "Null",
     "options": ["Lever", "Inclined plane", "Pulley", "Wheel"],
     "correct_option": 1,
-    "hi_question": null,
-    "hi_options": null,
-    "od_question": null,
-    "od_options": null
+    "hi_question": "कौन सी सरल मशीन एक ढलान है?",
+    "hi_options": ["लीवर", "झुका हुआ तल", "घिरनी", "पहिया"],
+    "od_question": "କେଉଁ ସରଳ ଯନ୍ତ୍ର ଏକ ରାମ୍ପ୍?",
+    "od_options": ["ଲିଭର୍", "ନଇଁଲା ସମତଳ", "ପୁଲି", "ଚକ"]
   }
 ]

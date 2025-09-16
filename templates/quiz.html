@@ -22,24 +22,14 @@
   </head>
   <body>
     <div class="app">
-      <!-- Sidebar omitted (same as before) -->
+      <!-- Sidebar -->
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-inner">
           <h1 class="logo">GyanSetu</h1>
           <nav>
             <ul class="menu">
               <li class="menu-item" data-page="home">
-                <a
-                  href="index.html"
-                  class="menu-link"
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    color: inherit;
-                    text-decoration: none;
-                  "
-                >
+                <a href="index.html" class="menu-link">
                   <i class="fas fa-house"></i><span>Home</span>
                 </a>
               </li>
@@ -80,6 +70,7 @@
           </select>
         </div>
 
+        <!-- Quiz selector -->
         <section class="page active" id="quizSelector">
           <h2 class="page-title">Games</h2>
           <div class="cards small">
@@ -92,7 +83,13 @@
               </div>
               <h3>Maths Quiz</h3>
               <p>Challenge yourself with Maths questions.</p>
-              <button class="btn btn-purple" id="playMathBtn">Play Now</button>
+              <button
+                class="btn btn-purple"
+                id="playMathBtn"
+                data-subject="math"
+              >
+                Play Now
+              </button>
             </article>
 
             <article class="card card-game card-purple">
@@ -101,13 +98,18 @@
               </div>
               <h3>Science Quiz</h3>
               <p>Challenge yourself with Science questions.</p>
-              <button class="btn btn-purple" id="playScienceBtn">
+              <button
+                class="btn btn-purple"
+                id="playScienceBtn"
+                data-subject="science"
+              >
                 Play Now
               </button>
             </article>
           </div>
         </section>
 
+        <!-- Quiz page -->
         <section id="quiz-page" class="page active" style="display: none">
           <h2 class="page-title">Quiz — Practice Questions</h2>
 
@@ -138,12 +140,8 @@
             </div>
 
             <div class="quiz-controls">
-              <!-- Next is visually right aligned through CSS; Quit remains left when space allows -->
               <button id="quitBtn" class="btn btn-orange">Quit</button>
-              <div
-                id="lastAnswerTime"
-                style="margin-left: 12px; align-self: center"
-              ></div>
+              <div id="lastAnswerTime" style="margin-left: 12px"></div>
               <div style="flex: 1"></div>
               <button id="nextBtn" class="btn btn-purple" disabled>Next</button>
             </div>
@@ -152,7 +150,6 @@
               <div id="progressFill" class="fill" style="width: 0%"></div>
             </div>
 
-            <!-- summary and result page same as before -->
             <div id="summary" style="display: none">
               <h3>Quiz finished</h3>
               <p>Score: <strong id="finalScore"></strong></p>
@@ -161,7 +158,6 @@
             </div>
 
             <div id="resultPage" class="result-page" style="display: none">
-              <!-- result content unchanged -->
               <div class="marks-card">
                 <h3>Marks Obtained</h3>
                 <div class="marks-value">
@@ -213,14 +209,10 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Make sure SettingsDB is loaded BEFORE quiz.js so XP saving works -->
+    <!-- Make sure SettingsDB is loaded BEFORE quiz.js -->
     <script src="../js/settings-db.js"></script>
-
-    <!-- main, nav, quiz -->
     <script src="../main.js"></script>
     <script src="../js/nav.js"></script>
     <script src="../js/quiz.js"></script>
-
-    <!-- small inline: a11y for toast (optional) -->
   </body>
 </html>
