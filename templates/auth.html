@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="../css/style.css" />
     <!-- Auth page overrides -->
     <link rel="stylesheet" href="../css/auth.css" />
+    <style>
+      /* small inline styles to ensure tabs look right even if CSS missing */
+      .auth-tabs { display:flex; gap:8px; margin-bottom:14px; }
+      .auth-tabs .tab { padding:8px 14px; border-radius:8px; cursor:pointer; background:transparent; border:1px solid transparent; color:var(--muted); }
+      .auth-tabs .tab.active { background: linear-gradient(90deg,#7b61ff,#3fd1c9); color:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.25); }
+      .form-msg { margin-top:10px; color:var(--accent-danger,#ff6b6b); }
+    </style>
   </head>
   <body>
     <div class="auth-page">
@@ -18,14 +25,14 @@
           <p class="tagline">Learn • Play • Grow</p>
         </header>
 
-        <div class="auth-tabs">
-          <button id="tabLogin" class="tab active">Login</button>
-          <button id="tabSignup" class="tab">Sign Up</button>
+        <div class="auth-tabs" role="tablist" aria-label="Authentication tabs">
+          <button id="tabLogin" class="tab" role="tab" aria-selected="true">Login</button>
+          <button id="tabSignup" class="tab" role="tab" aria-selected="false">Sign Up</button>
         </div>
 
         <div class="auth-body">
           <!-- LOGIN -->
-          <form id="loginForm" class="auth-form">
+          <form id="loginForm" class="auth-form" role="tabpanel">
             <div class="form-row">
               <label for="loginEmail">Email</label>
               <input
@@ -53,11 +60,11 @@
               </button>
             </div>
 
-            <div id="loginMsg" class="form-msg"></div>
+            <div id="loginMsg" class="form-msg" role="status" aria-live="polite"></div>
           </form>
 
           <!-- SIGNUP -->
-          <form id="signupForm" class="auth-form" style="display: none">
+          <form id="signupForm" class="auth-form" style="display: none" role="tabpanel" aria-hidden="true">
             <div class="form-grid">
               <div class="form-row">
                 <label for="firstName">First name</label>
@@ -149,7 +156,7 @@
               </button>
             </div>
 
-            <div id="signupMsg" class="form-msg"></div>
+            <div id="signupMsg" class="form-msg" role="status" aria-live="polite"></div>
           </form>
         </div>
 
@@ -167,10 +174,68 @@
       </aside>
     </div>
 
-    <!-- Scripts -->
-    <script src="../main.js"></script>
-    <!-- NEW: load SettingsDB before auth.js -->
-    <script src="../js/settings-db.js"></script>
-    <script src="../js/auth.js"></script>
+    <!-- IMPORTANT: do NOT include ../main.js here (it will redirect). -->
+    <!-- Load SettingsDB first so auth.js can call it -->
+    <script src="../js/settings-db.js" defer></script>
+    <script src="../js/auth.js" defer></script>
+
+    <!-- Small page script to control tab switching and auto-selecting login when ?login=1 -->
+    <script>
+      (function () {
+        function $(id) { return document.getElementById(id); }
+        const tabLogin = $('tabLogin');
+        const tabSignup = $('tabSignup');
+        const loginForm = $('loginForm');
+        const signupForm = $('signupForm');
+        const loginMsg = $('loginMsg');
+        const signupMsg = $('signupMsg');
+
+        function showLogin() {
+          tabLogin.classList.add('active');
+          tabLogin.setAttribute('aria-selected','true');
+          tabSignup.classList.remove('active');
+          tabSignup.setAttribute('aria-selected','false');
+          loginForm.style.display = '';
+          loginForm.setAttribute('aria-hidden','false');
+          signupForm.style.display = 'none';
+          signupForm.setAttribute('aria-hidden','true');
+          loginMsg.textContent = '';
+          signupMsg.textContent = '';
+        }
+        function showSignup() {
+          tabSignup.classList.add('active');
+          tabSignup.setAttribute('aria-selected','true');
+          tabLogin.classList.remove('active');
+          tabLogin.setAttribute('aria-selected','false');
+          signupForm.style.display = '';
+          signupForm.setAttribute('aria-hidden','false');
+          loginForm.style.display = 'none';
+          loginForm.setAttribute('aria-hidden','true');
+          loginMsg.textContent = '';
+          signupMsg.textContent = '';
+        }
+
+        tabLogin.addEventListener('click', showLogin);
+        tabSignup.addEventListener('click', showSignup);
+
+        // Auto-select based on ?login=1 or ?signup=1
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('signup') === '1') {
+          showSignup();
+        } else {
+          // default to login OR when ?login=1 present
+          showLogin();
+        }
+
+        // Accessibility: press Enter on active tab to focus first input
+        tabLogin.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginForm.querySelector('input')?.focus(); });
+        tabSignup.addEventListener('keydown', (e) => { if (e.key === 'Enter') signupForm.querySelector('input')?.focus(); });
+
+        // If auth.js performs redirects with querystring, ensure we switch tab accordingly:
+        // e.g. auth.js redirects to "./auth.html?login=1" after signup.
+        if (params.get('login') === '1') showLogin();
+
+      })();
+    </script>
   </body>
 </html>
