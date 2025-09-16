@@ -1,11 +1,9 @@
-// profile-widget.js
-// Adds a profile avatar to the top-right (next to language) and shows name + XP on click.
-// Usage: include after settings-db.js (so SettingsDB is already defined).
+// js/profile-widget.js (uses safe session reads and updates UI accordingly)
+
 (function () {
   const DEFAULT_AVATAR = "../assets/img/1.png";
   const DEFAULT_EMAIL = "johndoe@email.com";
 
-  // tiny CSS injected so you don't need to touch global stylesheet
   const css = `
   .gs-profile-wrap { display:inline-flex; align-items:center; gap:10px; position:relative; }
   .gs-avatar-btn { width:40px; height:40px; border-radius:10px; overflow:hidden; display:inline-block; cursor:pointer; border:1px solid rgba(255,255,255,0.04); background:rgba(255,255,255,0.02); }
@@ -30,32 +28,35 @@
     document.head.appendChild(s);
   }
 
-  // get email same way other pages do
-  function getEmailFromLocal() {
+  function normalizeEmailLocal(email) {
+    if (!email) return email;
+    return String(email).trim().toLowerCase();
+  }
+
+  function readSessionSafe() {
     try {
       const raw = localStorage.getItem("gyan_current_user");
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      return parsed && parsed.email ? parsed.email : null;
+      if (parsed && parsed.email) parsed.email = normalizeEmailLocal(parsed.email);
+      if (parsed && parsed.updatedAt) parsed.updatedAt = Number(parsed.updatedAt) || Date.now();
+      return parsed;
     } catch (e) {
       return null;
     }
   }
 
   async function readSettings(email) {
-    // prefer SettingsDB when available
     try {
       if (window.SettingsDB && SettingsDB.getSettings) {
-        const s = await SettingsDB.getSettings(email || getEmailFromLocal() || DEFAULT_EMAIL);
+        const s = await SettingsDB.getSettings(email || (readSessionSafe() && readSessionSafe().email) || DEFAULT_EMAIL);
         return s || null;
       }
     } catch (e) {
       console.warn("SettingsDB read failed", e);
     }
-
-    // fallback to localStorage cache if available
     try {
-      const raw = localStorage.getItem("gyan_settings_" + (email || getEmailFromLocal()));
+      const raw = localStorage.getItem("gyan_settings_" + (email || (readSessionSafe() && readSessionSafe().email)));
       if (raw) return JSON.parse(raw);
     } catch (e) {}
     return null;
@@ -72,11 +73,9 @@
   function buildWidget(rootContainer) {
     injectCSS();
 
-    // wrapper placed inside same container as language box (lang-fixed)
     const wrap = document.createElement("div");
     wrap.className = "gs-profile-wrap";
 
-    // avatar button
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "gs-avatar-btn";
@@ -92,7 +91,6 @@
     img.src = DEFAULT_AVATAR;
     btn.appendChild(img);
 
-    // popup panel
     const popup = document.createElement("div");
     popup.className = "gs-profile-popup";
     popup.setAttribute("role", "dialog");
@@ -115,31 +113,21 @@
     wrap.appendChild(btn);
     wrap.appendChild(popup);
 
-    // insert into DOM: after language element inside .lang-fixed
-    // prefer .lang-fixed container, else place into top-right area of body
     let inserted = false;
     if (rootContainer && rootContainer instanceof Element) {
       rootContainer.appendChild(wrap);
       inserted = true;
     } else {
       const lf = document.querySelector(".lang-fixed");
-      if (lf) {
-        // append at end so it appears to the right
-        lf.style.display = lf.style.display || ""; // ensure visible
-        lf.appendChild(wrap);
-        inserted = true;
-      }
+      if (lf) { lf.appendChild(wrap); inserted = true; }
     }
-
     if (!inserted) {
-      // fallback: append to body top-right corner
       wrap.style.position = "fixed";
       wrap.style.top = "12px";
       wrap.style.right = "12px";
       document.body.appendChild(wrap);
     }
 
-    // wire interactions
     const popupAvatarImg = popup.querySelector(".gs-popup-avatar img");
     const popupTitle = popup.querySelector(".gs-popup-title");
     const popupSub = popup.querySelector(".gs-popup-sub");
@@ -153,7 +141,6 @@
       popup.setAttribute("aria-hidden", "false");
       btn.setAttribute("aria-expanded", "true");
       isOpen = true;
-      // focus first actionable button for accessibility
       btnProfile.focus();
     }
 
@@ -166,111 +153,70 @@
 
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (isOpen) closePopup();
-      else openPopup();
+      if (isOpen) closePopup(); else openPopup();
     });
 
-    // close on outside click
     document.addEventListener("click", (ev) => {
-      if (!wrap.contains(ev.target)) {
-        if (isOpen) closePopup();
-      }
+      if (!wrap.contains(ev.target)) if (isOpen) closePopup();
     });
-
-    // keyboard: Esc closes
     document.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape" && isOpen) closePopup();
     });
 
-    // profile button - navigate to settings page (if exists)
-    btnProfile.addEventListener("click", () => {
-      // prefer settings page in same folder
-      window.location.href = "settings.html";
-    });
-
-    // logout button - clear local cache and optionally redirect to auth page
+    btnProfile.addEventListener("click", () => window.location.href = "settings.html");
     btnLogout.addEventListener("click", () => {
       localStorage.removeItem("gyan_current_user");
-      // keep settings but you may want to redirect to login screen
-      // try to call a global auth logout if available:
       if (window.authLogout && typeof window.authLogout === "function") {
-        try {
-          window.authLogout();
-        } catch (e) {}
+        try { window.authLogout(); } catch (e) {}
       }
-      // visual update
-      updateWidget(); // will show guest
+      updateWidget();
     });
 
-    // expose update function
     async function updateWidget() {
       let email = null;
       if (window.currentUser && window.currentUser.email) email = window.currentUser.email;
-      if (!email) email = getEmailFromLocal();
+      if (!email) {
+        const ses = readSessionSafe();
+        if (ses && ses.email) email = ses.email;
+      }
       if (!email) email = DEFAULT_EMAIL;
 
       let s = null;
-      try {
-        s = await readSettings(email);
-      } catch (e) {
-        console.warn("readSettings failed", e);
-      }
+      try { s = await readSettings(email); } catch (e) { console.warn("readSettings failed", e); }
 
-      const avatarUrl =
-        (s && (s.avatar || s.profileAvatar || s.photo)) || DEFAULT_AVATAR;
+      const avatarUrl = (s && (s.avatar || s.profileAvatar || s.photo)) || DEFAULT_AVATAR;
       const name = (s && (s.name || s.displayName || s.username)) || (email ? email.split("@")[0] : "Guest");
       const xp = (s && (s.xp != null ? s.xp : s.points)) != null ? (s.xp || s.points) : null;
 
-      // update small avatar and popup
       img.src = avatarUrl;
       popupAvatarImg.src = avatarUrl;
       popupTitle.textContent = name;
       popupSub.innerHTML = xp != null ? `XP: <span class="gs-popup-xp">${formatXp(xp)}</span>` : `<span class="muted">No XP yet</span>`;
     }
 
-    // initial update
     updateWidget();
 
-    // update when localStorage gyan_current_user changes (other tabs or login flow)
     window.addEventListener("storage", (ev) => {
-      if (ev.key === "gyan_current_user" || ev.key === "gyan_settings_" + getEmailFromLocal()) {
+      if (ev.key === "gyan_current_user" || ev.key === "gyan_settings_" + (readSessionSafe() && readSessionSafe().email)) {
+        console.debug("profile-widget detected storage change:", ev.key);
         updateWidget();
       }
     });
 
-    // also provide global update for other pages to call after login/profile changes
     window.updateProfileWidget = updateWidget;
   }
 
-  // Try to find the language container first so avatar sits to the right of language select
   function init() {
     injectCSS();
-    // prefer element with class 'lang-fixed'
     const langFixed = document.querySelector(".lang-fixed");
-    if (langFixed) {
-      buildWidget(langFixed);
-      return;
-    }
-
-    // try to find the top-right area by locating any element containing a language select
+    if (langFixed) { buildWidget(langFixed); return; }
     const langSelect = document.querySelector("#language, .lang-select, select.lang-select");
-    if (langSelect && langSelect.parentElement) {
-      buildWidget(langSelect.parentElement);
-      return;
-    }
-
-    // fallback: append to header/topbar if exists
+    if (langSelect && langSelect.parentElement) { buildWidget(langSelect.parentElement); return; }
     const header = document.querySelector("main .lang-fixed, .topbar, header, .header");
-    if (header) {
-      buildWidget(header);
-      return;
-    }
-
-    // ultimate fallback: body
+    if (header) { buildWidget(header); return; }
     buildWidget(null);
   }
 
-  // Run after DOM ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
