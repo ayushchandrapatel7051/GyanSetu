@@ -532,6 +532,7 @@ body {
 /* Page visibility */
 .page {
   display: none;
+  overflow-y: scroll;
   margin-top: 25px;
 }
 .page.active {
