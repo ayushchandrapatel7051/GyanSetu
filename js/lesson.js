@@ -42,7 +42,6 @@
   ------------------------------ */
   async function resolveLanguage() {
     try {
-      // SettingsDB first
       let email = null;
       try {
         const raw = localStorage.getItem("gyan_current_user");
@@ -54,23 +53,17 @@
         const s = await SettingsDB.getSettings(email);
         if (s?.language) return s.language.slice(0, 2).toLowerCase();
       }
-
-      // global getter
       if (window.GyanSetu?.getCurrentLanguage) {
         return window.GyanSetu.getCurrentLanguage().slice(0, 2).toLowerCase();
       }
-
-      // top-right select
       const sel = document.querySelector("#gs-language");
       if (sel?.value) return sel.value.slice(0, 2).toLowerCase();
 
-      // fallback local
       const raw = localStorage.getItem("gyan_current_user");
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed?.language) return parsed.language.slice(0, 2).toLowerCase();
       }
-
       const rawg = localStorage.getItem("gyan_guest_language");
       if (rawg) {
         const parsed = JSON.parse(rawg);
@@ -117,6 +110,7 @@
       lessonId,
       completed: false,
       percent: 0,
+      seenBlocks: [],     // 🔥 track seen block indexes
       timeSpentSeconds: 0,
       lastViewedAt: Date.now(),
     };
@@ -211,22 +205,34 @@
 
     // reattach observer
     const blocks = Array.from(contentEl.querySelectorAll(".block"));
-    let seenBlocks = new Set();
+    let seenBlocks = new Set(savedProgress.seenBlocks || []); // 🔥 restore old
+
+    const recalcAndSave = async () => {
+      const percent = Math.round((seenBlocks.size / blocks.length) * 100);
+      if (!savedProgress.completed) {
+        savedProgress.percent = percent;
+        savedProgress.seenBlocks = Array.from(seenBlocks);
+        savedProgress.lastViewedAt = Date.now();
+        updateUI(percent);
+        await LessonDB.saveProgress(savedProgress).catch(() => {});
+      }
+    };
+
     io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
             seenBlocks.add(entry.target.dataset.blockIdx);
-            const percent = Math.round((seenBlocks.size / blocks.length) * 100);
-            savedProgress.percent = percent;
-            savedProgress.lastViewedAt = Date.now();
-            updateUI(percent);
+            recalcAndSave();
           }
         });
       },
       { threshold: [0.5] }
     );
     blocks.forEach((b) => io.observe(b));
+
+    // apply old progress immediately
+    if (seenBlocks.size) updateUI(savedProgress.percent);
 
     // start timers
     startedAt = Date.now();
@@ -263,6 +269,7 @@
   markBtn.addEventListener("click", async () => {
     savedProgress.completed = true;
     savedProgress.percent = 100;
+    savedProgress.seenBlocks = []; // once complete, we don’t care
     savedProgress.lastViewedAt = Date.now();
     await LessonDB.saveProgress(savedProgress).catch(() => {});
     setCompletedUI();

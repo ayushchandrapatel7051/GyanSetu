@@ -115,8 +115,6 @@
       </aside>
 
       <main class="content">
-        
-
         <section id="progress" class="page active">
           <h2 class="page-title">My Progress</h2>
 
@@ -163,178 +161,179 @@
       </main>
     </div>
 
-   <script src="../js/settings-db.js"></script>
-<script src="../js/db.js"></script> <!-- ✅ ensure LessonDB is loaded -->
-<script>
-  (function () {
-    const DEFAULT_EMAIL = "johndoe@email.com";
+    <script src="../js/settings-db.js"></script>
+    <script src="../js/db.js"></script>
+    <script>
+      (function () {
+        const DEFAULT_EMAIL = "johndoe@email.com";
 
-    const xpNumberEl = document.getElementById("xpNumber");
-    const mathFill = document.getElementById("mathFill");
-    const scienceFill = document.getElementById("scienceFill");
-    const mathLabel = document.getElementById("mathPercentLabel");
-    const scienceLabel = document.getElementById("sciencePercentLabel");
-    const otherSubjectsRoot = document.getElementById("otherSubjects");
-    const badgesListEl = document.getElementById("badgesList");
-    const streakInfoEl = document.getElementById("streakInfo");
-    const refreshBtn = document.getElementById("refreshProgressBtn");
+        const xpNumberEl = document.getElementById("xpNumber");
+        const mathFill = document.getElementById("mathFill");
+        const scienceFill = document.getElementById("scienceFill");
+        const mathLabel = document.getElementById("mathPercentLabel");
+        const scienceLabel = document.getElementById("sciencePercentLabel");
+        const otherSubjectsRoot = document.getElementById("otherSubjects");
+        const badgesListEl = document.getElementById("badgesList");
+        const streakInfoEl = document.getElementById("streakInfo");
+        const refreshBtn = document.getElementById("refreshProgressBtn");
 
-    let currentEmail = null;
-    let settings = null;
+        let currentEmail = null;
+        let settings = null;
 
-    async function getCurrentEmail() {
-      if (window.currentUser && window.currentUser.email)
-        return window.currentUser.email;
-      try {
-        const raw = localStorage.getItem("gyan_current_user");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.email) return parsed.email;
-        }
-      } catch {}
-      return DEFAULT_EMAIL;
-    }
-
-    function applyPercentToFill(el, labelEl, val) {
-      const pct = Math.max(0, Math.min(100, Number(val) || 0));
-      el.style.width = pct + "%";
-      labelEl.textContent = pct + "%";
-    }
-
-    function renderBadges(badges) {
-      badgesListEl.innerHTML = "";
-      (badges || []).forEach((b) => {
-        const li = document.createElement("li");
-        li.className = "badge-item";
-        li.innerHTML = `<strong>${String(
-          b
-        )}</strong><div class="muted" style="font-size:0.85rem">Badge</div>`;
-        badgesListEl.appendChild(li);
-      });
-    }
-
-    function canonicalSubject(raw) {
-      if (!raw) return "Other";
-      const s = String(raw).trim().toLowerCase();
-      if (!s) return "Other";
-      const map = {
-        math: "Mathematics",
-        maths: "Mathematics",
-        mathematics: "Mathematics",
-        science: "Science",
-        sci: "Science",
-      };
-      if (map[s]) return map[s];
-      if (s.startsWith("math")) return "Mathematics";
-      if (s.startsWith("sci")) return "Science";
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    }
-
-    async function loadAndRender() {
-      try {
-        if (SettingsDB.openDB) await SettingsDB.openDB();
-        if (LessonDB.openDB) await LessonDB.openDB();
-      } catch (e) {
-        console.warn("DB open failed", e);
-      }
-
-      currentEmail = await getCurrentEmail();
-
-      // Load settings (XP, badges, grade)
-      try {
-        const s = await SettingsDB.getSettings(currentEmail);
-        settings = s || {
-          email: currentEmail,
-          xp: 0,
-          badges: [],
-          progress: {},
-          streak: null,
-          grade: "8",
-        };
-        if (!s) await SettingsDB.saveSettings(settings);
-
-        xpNumberEl.textContent = (Number(settings.xp) || 0).toLocaleString();
-        renderBadges(settings.badges || []);
-        streakInfoEl.textContent =
-          (settings.streak && String(settings.streak)) || "No active streak";
-      } catch (e) {
-        console.error("Settings load failed", e);
-      }
-
-      // Compute subject progress
-      try {
-        const res = await fetch("../data/lessons.json", { cache: "no-store" });
-        if (!res.ok) throw new Error("Could not fetch lessons.json");
-        let lessons = await res.json();
-
-        // 🔥 only keep lessons matching user grade
-        if (settings && settings.grade) {
-          lessons = lessons.filter(
-            (l) => String(l.grade) === String(settings.grade)
-          );
-        }
-
-        const bySubject = {};
-        for (const lesson of lessons) {
-          const subject = canonicalSubject(lesson.subject);
-          if (!bySubject[subject]) bySubject[subject] = [];
-          bySubject[subject].push(lesson);
-        }
-
-        const subjectAverages = {};
-        for (const [subject, list] of Object.entries(bySubject)) {
-          let sum = 0,
-            count = 0;
-          for (const l of list) {
-            try {
-              const progress = await LessonDB.getProgress(currentEmail, l.id);
-              if (progress && typeof progress.percent === "number") {
-                sum += Number(progress.percent);
-                count++;
-              }
-            } catch (e) {
-              console.warn("Lesson progress read failed", l.id, e);
+        async function getCurrentEmail() {
+          if (window.currentUser && window.currentUser.email)
+            return window.currentUser.email;
+          try {
+            const raw = localStorage.getItem("gyan_current_user");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed && parsed.email) return parsed.email;
             }
-          }
-          const avg = count ? Math.round(sum / count) : 0;
-          subjectAverages[subject] = { avg, lessons: list.length };
+          } catch {}
+          return DEFAULT_EMAIL;
         }
 
-        applyPercentToFill(
-          mathFill,
-          mathLabel,
-          subjectAverages["Mathematics"]?.avg || 0
-        );
-        applyPercentToFill(
-          scienceFill,
-          scienceLabel,
-          subjectAverages["Science"]?.avg || 0
-        );
+        function applyPercentToFill(el, labelEl, val) {
+          const pct = Math.max(0, Math.min(100, Number(val) || 0));
+          el.style.width = pct + "%";
+          labelEl.textContent = pct + "%";
+        }
 
-        otherSubjectsRoot.innerHTML = "";
-        Object.entries(subjectAverages)
-          .filter(([k]) => k !== "Mathematics" && k !== "Science")
-          .sort((a, b) => a[0].localeCompare(b[0]))
-          .forEach(([subject, info]) => {
-            const div = document.createElement("div");
-            div.style.marginTop = "12px";
-            div.innerHTML = `
-              <div class="progress-row"><span>${subject}</span>
-              <span class="muted">${info.avg}%</span></div>
-              <div class="bar"><div class="fill" style="width:${info.avg}%"></div></div>
-            `;
-            otherSubjectsRoot.appendChild(div);
+        function renderBadges(badges) {
+          badgesListEl.innerHTML = "";
+          (badges || []).forEach((b) => {
+            const li = document.createElement("li");
+            li.className = "badge-item";
+            li.innerHTML = `<strong>${String(
+              b
+            )}</strong><div class="muted" style="font-size:0.85rem">Badge</div>`;
+            badgesListEl.appendChild(li);
           });
-      } catch (e) {
-        console.error("Progress load failed", e);
-      }
-    }
+        }
 
-    refreshBtn.addEventListener("click", loadAndRender);
-    window.addEventListener("DOMContentLoaded", loadAndRender);
-  })();
-</script>
+        function canonicalSubject(raw) {
+          if (!raw) return "Other";
+          const s = String(raw).trim().toLowerCase();
+          if (!s) return "Other";
+          const map = {
+            math: "Mathematics",
+            maths: "Mathematics",
+            mathematics: "Mathematics",
+            science: "Science",
+            sci: "Science",
+          };
+          if (map[s]) return map[s];
+          if (s.startsWith("math")) return "Mathematics";
+          if (s.startsWith("sci")) return "Science";
+          return s.charAt(0).toUpperCase() + s.slice(1);
+        }
 
+        async function loadAndRender() {
+          try {
+            if (SettingsDB.openDB) await SettingsDB.openDB();
+            if (LessonDB.openDB) await LessonDB.openDB();
+          } catch (e) {
+            console.warn("DB open failed", e);
+          }
+
+          currentEmail = await getCurrentEmail();
+
+          // Load settings (XP, badges, grade)
+          try {
+            const s = await SettingsDB.getSettings(currentEmail);
+            settings = s || {
+              email: currentEmail,
+              xp: 0,
+              badges: [],
+              progress: {},
+              streak: null,
+              grade: "8",
+            };
+            if (!s) await SettingsDB.saveSettings(settings);
+
+            xpNumberEl.textContent = (Number(settings.xp) || 0).toLocaleString();
+            renderBadges(settings.badges || []);
+            streakInfoEl.textContent =
+              (settings.streak && String(settings.streak)) || "No active streak";
+          } catch (e) {
+            console.error("Settings load failed", e);
+          }
+
+          // Compute subject progress
+          try {
+            const res = await fetch("../data/lessons.json", { cache: "no-store" });
+            if (!res.ok) throw new Error("Could not fetch lessons.json");
+            let lessons = await res.json();
+
+            // 🔥 only keep lessons matching user grade
+            if (settings && settings.grade) {
+              lessons = lessons.filter(
+                (l) => String(l.grade) === String(settings.grade)
+              );
+            }
+
+            const bySubject = {};
+            for (const lesson of lessons) {
+              const subject = canonicalSubject(lesson.subject);
+              if (!bySubject[subject]) bySubject[subject] = [];
+              bySubject[subject].push(lesson);
+            }
+
+            const subjectAverages = {};
+            for (const [subject, list] of Object.entries(bySubject)) {
+              let sum = 0;
+              const total = list.length; // ✅ denominator is total lessons
+              for (const l of list) {
+                try {
+                  const progress = await LessonDB.getProgress(currentEmail, l.id);
+                  if (progress && typeof progress.percent === "number") {
+                    sum += Number(progress.percent);
+                  } else {
+                    sum += 0; // unopened lesson
+                  }
+                } catch (e) {
+                  console.warn("Lesson progress read failed", l.id, e);
+                  sum += 0;
+                }
+              }
+              const avg = total ? Math.round(sum / total) : 0;
+              subjectAverages[subject] = { avg, lessons: total };
+            }
+
+            applyPercentToFill(
+              mathFill,
+              mathLabel,
+              subjectAverages["Mathematics"]?.avg || 0
+            );
+            applyPercentToFill(
+              scienceFill,
+              scienceLabel,
+              subjectAverages["Science"]?.avg || 0
+            );
+
+            otherSubjectsRoot.innerHTML = "";
+            Object.entries(subjectAverages)
+              .filter(([k]) => k !== "Mathematics" && k !== "Science")
+              .sort((a, b) => a[0].localeCompare(b[0]))
+              .forEach(([subject, info]) => {
+                const div = document.createElement("div");
+                div.style.marginTop = "12px";
+                div.innerHTML = `
+                  <div class="progress-row"><span>${subject}</span>
+                  <span class="muted">${info.avg}%</span></div>
+                  <div class="bar"><div class="fill" style="width:${info.avg}%"></div></div>
+                `;
+                otherSubjectsRoot.appendChild(div);
+              });
+          } catch (e) {
+            console.error("Progress load failed", e);
+          }
+        }
+
+        refreshBtn.addEventListener("click", loadAndRender);
+        window.addEventListener("DOMContentLoaded", loadAndRender);
+      })();
+    </script>
 
     <script src="../main.js"></script>
     <script src="../js/profile-widget.js"></script>
