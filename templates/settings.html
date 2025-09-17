@@ -296,7 +296,6 @@
           return "en";
         }
 
-        // merge function: choose newest for each whole object (DB vs login)
         function pickNewest(dbRec, loginRec) {
           if (!dbRec && !loginRec) return null;
           if (!dbRec) return loginRec;
@@ -306,7 +305,6 @@
           return dbTime >= loginTime ? dbRec : loginRec;
         }
 
-        // read login session (localStorage)
         function readLoginSession() {
           const raw = localStorage.getItem("gyan_current_user");
           if (!raw) return null;
@@ -320,7 +318,6 @@
             ) {
               parsed.email = window.SettingsDB.normalizeEmail(parsed.email);
             }
-            // ensure numeric updatedAt
             if (parsed && parsed.updatedAt)
               parsed.updatedAt = Number(parsed.updatedAt) || Date.now();
             return parsed;
@@ -330,7 +327,6 @@
           }
         }
 
-        // write session
         function writeLoginSession(obj) {
           try {
             localStorage.setItem("gyan_current_user", JSON.stringify(obj));
@@ -340,7 +336,6 @@
         }
 
         async function loadAndSync(emailFromLogin) {
-          // ensure DB ready
           await SettingsDB.openDB();
           const loginRec = readLoginSession() || {};
           const emailCandidate =
@@ -354,52 +349,51 @@
 
           // if no dbRec but loginRec has data, save loginRec into DB (initial save)
           if (!dbRec && loginRec && loginRec.email) {
-            // fill with defaults
+            // combine defaults with loginRec, but then save and use the saved result
             const toSave = Object.assign({}, DEFAULT_SETTINGS, loginRec, {
               email: normalizedEmail,
               updatedAt: loginRec.updatedAt || Date.now(),
             });
-            await SettingsDB.saveSettings(toSave).catch((err) =>
-              console.warn("initial save failed", err)
-            );
-            writeLoginSession(toSave);
-            currentSettings = toSave;
-          } else {
-            // pick latest between db and login (based on updatedAt)
-            const dbProcessed = dbRec
-              ? Object.assign({}, DEFAULT_SETTINGS, dbRec)
-              : null;
-            const loginProcessed = loginRec
-              ? Object.assign({}, DEFAULT_SETTINGS, loginRec)
-              : null;
-            const winner =
-              pickNewest(dbProcessed, loginProcessed) || DEFAULT_SETTINGS;
-            // ensure normalized email and language
-            winner.email = SettingsDB.normalizeEmail(
-              winner.email || DEFAULT_SETTINGS.email
-            );
-            winner.language = normalizeLanguage(winner.language);
-            currentSettings = winner;
-            // make DB and localStorage consistent: if localStorage older than DB, update it; if DB older and login newer, save to DB
-            const dbTime =
-              dbProcessed && dbProcessed.updatedAt
-                ? Number(dbProcessed.updatedAt)
-                : 0;
-            const winTime = winner.updatedAt
-              ? Number(winner.updatedAt)
-              : Date.now();
-            if (!dbRec || winTime > dbTime) {
-              try {
-                await SettingsDB.saveSettings(winner);
-              } catch (e) {
-                console.warn("sync save to DB failed", e);
-              }
+            try {
+              const saved = await SettingsDB.saveSettings(toSave);
+              writeLoginSession(saved);
+              currentSettings = saved;
+              applyToUI(currentSettings);
+              console.debug("Initial saved settings:", saved);
+              return;
+            } catch (err) {
+              console.warn("initial save failed", err);
             }
-            writeLoginSession(winner);
           }
 
+          // otherwise pick newest (db vs login) — do not overlay DEFAULT_SETTINGS first (that could erase xp)
+          const dbProcessed = dbRec ? Object.assign({}, dbRec) : null;
+          const loginProcessed = loginRec ? Object.assign({}, loginRec) : null;
+          const winnerCandidate =
+            pickNewest(dbProcessed, loginProcessed) || DEFAULT_SETTINGS;
+
+          // ensure normalized email and language
+          winnerCandidate.email = SettingsDB.normalizeEmail(
+            winnerCandidate.email || normalizedEmail || DEFAULT_SETTINGS.email
+          );
+          winnerCandidate.language = normalizeLanguage(winnerCandidate.language);
+
+          // Save the winner and use the merged record returned from the DB (this preserves xp)
+          try {
+            const saved = await SettingsDB.saveSettings(winnerCandidate);
+            currentSettings = saved;
+            writeLoginSession(saved);
+            applyToUI(currentSettings);
+            console.debug("Loaded and saved winner settings:", saved);
+            return;
+          } catch (e) {
+            console.warn("sync save to DB failed", e);
+          }
+
+          // fallback
+          currentSettings = winnerCandidate;
+          writeLoginSession(currentSettings);
           applyToUI(currentSettings);
-          console.debug("Loaded settings:", currentSettings);
         }
 
         function applyToUI(s) {
@@ -408,55 +402,16 @@
           profileAvatar.src = s.avatar || "../assets/img/avatar.jpg";
           cardLanguage.value = s.language || "en";
           cardGrade.value = s.grade || "8";
-          const topLang = document.getElementById("language");
-          if (topLang) topLang.value = s.language || "en";
         }
 
-        // Watch for other scripts changing gyan_current_user in localStorage (helps debug overwrite sources)
-        window.addEventListener("storage", (ev) => {
-          if (ev.key === "gyan_current_user") {
-            console.warn(
-              "localStorage gyan_current_user changed (storage event). Old:",
-              ev.oldValue,
-              "New:",
-              ev.newValue
-            );
-            // optionally reload / re-sync if you want immediate response
-            try {
-              const parsed = JSON.parse(ev.newValue || "{}");
-              // quick sanity: if new value is older than our current settings, log suspicious
-              const newTime =
-                parsed && parsed.updatedAt ? Number(parsed.updatedAt) : 0;
-              const curTime =
-                currentSettings && currentSettings.updatedAt
-                  ? Number(currentSettings.updatedAt)
-                  : 0;
-              if (newTime < curTime) {
-                console.warn(
-                  "A stale localStorage value replaced a newer profile. That is likely the cause of reverts."
-                );
-              } else {
-                // otherwise, apply it
-                applyToUI(parsed);
-                currentSettings = parsed;
-              }
-            } catch (e) {
-              console.warn("failed to parse new storage value", e);
-            }
-          }
-        });
-
-        // boot
         window.addEventListener("DOMContentLoaded", async () => {
           await SettingsDB.openDB();
-          // load login session email if any
           const login = readLoginSession();
           const email =
             login && login.email ? login.email : DEFAULT_SETTINGS.email;
           await loadAndSync(email);
         });
 
-        // open edit modal
         openEditBtn.addEventListener("click", () => {
           if (!currentSettings) return;
           modalName.value = currentSettings.name || "";
@@ -479,20 +434,24 @@
 
           const normalizedEmail = SettingsDB.normalizeEmail(newEmailRaw);
 
-          const updated = Object.assign({}, currentSettings, {
+          // build candidate update; do not hard-zero xp/badges here
+          const candidate = Object.assign({}, currentSettings, {
             email: normalizedEmail,
             name: modalName.value || "Unknown",
             profile: modalProfile.value || "",
             grade: modalGrade.value || "8",
             language: normalizeLanguage(modalLanguage.value),
             avatar: modalAvatar.src || "../assets/img/avatar.jpg",
+            // note: do not set xp/badges here — let saveSettings preserve them
             updatedAt: Date.now(),
           });
 
           try {
-            await SettingsDB.saveSettings(updated);
-            writeLoginSession(updated);
-            await loadAndSync(normalizedEmail);
+            // save and use the returned merged/saved record (this will contain xp)
+            const saved = await SettingsDB.saveSettings(candidate);
+            writeLoginSession(saved);
+            // optionally re-load to ensure UI/other pages pick up the same canonical state
+            await loadAndSync(saved.email);
             editModal.classList.remove("show");
             alert("Profile saved");
           } catch (e) {
@@ -513,6 +472,32 @@
           } catch (e) {
             console.error("delete error", e);
             alert("Failed to delete profile. See console.");
+          }
+        });
+
+        // watch for other tabs/processes changing the localStorage
+        window.addEventListener("storage", (ev) => {
+          if (ev.key === "gyan_current_user") {
+            try {
+              const parsed = JSON.parse(ev.newValue || "{}");
+              // keep only if it's newer (optional)
+              const newTime =
+                parsed && parsed.updatedAt ? Number(parsed.updatedAt) : 0;
+              const curTime =
+                currentSettings && currentSettings.updatedAt
+                  ? Number(currentSettings.updatedAt)
+                  : 0;
+              if (newTime >= curTime) {
+                currentSettings = parsed;
+                applyToUI(currentSettings);
+              } else {
+                console.warn(
+                  "Ignored older gyan_current_user localStorage update (might cause reverts)."
+                );
+              }
+            } catch (e) {
+              console.warn("failed to parse new storage value", e);
+            }
           }
         });
       })();
