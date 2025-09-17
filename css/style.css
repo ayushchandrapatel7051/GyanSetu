@@ -534,6 +534,7 @@ body {
   display: none;
   overflow-y: scroll;
   margin-top: 25px;
+  margin-bottom: 50px;
 }
 .page.active {
   display: block;
