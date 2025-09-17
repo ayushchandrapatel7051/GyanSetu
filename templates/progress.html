@@ -81,6 +81,9 @@
   </head>
   <body>
     <div class="app">
+      <div class="sidebar-mobile" id="sidebarMobile">
+        <i class="fas fa-bars"></i>
+      </div>
       <aside class="sidebar" role="navigation" aria-label="Main navigation">
         <div class="sidebar-inner">
           <h1 class="logo">GyanSetu</h1>
@@ -251,17 +254,22 @@
             };
             if (!s) await SettingsDB.saveSettings(settings);
 
-            xpNumberEl.textContent = (Number(settings.xp) || 0).toLocaleString();
+            xpNumberEl.textContent = (
+              Number(settings.xp) || 0
+            ).toLocaleString();
             renderBadges(settings.badges || []);
             streakInfoEl.textContent =
-              (settings.streak && String(settings.streak)) || "No active streak";
+              (settings.streak && String(settings.streak)) ||
+              "No active streak";
           } catch (e) {
             console.error("Settings load failed", e);
           }
 
           // Compute subject progress
           try {
-            const res = await fetch("../data/lessons.json", { cache: "no-store" });
+            const res = await fetch("../data/lessons.json", {
+              cache: "no-store",
+            });
             if (!res.ok) throw new Error("Could not fetch lessons.json");
             let lessons = await res.json();
 
@@ -285,7 +293,10 @@
               const total = list.length; // ✅ denominator is total lessons
               for (const l of list) {
                 try {
-                  const progress = await LessonDB.getProgress(currentEmail, l.id);
+                  const progress = await LessonDB.getProgress(
+                    currentEmail,
+                    l.id
+                  );
                   if (progress && typeof progress.percent === "number") {
                     sum += Number(progress.percent);
                   } else {

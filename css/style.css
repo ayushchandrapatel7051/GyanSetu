@@ -505,7 +505,9 @@ body {
     grid-template-columns: 1fr;
   }
   .sidebar {
-    display: none;
+    transform: translateX(-260px);
+    transition: transform 200ms ease;
+    padding-top: 50px;
   }
   .app {
     display: block;
@@ -530,6 +532,7 @@ body {
 /* Page visibility */
 .page {
   display: none;
+  margin-top: 25px;
 }
 .page.active {
   display: block;
@@ -681,5 +684,22 @@ body {
 /* to ensure text is visible in the dropdowns */
 select option {
   background-color: #16002a;
-  color: #fff; 
+  color: #fff;
+}
+
+.sidebar-mobile {
+  display: none;
+  position: fixed;
+  font-size: 30px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 5px 7px;
+  border-radius: 30px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 1500;
+}
+
+@media (max-width: 1100px) {
+  .sidebar-mobile {
+    display: block;
+  }
 }

@@ -84,4 +84,54 @@
         : '<i class="fas fa-right-to-bracket"></i><span>Log In</span>';
     });
   }
+  // mobile sidebar toggle
+  // Toggle sidebar + swap FontAwesome icon inside #sidebarMobile (bars <-> times)
+  var opened = false;
+  const sidebarMobile = document.getElementById("sidebarMobile");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (sidebarMobile && sidebar) {
+    // ensure an <i> icon exists inside the trigger
+    function ensureIcon() {
+      let icon = sidebarMobile.querySelector("i");
+      if (!icon) {
+        icon = document.createElement("i");
+        icon.setAttribute("aria-hidden", "true");
+        sidebarMobile.appendChild(icon);
+      }
+      return icon;
+    }
+
+    function setIcon(isOpen) {
+      const icon = ensureIcon();
+      // reset classes to avoid leftover classes from different FA versions
+      icon.className = "";
+      if (isOpen) {
+        // Font Awesome close icon (FA5: fas fa-times)
+        icon.classList.add("fas", "fa-times");
+        sidebarMobile.setAttribute("aria-label", "Close menu");
+        sidebarMobile.setAttribute("aria-expanded", "true");
+      } else {
+        // Font Awesome bars icon (FA5: fas fa-bars)
+        icon.classList.add("fas", "fa-bars");
+        sidebarMobile.setAttribute("aria-label", "Open menu");
+        sidebarMobile.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    // initialize to closed state icon
+    setIcon(false);
+
+    sidebarMobile.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (opened) {
+        sidebar.style.transform = "translateX(-100%)";
+        setIcon(false);
+      } else {
+        sidebar.style.transform = "translateX(0)";
+        setIcon(true);
+      }
+      opened = !opened;
+    });
+  }
 })();

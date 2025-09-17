@@ -1,107 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GyanSetu — Lessons</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/lessons.css" />
-  <script src="../js/settings-db.js" defer></script>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GyanSetu — Lessons</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/lessons.css" />
+    <script src="../js/settings-db.js" defer></script>
 
-  <style>
-    /* small in-file tweaks so the continue card is visible */
-    #continueLastLesson { display: none; margin-bottom: 12px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.02); }
-    #continueLastLesson .title { font-weight:700; margin-bottom:6px; }
-    #continueLastLesson .meta { color: rgba(255,255,255,0.6); font-size:0.9rem; margin-bottom:8px; }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <aside class="sidebar" role="navigation" aria-label="Main navigation">
-      <div class="sidebar-inner">
-        <h1 class="logo">GyanSetu</h1>
-        <nav>
-          <ul class="menu">
-            <li class="menu-item" data-page="home"><i class="fas fa-house"></i><span>Home</span></li>
-            <li class="menu-item active" data-page="lessons"><i class="fas fa-book-open"></i><span>Lessons</span></li>
-            <li class="menu-item" data-page="games"><i class="fas fa-gamepad"></i><span>Games</span></li>
-            <li class="menu-item" data-page="progress"><i class="fas fa-chart-simple"></i><span>Progress</span></li>
-            <li class="menu-item" data-page="rewards"><i class="fas fa-award"></i><span>Rewards</span></li>
-            <li class="menu-item" data-page="settings"><i class="fas fa-gear"></i><span>Settings</span></li>
-          </ul>
-        </nav>
-        <div class="sidebar-bottom">
-          <button class="login" id="loginBtn" style="background: none">
-            <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
-          </button>
-        </div>
+    <style>
+      /* small in-file tweaks so the continue card is visible */
+      #continueLastLesson {
+        display: none;
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      #continueLastLesson .title {
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      #continueLastLesson .meta {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="sidebar-mobile" id="sidebarMobile">
+        <i class="fas fa-bars"></i>
       </div>
-    </aside>
-
-    <main class="content">
-      
-
-      <section class="page active" id="lessonsPage">
-        <h2 class="page-title">Lessons</h2>
-
-        <!-- Continue last lesson card (hidden if none) -->
-        <div id="continueLastLesson" role="region" aria-label="Continue last lesson">
-          <div class="title">Continue:</div>
-          <div class="meta"></div>
-          <div>
-            <button class="btn btn-purple open">Open lesson</button>
-          </div>
-        </div>
-
-        <!-- Filters -->
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
-          <label style="font-weight:700; color:var(--muted)">Grade</label>
-          <select id="filterGrade" class="input">
-            <option value="">All grades</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-
-          <label style="font-weight:700; color:var(--muted)">Subject</label>
-          <select id="filterSubject" class="input">
-            <option value="">All subjects</option>
-          </select>
-
-          <input id="searchLessons" class="input" placeholder="Search lessons..." style="margin-left:auto;"/>
-        </div>
-
-        <div class="grid-2">
-          <div>
-            <ul id="lessonsList" class="lessons-list">
-              <!-- list populated by JS -->
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">GyanSetu</h1>
+          <nav>
+            <ul class="menu">
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i><span>Home</span>
+              </li>
+              <li class="menu-item active" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
             </ul>
-          </div>
-
-          <div class="panel">
-            <h3 id="spot-title">Preview</h3>
-            <div id="spot-body" class="muted">Hover a lesson to preview.</div>
+          </nav>
+          <div class="sidebar-bottom">
+            <button class="login" id="loginBtn" style="background: none">
+              <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+            </button>
           </div>
         </div>
-      </section>
-    </main>
-  </div>
+      </aside>
 
-  <!-- load DB wrappers first -->
-  <script src="../js/settings-db.js"></script>
-  <!-- your LessonDB wrapper (if you have a file for it; change name if different) -->
-  <script src="../js/lesson-db.js"></script>
+      <main class="content">
+        <section class="page active" id="lessonsPage">
+          <h2 class="page-title">Lessons</h2>
 
-  <!-- lessons logic (replace your previous js/lessons.js) -->
-  <script src="../js/lessons.js"></script>
+          <!-- Continue last lesson card (hidden if none) -->
+          <div
+            id="continueLastLesson"
+            role="region"
+            aria-label="Continue last lesson"
+          >
+            <div class="title">Continue:</div>
+            <div class="meta"></div>
+            <div>
+              <button class="btn btn-purple open">Open lesson</button>
+            </div>
+          </div>
 
-  <script src="../main.js"></script>
-  <script src="../js/profile-widget.js"></script>
-  <script src="../js/nav.js"></script>
-  <script src="../js/script.js"></script>
-</body>
+          <!-- Filters -->
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              align-items: center;
+              margin-bottom: 12px;
+            "
+          >
+            <label style="font-weight: 700; color: var(--muted)">Grade</label>
+            <select id="filterGrade" class="input">
+              <option value="">All grades</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+
+            <label style="font-weight: 700; color: var(--muted)">Subject</label>
+            <select id="filterSubject" class="input">
+              <option value="">All subjects</option>
+            </select>
+
+            <input
+              id="searchLessons"
+              class="input"
+              placeholder="Search lessons..."
+              style="margin-left: auto"
+            />
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <ul id="lessonsList" class="lessons-list">
+                <!-- list populated by JS -->
+              </ul>
+            </div>
+
+            <div class="panel">
+              <h3 id="spot-title">Preview</h3>
+              <div id="spot-body" class="muted">Hover a lesson to preview.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- load DB wrappers first -->
+    <script src="../js/settings-db.js"></script>
+    <!-- your LessonDB wrapper (if you have a file for it; change name if different) -->
+    <script src="../js/lesson-db.js"></script>
+
+    <!-- lessons logic (replace your previous js/lessons.js) -->
+    <script src="../js/lessons.js"></script>
+
+    <script src="../main.js"></script>
+    <script src="../js/profile-widget.js"></script>
+    <script src="../js/nav.js"></script>
+    <script src="../js/script.js"></script>
+  </body>
 </html>
