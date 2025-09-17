@@ -75,8 +75,6 @@ function normalizeEmailLocal(email) {
 }
 
 function mergeSession(existing, incoming) {
-  // canonical session shape:
-  // { email, name, profile, avatar, grade, language, phone, updatedAt }
   const now = Date.now();
   const a = existing || {};
   const b = incoming || {};
@@ -89,7 +87,7 @@ function mergeSession(existing, incoming) {
   const newer = bTime > aTime ? b : a;
   const older = bTime > aTime ? a : b;
 
-  const merged = {
+  return {
     email: newer.email || older.email || "",
     name:
       newer.name ||
@@ -104,8 +102,6 @@ function mergeSession(existing, incoming) {
     phone: newer.phone || older.phone || "",
     updatedAt: Math.max(aTime, bTime, now),
   };
-
-  return merged;
 }
 
 function readLoginSession() {
@@ -146,11 +142,10 @@ async function fetchUsersFromJsonbin() {
     });
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
     const payload = await res.json();
-    // jsonbin v3 wraps your record at payload.record
     return payload && payload.record ? payload.record : [];
   } catch (err) {
     console.warn("fetchUsersFromJsonbin failed", err);
-    return null; // null means cannot reach
+    return null;
   }
 }
 
@@ -184,7 +179,6 @@ async function ensureSettingsForUser(user) {
       user && user.email ? normalizeEmailLocal(String(user.email)) : null;
     if (!email) return;
 
-    // load existing settings
     let s = null;
     try {
       s = await SettingsDB.getSettings(email);
@@ -192,7 +186,6 @@ async function ensureSettingsForUser(user) {
       s = null;
     }
 
-    // ensure fields and prefer existing settings values where reasonable
     const merged = Object.assign({}, s || {}, {
       email,
       name:
@@ -223,7 +216,7 @@ async function ensureSettingsForUser(user) {
 }
 
 /* -----------------------
-   Signup / Login flows (integrated with JSONBin)
+   Signup / Login flows
    ----------------------- */
 async function signupUser(user) {
   try {
@@ -231,7 +224,6 @@ async function signupUser(user) {
     user.createdAt = Date.now();
     user.updatedAt = Date.now();
 
-    // load remote users (if available)
     const remote = await fetchUsersFromJsonbin();
     if (Array.isArray(remote)) {
       const existsRemote = remote.find(
@@ -245,10 +237,8 @@ async function signupUser(user) {
       }
     }
 
-    // add to auth DB (local)
     await addUserToDB(Object.assign({}, user));
 
-    // also add to remote if we could fetch remote (best-effort)
     if (Array.isArray(remote)) {
       const newRemote = remote.concat([
         Object.assign({}, user, { xp: 0, lastLesson: "" }),
@@ -258,15 +248,17 @@ async function signupUser(user) {
       );
     }
 
-    // safe write to local session (not marking logged in yet)
     writeLoginSessionSafely(user);
-
-    // sync settings record
     await ensureSettingsForUser(user).catch((e) =>
       console.warn("Settings sync after signup failed", e)
     );
 
-    // redirect to login tab
+    // ✅ store signup success message before redirect
+    localStorage.setItem(
+      "gyan_signup_success",
+      "Your account has been created! Please login with your credentials."
+    );
+
     const authPath = location.pathname.includes("/templates/")
       ? "auth.html?login=1"
       : "./auth.html?login=1";
@@ -284,13 +276,11 @@ async function signupUser(user) {
 async function loginSuccess(user) {
   try {
     user.updatedAt = Date.now();
-    // mark logged in in auth DB
     user.isLoggedIn = true;
     await updateUserInDB(user).catch((e) =>
       console.warn("updateUserInDB failed", e)
     );
 
-    // write safe merged session
     writeLoginSessionSafely({
       email: user.email,
       firstName: user.firstName,
@@ -309,12 +299,10 @@ async function loginSuccess(user) {
       updatedAt: user.updatedAt,
     });
 
-    // ensure settings record exists and is up to date
     await ensureSettingsForUser(user).catch((e) =>
       console.warn("ensureSettingsForUser during login failed", e)
     );
 
-    // update remote record (best-effort) - fetch, update user, push
     (async () => {
       try {
         const remote = await fetchUsersFromJsonbin();
@@ -334,14 +322,12 @@ async function loginSuccess(user) {
       }
     })();
 
-    // redirect to index
     const redirectPath = location.pathname.includes("/templates/")
       ? "../index.html"
       : "../index.html";
     setTimeout(() => (window.location.href = redirectPath), 300);
   } catch (err) {
     console.error("loginSuccess failed", err);
-    // fallback: still redirect
     window.location.href = "../index.html";
   }
 }
@@ -376,6 +362,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (tabLogin) tabLogin.addEventListener("click", showLoginTab);
   if (tabSignup) tabSignup.addEventListener("click", showSignupTab);
+
+  // ✅ check signup success message
+  const signupSuccessMsg = localStorage.getItem("gyan_signup_success");
+  if (signupSuccessMsg && loginMsg) {
+    loginMsg.textContent = signupSuccessMsg;
+    loginMsg.style.color = "limegreen";
+    localStorage.removeItem("gyan_signup_success");
+  }
 
   // SIGNUP submit
   if (signupForm) {
@@ -428,7 +422,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // first check local DB
         let user = await getUserFromDB(email);
         if (user && user.password === password) {
           user.isLoggedIn = true;
@@ -438,14 +431,12 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // if not local or password mismatch, try remote (best-effort)
         const remote = await fetchUsersFromJsonbin();
         if (Array.isArray(remote)) {
           const remoteUser = remote.find(
             (u) => String(u.email || "").toLowerCase() === email
           );
           if (remoteUser && remoteUser.password === password) {
-            // seed local DB with remote user then login
             const seedUser = Object.assign({}, remoteUser, {
               updatedAt: Date.now(),
               isLoggedIn: true,
@@ -468,5 +459,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-// End of file
