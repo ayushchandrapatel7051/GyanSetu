@@ -255,7 +255,7 @@ body {
   box-sizing: border-box;
 }
 .cards.small {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 .card {
   background: var(--card);
@@ -703,4 +703,110 @@ select option {
   .sidebar-mobile {
     display: block;
   }
+}
+
+/* ----- CARD + GRID FIXES (replace your existing cards/card/badge/content rules) ----- */
+
+/* Make the grid responsive: auto-fit with a sensible min width per card */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 22px;
+  align-items: start; /* align cards to the top */
+  justify-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 8px; /* avoid right-edge clipping */
+}
+
+/* Card visual improvements */
+.card {
+  background: var(--card);
+  padding: clamp(14px, 3.5vw, 26px);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  min-height: 160px; /* smaller, more consistent min height */
+  max-height: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* align content to left so text won't center and wrap weirdly */
+  justify-content: flex-start;
+  text-align: left;
+  box-sizing: border-box;
+  overflow: visible; /* allow overflow (icons / badges) if needed */
+}
+
+/* Badge: keep image scaled and constrained so it doesn't overflow card */
+.badge {
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 16px 0; /* space below badge */
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* use contain so important parts aren't cropped */
+}
+
+/* Card title / copy style (left aligned, readable) */
+.card-cta h3 {
+  font-size: 20px;
+  margin: 6px 0 8px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-cta p {
+  color: var(--muted);
+  margin: 0 0 14px 0;
+}
+
+/* ensure content area doesn't get hidden on small screens */
+.content {
+  position: relative;
+  margin-left: 260px; /* same as sidebar width */
+  padding: 28px 36px;
+  width: calc(100% - 260px);
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding-bottom: 48px;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 22px; /* extra right padding prevents clipping by scrollbars/overlays */
+}
+
+/* On smaller viewports, reduce margins and let content use full width */
+@media (max-width: 1100px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 18px 16px;
+  }
+  .cards {
+    gap: 16px;
+    padding-right: 6px;
+  }
+  .card {
+    padding: 14px;
+    border-radius: 12px;
+    min-height: 140px;
+  }
+  .badge {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+/* small tweak to avoid excessive vertical lift on hover (prevents overlap) */
+.menu-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
