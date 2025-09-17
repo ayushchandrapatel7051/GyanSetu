@@ -14,7 +14,6 @@
     />
     <link rel="stylesheet" href="../css/style.css" />
     <script src="../js/settings-db.js" defer></script>
-  
   </head>
   <body>
     <div class="app">
@@ -24,7 +23,14 @@
           <nav>
             <ul class="menu">
               <li class="menu-item" data-page="home">
-                <i class="fas fa-house"></i><span style= "text-decoration:none;color:rgba(255,255,255,0.65)">Home</span>
+                <i class="fas fa-house"></i
+                ><span
+                  style="
+                    text-decoration: none;
+                    color: rgba(255, 255, 255, 0.65);
+                  "
+                  >Home</span
+                >
               </li>
               <li class="menu-item" data-page="lessons">
                 <i class="fas fa-book-open"></i><span>Lessons</span>
@@ -52,8 +58,6 @@
       </aside>
 
       <main class="content">
-        
-
         <section class="page active">
           <h2 class="page-title">Games</h2>
           <div class="cards small">
@@ -71,6 +75,17 @@
               <button
                 class="btn btn-purple"
                 onclick="location.href='quiz.html'"
+              >
+                Play Now
+              </button>
+            </article>
+            <article class="card card-game card-purple">
+              <div class="tile"><img src="../assets/img/quiz.png" /></div>
+              <h3>Quest</h3>
+              <p>Challenge yourself with Science and Maths questions.</p>
+              <button
+                class="btn btn-purple"
+                onclick="location.href='questGame.html'"
               >
                 Play Now
               </button>
