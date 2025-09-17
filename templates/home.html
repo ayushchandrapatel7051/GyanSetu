@@ -15,7 +15,6 @@
     />
     <link rel="stylesheet" href="../css/style.css" />
     <script src="../js/settings-db.js" defer></script>
-  <script src="../js/profile-widget.js" defer></script>
   </head>
   <body>
     <div class="app">
@@ -59,17 +58,7 @@
       <main class="content">
         <!-- Top bar -->
         <!-- remove the old language markup inside topbar and add this once at top of <body> or keep it inside topbar but with class lang-fixed -->
-        <div class="lang-fixed" aria-label="Language selector">
-          <i class="fas fa-globe" aria-hidden="true"></i>
-          <label for="language" class="lang-label" style="margin: 0"
-            >Language:</label
-          >
-          <select id="language" class="lang-select" aria-label="Language">
-            <option value="en" selected>English</option>
-            <option value="hi">Hindi</option>
-            <option value="or">Odia</option>
-          </select>
-        </div>
+       
 
         <!-- Pages -->
         <section id="home" class="page active">
@@ -127,6 +116,7 @@
       </main>
     </div>
     <script src="../main.js"></script>
+    <script src="../js/profile-widget.js"></script>
     <script src="../js/nav.js"></script>
     <script src="../js/script.js"></script>
   </body>
