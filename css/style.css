@@ -532,7 +532,7 @@ body {
 /* Page visibility */
 .page {
   display: none;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 25px;
   margin-bottom: 75px;
 }
@@ -810,4 +810,11 @@ select option {
 .menu-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #d946ef, #6366f1, #3b82f6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* necessary so the background shows through */
 }

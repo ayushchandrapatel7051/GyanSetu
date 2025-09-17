@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GyanSetu — Home</title>
-    <link rel="icon" type="image/x-icon" href="./assets/img/favicon.ico" />
+    <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="./assets/img/logo1.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
       rel="stylesheet"
@@ -65,6 +65,10 @@
         <!-- Pages -->
         <section id="home" class="page active">
           <h2 class="page-title">Home</h2>
+          <h3 class="page-title" style="font-size: 30px">
+            Welcome
+            <span id="userName" class="gradient-text"></span> 👋
+          </h3>
           <div class="cards">
             <article class="card card-cta card-orange">
               <div class="badge"><img src="./assets/img/1.png" /></div>
@@ -121,5 +125,81 @@
     <script src="../js/profile-widget.js"></script>
     <script src="../js/nav.js"></script>
     <script src="../js/script.js"></script>
+    <script>
+      // set/display user name into #userName using localStorage first, then IndexedDB (SettingsDB)
+      async function initUserName() {
+        const el = document.getElementById("userName");
+        if (!el) return;
+
+        // helper to try localStorage
+        function nameFromLocalStorage() {
+          try {
+            const raw = localStorage.getItem("gyan_current_user");
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.name) return String(parsed.name);
+            return null;
+          } catch (e) {
+            console.warn(
+              "failed reading gyan_current_user from localStorage",
+              e
+            );
+            return null;
+          }
+        }
+
+        // try localStorage first
+        let name = nameFromLocalStorage();
+
+        // if not found, try IndexedDB via SettingsDB if available
+        if (
+          !name &&
+          window.SettingsDB &&
+          typeof SettingsDB.openDB === "function"
+        ) {
+          try {
+            await SettingsDB.openDB();
+
+            // attempt to get email from localStorage login if there is one
+            let loginRaw = null;
+            try {
+              loginRaw = JSON.parse(
+                localStorage.getItem("gyan_current_user") || "null"
+              );
+            } catch (e) {
+              loginRaw = null;
+            }
+
+            const emailCandidate =
+              (loginRaw && loginRaw.email) ||
+              (window.SettingsDB && window.SettingsDB.normalizeEmail
+                ? SettingsDB.normalizeEmail("johndoe@email.com")
+                : "johndoe@email.com");
+
+            const rec = await SettingsDB.getSettings(
+              window.SettingsDB && window.SettingsDB.normalizeEmail
+                ? SettingsDB.normalizeEmail(emailCandidate)
+                : emailCandidate
+            );
+
+            if (rec && rec.name) name = String(rec.name);
+          } catch (e) {
+            console.warn("error reading SettingsDB for user name", e);
+          }
+        }
+
+        // fallback
+        if (!name) name = "Learner";
+
+        // set the text and add gradient class (you can remove class if you don't want gradient)
+        el.textContent = name;
+        el.classList.add("gradient-text");
+      }
+
+      // call on DOMContentLoaded
+      window.addEventListener("DOMContentLoaded", () => {
+        initUserName().catch((e) => console.error("initUserName failed", e));
+      });
+    </script>
   </body>
 </html>

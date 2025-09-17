@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GyanSetu — Settings</title>
+    <title>Settings</title>
+    <link rel="icon" type="image/x-icon" href="../assets/img/logo1.png" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
@@ -376,7 +377,9 @@
           winnerCandidate.email = SettingsDB.normalizeEmail(
             winnerCandidate.email || normalizedEmail || DEFAULT_SETTINGS.email
           );
-          winnerCandidate.language = normalizeLanguage(winnerCandidate.language);
+          winnerCandidate.language = normalizeLanguage(
+            winnerCandidate.language
+          );
 
           // Save the winner and use the merged record returned from the DB (this preserves xp)
           try {
