@@ -1,0 +1,495 @@
+<!-- teacher-dashboard.html
+     Single-file teacher dashboard (HTML + CSS + JS)
+     - Fetches users from your JSONBin (read with access key)
+     - Shows student list, summary stats, progress distribution chart
+     - Search, filter by grade/language, refresh, export CSV
+     - NOTE: Master key write example included but commented out. For production, proxy writes via backend.
+
+     Replace JSONBIN_BIN_ID, ACCESS & MASTER keys if needed.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Teacher Dashboard — GyanSetu</title>
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --muted: #94a3b8;
+        --accent: #06b6d4;
+        --glass: rgba(255, 255, 255, 0.03);
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: Inter, system-ui, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      }
+      body {
+        background: linear-gradient(180deg, #071026 0%, #07111a 100%);
+        color: #e6eef8;
+        padding: 20px;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      .controls {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        background: var(--accent);
+        border: none;
+        color: #022;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+      }
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .stat .num {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .filters {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .search {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: inherit;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+        font-size: 13px;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      tr:hover td {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.01),
+          rgba(255, 255, 255, 0)
+        );
+      }
+      .tag {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--glass);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      footer {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 14px;
+      }
+      .chart-wrap {
+        height: 160px;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: repeat(1, 1fr);
+        }
+        header {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>Teacher Dashboard</h1>
+          <div style="color: var(--muted); font-size: 13px">
+            Student performance & analytics
+          </div>
+        </div>
+        <div class="controls">
+          <input
+            id="txtSearch"
+            class="search"
+            placeholder="Search by name or email"
+          />
+          <select id="selGrade" class="search">
+            <option value="">All grades</option>
+          </select>
+          <select id="selLang" class="search">
+            <option value="">All languages</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="or">Odia</option>
+          </select>
+          <button id="btnRefresh" class="btn ghost">Refresh</button>
+          <button id="btnExport" class="btn">Export CSV</button>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="card stat">
+          <div style="color: var(--muted); font-size: 13px">Total students</div>
+          <div class="num" id="statTotal">—</div>
+        </div>
+        <div class="card stat">
+          <div style="color: var(--muted); font-size: 13px">Avg XP</div>
+          <div class="num" id="statXp">—</div>
+        </div>
+        <div class="card stat">
+          <div style="color: var(--muted); font-size: 13px">
+            Completion Rate
+          </div>
+          <div class="num" id="statCompletion">—</div>
+        </div>
+      </section>
+
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <strong>Progress distribution</strong>
+          <div style="color: var(--muted); font-size: 13px">
+            Seen blocks / percent
+          </div>
+        </div>
+        <div class="chart-wrap card" style="margin-top: 8px; padding: 12px">
+          <canvas
+            id="distChart"
+            width="1000"
+            height="160"
+            style="width: 100%; height: 160px"
+          ></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <strong>Students</strong>
+          <div style="color: var(--muted); font-size: 13px">
+            Click a row to view JSON
+          </div>
+        </div>
+        <div style="overflow: auto; max-height: 420px; margin-top: 8px">
+          <table id="tblStudents">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Grade</th>
+                <th>Lang</th>
+                <th>XP</th>
+                <th>Percent</th>
+                <th>Last Lesson</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer>
+        Data loaded from JSONBin. For safety, master key is not used in this UI
+        for writes. Move write operations to a backend.
+      </footer>
+    </div>
+
+    <script>
+      // Configuration - replace if needed
+      const JSONBIN_BIN_ID = "68ca76a0d0ea881f4080ca15";
+      const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+      const JSONBIN_ACCESS_KEY =
+        "$2a$10$zR1cR2SnB3AY5HsaXJl5DurOmCkyNhh/nqoCa4QQfB.WC6fEVymZy"; // read-only OK for frontend
+      // const JSONBIN_MASTER_KEY = '...'; // do not embed in frontend for production
+
+      // state
+      let students = [];
+      const tblBody = document.querySelector("#tblStudents tbody");
+      const statTotal = document.getElementById("statTotal");
+      const statXp = document.getElementById("statXp");
+      const statCompletion = document.getElementById("statCompletion");
+      const selGrade = document.getElementById("selGrade");
+      const selLang = document.getElementById("selLang");
+      const txtSearch = document.getElementById("txtSearch");
+      const btnRefresh = document.getElementById("btnRefresh");
+      const btnExport = document.getElementById("btnExport");
+      const distCanvas = document.getElementById("distChart");
+      const distCtx = distCanvas.getContext("2d");
+
+      async function fetchStudents() {
+        try {
+          const res = await fetch(JSONBIN_BASE, {
+            headers: { "X-Access-Key": JSONBIN_ACCESS_KEY },
+          });
+          if (!res.ok) throw new Error("Fetch failed: " + res.status);
+          const payload = await res.json();
+          const data = payload && payload.record ? payload.record : [];
+          // normalize
+          students = data.map((s) => normalizeStudent(s));
+          render();
+        } catch (e) {
+          console.error("fetchStudents failed", e);
+          alert("Failed to load students from JSONBin. Check console.");
+        }
+      }
+
+      function normalizeStudent(s) {
+        return {
+          firstName: s.firstName || "",
+          lastName: s.lastName || "",
+          name:
+            s.name ||
+            ((s.firstName || "") + " " + (s.lastName || "")).trim() ||
+            s.email ||
+            "Unknown",
+          email: (s.email || "").toLowerCase(),
+          grade: s.grade || "",
+          language: (s.language || "en").slice(0, 2),
+          xp: Number(s.xp || 0),
+          lastLesson: s.lastLesson || "",
+          percent: Number(s.percent || 0),
+          completed: Boolean(s.completed),
+          raw: s,
+        };
+      }
+
+      function render() {
+        // populate filters
+        const grades = Array.from(
+          new Set(students.map((s) => s.grade).filter(Boolean))
+        ).sort();
+        selGrade.innerHTML =
+          '<option value="">All grades</option>' +
+          grades.map((g) => `<option value="${g}">${g}</option>`).join("");
+
+        // stats
+        statTotal.textContent = students.length;
+        statXp.textContent = students.length
+          ? Math.round(students.reduce((a, b) => a + b.xp, 0) / students.length)
+          : 0;
+        const completionRate = students.length
+          ? Math.round(
+              (students.filter((s) => s.completed || s.percent >= 100).length /
+                students.length) *
+                100
+            )
+          : 0;
+        statCompletion.textContent = completionRate + "%";
+
+        renderTable();
+        renderDistribution();
+      }
+
+      function renderTable() {
+        const q = (txtSearch.value || "").trim().toLowerCase();
+        const g = selGrade.value;
+        const lang = selLang.value;
+        const filtered = students.filter((s) => {
+          if (g && s.grade !== g) return false;
+          if (lang && s.language !== lang) return false;
+          if (!q) return true;
+          return (
+            (s.name || "").toLowerCase().includes(q) ||
+            (s.email || "").toLowerCase().includes(q)
+          );
+        });
+
+        tblBody.innerHTML = filtered
+          .map(
+            (s) => `
+      <tr data-email="${escapeHtml(s.email)}">
+        <td>${escapeHtml(s.name)}</td>
+        <td>${escapeHtml(s.email)}</td>
+        <td>${escapeHtml(s.grade)}</td>
+        <td>${escapeHtml(s.language)}</td>
+        <td>${s.xp}</td>
+        <td>${s.percent}%</td>
+        <td>${escapeHtml(s.lastLesson)}</td>
+      </tr>
+    `
+          )
+          .join("");
+
+        // attach row click to show raw JSON
+        tblBody.querySelectorAll("tr").forEach((r) =>
+          r.addEventListener("click", () => {
+            const em = r.dataset.email;
+            const st = students.find((x) => x.email === em);
+            if (st) showJsonModal(st.raw);
+          })
+        );
+      }
+
+      function showJsonModal(obj) {
+        const w = window.open("", "_blank", "width=700,height=600");
+        w.document.write(
+          '<pre style="white-space:pre-wrap;font-family:monospace">' +
+            escapeHtml(JSON.stringify(obj, null, 2)) +
+            "</pre>"
+        );
+        w.document.title = "Student JSON";
+      }
+
+      function renderDistribution() {
+        // distribution buckets 0-19,20-39,40-59,60-79,80-99,100
+        const buckets = [0, 0, 0, 0, 0, 0];
+        students.forEach((s) => {
+          const p = Math.max(0, Math.min(100, s.percent || 0));
+          if (p >= 100) buckets[5]++;
+          else buckets[Math.floor(p / 20)]++;
+        });
+
+        // draw bar chart manually
+        const w = distCanvas.clientWidth * devicePixelRatio || 1000;
+        const h = distCanvas.clientHeight * devicePixelRatio || 160;
+        distCanvas.width = w;
+        distCanvas.height = h;
+        distCtx.clearRect(0, 0, w, h);
+
+        const labels = ["0-19", "20-39", "40-59", "60-79", "80-99", "100"];
+        const max = Math.max(1, ...buckets);
+        const pad = 20 * devicePixelRatio;
+        const barW = ((w - pad * 2) / buckets.length) * 0.6;
+        labels.forEach((lab, i) => {
+          const barH = Math.round(
+            (buckets[i] / max) * (h - 60 * devicePixelRatio)
+          );
+          const x =
+            pad +
+            i * ((w - pad * 2) / buckets.length) +
+            ((w - pad * 2) / buckets.length - barW) / 2;
+          const y = h - pad - barH;
+          // bar
+          distCtx.fillStyle = "#06b6d4";
+          distCtx.fillRect(x, y, barW, barH);
+          // label
+          distCtx.fillStyle = "#94a3b8";
+          distCtx.font = `${12 * devicePixelRatio}px Inter, Arial`;
+          distCtx.textAlign = "center";
+          distCtx.fillText(lab, x + barW / 2, h - pad + 14 * devicePixelRatio);
+          // value
+          distCtx.fillText(buckets[i], x + barW / 2, y - 6 * devicePixelRatio);
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s || "").replace(
+          /[&<>\"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[m])
+        );
+      }
+
+      btnRefresh.addEventListener("click", () => fetchStudents());
+      txtSearch.addEventListener("input", () => renderTable());
+      selGrade.addEventListener("change", () => renderTable());
+      selLang.addEventListener("change", () => renderTable());
+
+      btnExport.addEventListener("click", () => {
+        const rows = [
+          ["name", "email", "grade", "language", "xp", "percent", "lastLesson"],
+        ];
+        students.forEach((s) =>
+          rows.push([
+            s.name,
+            s.email,
+            s.grade,
+            s.language,
+            s.xp,
+            s.percent,
+            s.lastLesson,
+          ])
+        );
+        const csv = rows
+          .map((r) =>
+            r
+              .map((c) => '"' + String(c || "").replace(/"/g, '""') + '"')
+              .join(",")
+          )
+          .join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "students.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      // initial load
+      fetchStudents();
+    </script>
+  </body>
+</html>

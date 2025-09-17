@@ -71,6 +71,80 @@
         display: flex;
         justify-content: space-between;
       }
+      /* Leaderboard visuals: medal + top-3 backgrounds */
+      .leaderboard li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        border-radius: 6px;
+        margin: 6px 0;
+        gap: 12px;
+      }
+
+      .leaderboard li .left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* Medal circle with rank number */
+      .leaderboard .medal {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        color: #111;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      }
+
+      /* gold / silver / bronze medal fills */
+      .leaderboard .rank-1 .medal {
+        background: linear-gradient(180deg, #ffd700, #ffb700);
+        color: #2b1a00;
+      }
+      .leaderboard .rank-2 .medal {
+        background: linear-gradient(180deg, #e6e6e6, #bfbfbf);
+        color: #222;
+      }
+      .leaderboard .rank-3 .medal {
+        background: linear-gradient(180deg, #cd7f32, #a15b2a);
+        color: #111;
+      }
+
+      /* subtle row tint for top 3 */
+      .leaderboard .rank-1 {
+        background: rgba(255, 215, 0, 0.06);
+      }
+      .leaderboard .rank-2 {
+        background: rgba(192, 192, 192, 0.06);
+      }
+      .leaderboard .rank-3 {
+        background: rgba(205, 127, 50, 0.05);
+      }
+
+      /* name styling and small rank text */
+      .leaderboard .name {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      /* fallback for non-top rows */
+      .leaderboard li:not(.rank-1):not(.rank-2):not(.rank-3) .medal {
+        background: rgba(255, 255, 255, 0.03);
+        color: #fff;
+        font-size: 12px;
+      }
+
+      /* highlight 'You' row keeps you class styling */
+      .leaderboard .you {
+        font-weight: 700;
+      }
     </style>
   </head>
 
@@ -171,8 +245,245 @@
     <script src="../js/settings-db.js"></script>
 
     <script>
+      (() => {
+        // CONFIG - change these only if needed
+        const JSONBIN_BIN_ID = "68ca76a0d0ea881f4080ca15";
+        const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+        const JSONBIN_ACCESS_KEY =
+          "$2a$10$zR1cR2SnB3AY5HsaXJl5DurOmCkyNhh/nqoCa4QQfB.WC6fEVymZy";
+
+        const leaderboardRoot = document.getElementById("leaderboardRoot");
+        const refreshBtn = document.getElementById("refreshXpBtn");
+
+        // --------------- helpers ---------------
+        function normalizeEmail(email) {
+          if (!email) return "";
+          return String(email).trim().toLowerCase();
+        }
+
+        async function getCurrentEmail() {
+          if (window.currentUser && window.currentUser.email)
+            return normalizeEmail(window.currentUser.email);
+          try {
+            const raw = localStorage.getItem("gyan_current_user");
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed && parsed.email) return normalizeEmail(parsed.email);
+            }
+          } catch (e) {
+            console.warn("localStorage parse failed", e);
+          }
+          return normalizeEmail("johndoe@email.com");
+        }
+
+        async function fetchUsersRemote() {
+          try {
+            const res = await fetch(JSONBIN_BASE, {
+              headers: { "X-Access-Key": JSONBIN_ACCESS_KEY },
+            });
+            if (!res.ok) throw new Error("jsonbin fetch failed: " + res.status);
+            const payload = await res.json();
+            return payload && payload.record ? payload.record : [];
+          } catch (e) {
+            console.warn("fetchUsersRemote failed", e);
+            throw e;
+          }
+        }
+
+        // minimal fallback: read current user's SettingsDB record (if available)
+        async function fetchUsersLocal() {
+          try {
+            if (!window.SettingsDB || !SettingsDB.openDB) return [];
+            await SettingsDB.openDB();
+            const email = await getCurrentEmail();
+            const s = await SettingsDB.getSettings(email).catch(() => null);
+            if (s) {
+              return [
+                {
+                  email: s.email || email,
+                  name: s.name || (s.email ? s.email.split("@")[0] : "Unknown"),
+                  xp: Number(s.xp || 0),
+                  avatar: s.avatar || "../assets/img/avatar.jpg",
+                },
+              ];
+            }
+            return [];
+          } catch (e) {
+            console.warn("fetchUsersLocal failed", e);
+            return [];
+          }
+        }
+
+        function normalizeUser(u) {
+          return {
+            email: u && u.email ? String(u.email).toLowerCase() : "",
+            name:
+              (u &&
+                (u.name ||
+                  (u.firstName
+                    ? `${u.firstName} ${u.lastName || ""}`.trim()
+                    : ""))) ||
+              (u && u.email ? u.email.split("@")[0] : "Unknown"),
+            xp: Number((u && (u.xp != null ? u.xp : u.xp)) || 0),
+            avatar: (u && u.avatar) || "../assets/img/avatar.jpg",
+          };
+        }
+
+        function escapeHtml(str) {
+          return String(str || "").replace(
+            /[&<>"']/g,
+            (s) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              }[s])
+          );
+        }
+
+        // --------------- render logic ---------------
+        function renderLeaderboard(users, currentEmail) {
+          leaderboardRoot.innerHTML = "";
+
+          // top-10 rows
+          const top = users.slice(0, 10);
+          top.forEach((u, i) => {
+            const rank = i + 1;
+            const li = document.createElement("li");
+
+            // apply top-3 class
+            if (rank <= 3) li.classList.add(`rank-${rank}`);
+
+            // medal shows numeric rank
+            const leftHTML = `
+        <span class="left">
+          <span class="medal" aria-hidden="true">${rank}</span>
+          <span class="name">${escapeHtml(u.name)}</span>
+        </span>
+      `;
+            const rightHTML = `<span class="xp-small">${u.xp.toLocaleString()} XP</span>`;
+            li.innerHTML = leftHTML + rightHTML;
+
+            leaderboardRoot.appendChild(li);
+          });
+
+          // find overall rank for current user
+          const idx = users.findIndex((u) => u.email === currentEmail);
+          const ranking = idx >= 0 ? idx + 1 : -1;
+          const youXp = idx >= 0 ? users[idx].xp : 0;
+          const youName = idx >= 0 ? users[idx].name : "You";
+
+          // handle 'You' row
+          let youRowEl = document.getElementById("youRow");
+          if (!youRowEl) {
+            youRowEl = document.createElement("li");
+            youRowEl.id = "youRow";
+            youRowEl.className = "you";
+            leaderboardRoot.appendChild(youRowEl);
+          }
+
+          // if user is inside top-10, highlight that row instead of duplicating
+          if (ranking > 0 && ranking <= 10) {
+            const rankIdx = ranking - 1;
+            const li = leaderboardRoot.children[rankIdx];
+            if (li) {
+              // mark as you
+              li.classList.add("you");
+              // ensure medal shows numeric rank (already set), append small rank label next to name
+              const nameSpan = li.querySelector(".name");
+              if (nameSpan)
+                nameSpan.innerHTML = `${escapeHtml(
+                  youName
+                )} <small style="opacity:.75">· #${ranking}</small>`;
+              const xpSpan = li.querySelector(".xp-small");
+              if (xpSpan) xpSpan.textContent = youXp.toLocaleString() + " XP";
+            }
+            // remove separate youRow if present and not same
+            if (
+              youRowEl.parentNode &&
+              youRowEl !== leaderboardRoot.children[rankIdx]
+            ) {
+              youRowEl.remove();
+            }
+          } else {
+            // user not in top 10 -> build a dedicated 'You' row and append at bottom
+            youRowEl.className = "you";
+            const medalHtml = `<span class="medal" aria-hidden="true">${
+              ranking > 0 ? ranking : "—"
+            }</span>`;
+            youRowEl.innerHTML = `
+        <span class="left">
+          ${medalHtml}
+          <span class="name">${escapeHtml(youName)}${
+              ranking > 0
+                ? ` <small style="opacity:.75">· #${ranking}</small>`
+                : ""
+            }</span>
+        </span>
+        <span class="xp-small">${youXp.toLocaleString()} XP</span>
+      `;
+            // ensure it is last element
+            leaderboardRoot.appendChild(youRowEl);
+          }
+        }
+
+        // --------------- main loader ---------------
+        async function loadLeaderboard() {
+          const currentEmail = await getCurrentEmail();
+          let users = [];
+
+          // try remote first
+          try {
+            const remote = await fetchUsersRemote();
+            if (Array.isArray(remote) && remote.length > 0) {
+              const map = new Map();
+              remote.forEach((r) => {
+                const n = normalizeUser(r);
+                if (n.email) map.set(n.email, n);
+              });
+              users = Array.from(map.values());
+            }
+          } catch (err) {
+            // ignore: fallback below
+          }
+
+          // if remote empty, use local fallback
+          if (users.length === 0) {
+            const local = await fetchUsersLocal();
+            users = local.map(normalizeUser);
+          } else {
+            // ensure current local user exists in list (so 'You' always shows)
+            try {
+              const local = await fetchUsersLocal();
+              local.forEach((l) => {
+                const n = normalizeUser(l);
+                if (n.email && !users.some((u) => u.email === n.email))
+                  users.push(n);
+              });
+            } catch (e) {
+              /* ignore */
+            }
+          }
+
+          // sort by xp desc then name
+          users.sort((a, b) => {
+            if (b.xp !== a.xp) return b.xp - a.xp;
+            return a.name.localeCompare(b.name);
+          });
+
+          renderLeaderboard(users, currentEmail);
+        }
+
+        // initial run
+        window.addEventListener("DOMContentLoaded", loadLeaderboard);
+        if (refreshBtn) refreshBtn.addEventListener("click", loadLeaderboard);
+      })();
+    </script>
+
+    <script>
       (function () {
-        // match the defaults used elsewhere in your app
         const DEFAULT_EMAIL = "johndoe@email.com";
         const MILESTONE = 2000;
 
@@ -187,14 +498,22 @@
         let currentEmail = null;
         let currentSettings = null;
 
+        // Normalizer (same behavior as your auth helper)
+        function normalizeEmail(email) {
+          if (!email) return "";
+          return String(email).trim().toLowerCase();
+        }
+
         async function getCurrentEmail() {
-          if (window.currentUser && window.currentUser.email)
-            return window.currentUser.email;
+          // prefer window.currentUser if available
+          if (window.currentUser && window.currentUser.email) {
+            return normalizeEmail(window.currentUser.email);
+          }
           try {
             const raw = localStorage.getItem("gyan_current_user");
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (parsed.email) return parsed.email;
+              if (parsed && parsed.email) return normalizeEmail(parsed.email);
             }
           } catch (e) {
             console.warn("localStorage parse failed", e);
@@ -212,51 +531,89 @@
             "Profile: " + ((s && (s.name || s.email)) || "—");
         }
 
+        // load settings from SettingsDB, seed if missing
         async function loadAndRender() {
           try {
+            // ensure DB is open first
+            if (!window.SettingsDB || !SettingsDB.openDB) {
+              console.warn("SettingsDB not available");
+              return;
+            }
             await SettingsDB.openDB();
-          } catch (e) {
-            console.error("Failed to open SettingsDB", e);
-            return;
-          }
 
-          currentEmail = await getCurrentEmail();
+            currentEmail = await getCurrentEmail();
 
-          try {
-            const s = await SettingsDB.getSettings(currentEmail);
-            if (s) {
-              currentSettings = s;
-            } else {
-              // seed a minimal record so future reads succeed
+            // ensure normalized email is used for lookup
+            const lookupEmail = normalizeEmail(currentEmail);
+
+            let s = null;
+            try {
+              s = await SettingsDB.getSettings(lookupEmail);
+            } catch (e) {
+              console.warn("getSettings failed for", lookupEmail, e);
+              s = null;
+            }
+
+            if (!s) {
+              // seed minimal record so future reads succeed and xp shows up
               currentSettings = {
-                email: currentEmail,
+                email: lookupEmail,
                 name:
-                  currentEmail === DEFAULT_EMAIL
+                  lookupEmail === DEFAULT_EMAIL
                     ? "John Doe"
-                    : currentEmail.split("@")[0],
+                    : (lookupEmail && lookupEmail.split("@")[0]) || "User",
                 xp: 0,
                 badges: [],
                 language: "en",
                 grade: "8",
+                lastLesson: "",
+                updatedAt: Date.now(),
               };
               try {
                 await SettingsDB.saveSettings(currentSettings);
+                console.debug(
+                  "Seeded settings for",
+                  lookupEmail,
+                  currentSettings
+                );
               } catch (err) {
-                console.warn("seed failed", err);
+                console.warn("seed saveSettings failed", err);
+              }
+            } else {
+              // ensure xp and lastLesson defaults
+              currentSettings = Object.assign({}, s, {
+                xp: s.xp != null ? Number(s.xp) : 0,
+                lastLesson: s.lastLesson != null ? s.lastLesson : "",
+              });
+
+              // If defaults were applied, persist them back
+              if (s.xp == null || s.lastLesson == null) {
+                try {
+                  await SettingsDB.saveSettings(currentSettings);
+                  console.debug(
+                    "Patched missing xp/lastLesson for",
+                    lookupEmail
+                  );
+                } catch (err) {
+                  console.warn("patch saveSettings failed", err);
+                }
               }
             }
+
             updateUIFromSettings(currentSettings);
           } catch (e) {
-            console.error("load settings error", e);
+            console.error("loadAndRender error", e);
           }
         }
 
         // refresh button reloads XP from DB
-        refreshXpBtn.addEventListener("click", async () => {
-          await loadAndRender();
-        });
+        if (refreshXpBtn)
+          refreshXpBtn.addEventListener(
+            "click",
+            async () => await loadAndRender()
+          );
 
-        // initial render
+        // initial render once DOM is ready
         window.addEventListener("DOMContentLoaded", loadAndRender);
       })();
     </script>

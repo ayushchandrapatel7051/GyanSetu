@@ -8,6 +8,12 @@
   /* -----------------------------
      Utilities & small UI helpers
      ----------------------------- */
+  const JSONBIN_BIN_ID = "68ca76a0d0ea881f4080ca15";
+  const JSONBIN_BASE = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+  const JSONBIN_ACCESS_KEY =
+    "$2a$10$zR1cR2SnB3AY5HsaXJl5DurOmCkyNhh/nqoCa4QQfB.WC6fEVymZy"; // read
+  const JSONBIN_MASTER_KEY =
+    "$2a$10$igVzx0be3sIoxVgcfIcqWuISN5TijUNAFmlolSVB9H1QSimy.1mCK"; // write
 
   // WebAudio for short feedback sounds
   const audioCtx = (() => {
@@ -47,19 +53,19 @@
     }
   }
 
-  // small toast for XP
+  // small toast for XP (updated - top-right)
   (function injectToastCSS() {
     if (document.getElementById("gs-quiz-toast-css")) return;
     const s = document.createElement("style");
     s.id = "gs-quiz-toast-css";
     s.textContent = `
-      .gs-xp-toast { position: fixed; right:18px; bottom:26px; z-index:99999;
-        padding:10px 14px; border-radius:10px; font-weight:700; color:#fff;
-        background: linear-gradient(90deg,#7b61ff,#3fd1c9); box-shadow:0 14px 40px rgba(0,0,0,0.45);
-        transform: translateY(8px); opacity:0; transition: transform .22s, opacity .22s;
-      }
-      .gs-xp-toast.show { transform: translateY(0); opacity:1; }
-    `;
+    .gs-xp-toast { position: fixed; right:18px; top:18px; z-index:99999;
+      padding:10px 14px; border-radius:10px; font-weight:700; color:#111;
+      background: linear-gradient(90deg,#ffd966,#ffb347); box-shadow:0 14px 40px rgba(0,0,0,0.25);
+      transform: translateY(-8px); opacity:0; transition: transform .22s, opacity .22s;
+    }
+    .gs-xp-toast.show { transform: translateY(0); opacity:1; }
+  `;
     document.head.appendChild(s);
   })();
 
@@ -202,126 +208,139 @@
        4. fallback 'en'
   ----------------------------- */
   async function getUserLanguage() {
-  try {
-    // 0) Prefer global API if available (main.js exposes GyanSetu.getCurrentLanguage)
-    if (window.GyanSetu && typeof window.GyanSetu.getCurrentLanguage === "function") {
-      try {
-        const g = window.GyanSetu.getCurrentLanguage();
-        if (g) return (String(g).toLowerCase() || "en").slice(0, 2);
-      } catch (e) { /* ignore */ }
-    }
-
-    // 1) window.currentUser + SettingsDB (existing logic)
-    if (
-      window.currentUser &&
-      window.currentUser.email &&
-      window.SettingsDB &&
-      typeof SettingsDB.getSettings === "function"
-    ) {
-      try {
-        const s = await SettingsDB.getSettings(window.currentUser.email);
-        if (s && s.language)
-          return (String(s.language).toLowerCase() || "en").slice(0, 2);
-      } catch (e) {
-        /* ignore */
+    try {
+      // 0) Prefer global API if available (main.js exposes GyanSetu.getCurrentLanguage)
+      if (
+        window.GyanSetu &&
+        typeof window.GyanSetu.getCurrentLanguage === "function"
+      ) {
+        try {
+          const g = window.GyanSetu.getCurrentLanguage();
+          if (g) return (String(g).toLowerCase() || "en").slice(0, 2);
+        } catch (e) {
+          /* ignore */
+        }
       }
-    }
 
-    // 2) localStorage gyan_current_user
-    try {
-      const raw = localStorage.getItem("gyan_current_user");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.language)
-          return (String(parsed.language).toLowerCase() || "en").slice(0, 2);
+      // 1) window.currentUser + SettingsDB (existing logic)
+      if (
+        window.currentUser &&
+        window.currentUser.email &&
+        window.SettingsDB &&
+        typeof SettingsDB.getSettings === "function"
+      ) {
+        try {
+          const s = await SettingsDB.getSettings(window.currentUser.email);
+          if (s && s.language)
+            return (String(s.language).toLowerCase() || "en").slice(0, 2);
+        } catch (e) {
+          /* ignore */
+        }
       }
-    } catch (e) {}
 
-    // 3) top-right selector injected by main.js
-    try {
-      const topSel = document.querySelector("#gs-language");
-      if (topSel && topSel.value) return (String(topSel.value).toLowerCase() || "en").slice(0, 2);
-    } catch (e) {}
+      // 2) localStorage gyan_current_user
+      try {
+        const raw = localStorage.getItem("gyan_current_user");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.language)
+            return (String(parsed.language).toLowerCase() || "en").slice(0, 2);
+        }
+      } catch (e) {}
 
-    // 4) language select on page (legacy)
-    try {
-      const sel = document.querySelector("#language, .lang-select");
-      if (sel && sel.value)
-        return (String(sel.value).toLowerCase() || "en").slice(0, 2);
-    } catch (e) {}
+      // 3) top-right selector injected by main.js
+      try {
+        const topSel = document.querySelector("#gs-language");
+        if (topSel && topSel.value)
+          return (String(topSel.value).toLowerCase() || "en").slice(0, 2);
+      } catch (e) {}
 
-  } catch (e) {
-    console.warn("getUserLanguage failed", e);
+      // 4) language select on page (legacy)
+      try {
+        const sel = document.querySelector("#language, .lang-select");
+        if (sel && sel.value)
+          return (String(sel.value).toLowerCase() || "en").slice(0, 2);
+      } catch (e) {}
+    } catch (e) {
+      console.warn("getUserLanguage failed", e);
+    }
+    return "en";
   }
-  return "en";
-}
 
   // If user changes the page-wide language select we should re-render current question in new language
   (function attachLanguageWatcher() {
-  // watch the legacy select(s) and the top-right select (#gs-language)
-  const selectors = [
-    () => document.querySelector("#language"),
-    () => document.querySelector(".lang-select"),
-    () => document.querySelector("#gs-language")
-  ];
+    // watch the legacy select(s) and the top-right select (#gs-language)
+    const selectors = [
+      () => document.querySelector("#language"),
+      () => document.querySelector(".lang-select"),
+      () => document.querySelector("#gs-language"),
+    ];
 
-  function bindIfPresent(el) {
-    if (!el) return;
-    // avoid duplicate handlers
-    if (el._quizLangBound) return;
-    el._quizLangBound = true;
-    el.addEventListener("change", async () => {
-      // re-render current question in new language
-      if (questions && questions.length && currentIndex >= 0) {
-        try {
-          await renderCurrent();
-        } catch (e) { console.warn("renderCurrent failed after lang change", e); }
+    function bindIfPresent(el) {
+      if (!el) return;
+      // avoid duplicate handlers
+      if (el._quizLangBound) return;
+      el._quizLangBound = true;
+      el.addEventListener("change", async () => {
+        // re-render current question in new language
+        if (questions && questions.length && currentIndex >= 0) {
+          try {
+            await renderCurrent();
+          } catch (e) {
+            console.warn("renderCurrent failed after lang change", e);
+          }
+        }
+      });
+    }
+
+    // initial bind for elements that already exist
+    selectors.forEach((fn) => bindIfPresent(fn()));
+
+    // observe DOM for late-inserted #gs-language (since main.js injects early but safe)
+    const mo = new MutationObserver(() => {
+      selectors.forEach((fn) => bindIfPresent(fn()));
+    });
+    mo.observe(document.documentElement || document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // listen for app-wide language updates via event dispatched by main.js
+    document.addEventListener("gyan:user-updated", async (ev) => {
+      try {
+        if (ev && ev.detail && ev.detail.language) {
+          // if top-right selector exists, keep it in sync (main.js should already)
+          const sel = document.querySelector("#gs-language");
+          if (sel && sel.value !== ev.detail.language)
+            sel.value = ev.detail.language;
+
+          if (questions && questions.length && currentIndex >= 0) {
+            await renderCurrent();
+          }
+        }
+      } catch (e) {
+        console.warn("gyan:user-updated handler failed", e);
       }
     });
-  }
 
-  // initial bind for elements that already exist
-  selectors.forEach((fn) => bindIfPresent(fn()));
-
-  // observe DOM for late-inserted #gs-language (since main.js injects early but safe)
-  const mo = new MutationObserver(() => {
-    selectors.forEach((fn) => bindIfPresent(fn()));
-  });
-  mo.observe(document.documentElement || document.body, { childList: true, subtree: true });
-
-  // listen for app-wide language updates via event dispatched by main.js
-  document.addEventListener("gyan:user-updated", async (ev) => {
-    try {
-      if (ev && ev.detail && ev.detail.language) {
-        // if top-right selector exists, keep it in sync (main.js should already)
-        const sel = document.querySelector("#gs-language");
-        if (sel && sel.value !== ev.detail.language) sel.value = ev.detail.language;
-
-        if (questions && questions.length && currentIndex >= 0) {
-          await renderCurrent();
+    // also listen for storage events so if another tab changes language we update
+    window.addEventListener("storage", async (ev) => {
+      try {
+        if (!ev) return;
+        if (
+          ev.key === "gyan_current_user" ||
+          ev.key === "gyan_guest_language"
+        ) {
+          // re-render if language might have changed
+          if (questions && questions.length && currentIndex >= 0) {
+            await renderCurrent();
+          }
         }
+      } catch (e) {
+        console.warn("storage event lang handler failed", e);
       }
-    } catch (e) {
-      console.warn("gyan:user-updated handler failed", e);
-    }
-  });
-
-  // also listen for storage events so if another tab changes language we update
-  window.addEventListener("storage", async (ev) => {
-    try {
-      if (!ev) return;
-      if (ev.key === "gyan_current_user" || ev.key === "gyan_guest_language") {
-        // re-render if language might have changed
-        if (questions && questions.length && currentIndex >= 0) {
-          await renderCurrent();
-        }
-      }
-    } catch (e) {
-      console.warn("storage event lang handler failed", e);
-    }
-  });
-})();
-
+    });
+  })();
 
   /* -----------------------------
      Load questions file (maths.json/science.json/questions.json)
@@ -596,6 +615,7 @@
     updateProgress();
 
     // award XP for correct & faster answers
+    // award XP for correct & faster answers (immediate UI update + async remote sync)
     (async function awardXp() {
       if (pickedIdx !== correctIdx) return;
       try {
@@ -608,11 +628,11 @@
         if (!window.SettingsDB || typeof SettingsDB.getSettings !== "function")
           return;
 
-        // find email consistent with your app
+        // find email
         let email = null;
-        if (window.currentUser && window.currentUser.email)
+        if (window.currentUser && window.currentUser.email) {
           email = window.currentUser.email;
-        else {
+        } else {
           try {
             const raw = localStorage.getItem("gyan_current_user");
             if (raw) {
@@ -623,19 +643,91 @@
         }
         if (!email) email = "johndoe@email.com";
 
+        // 1) update local settings FIRST (await)
         const s = await SettingsDB.getSettings(email);
         const settings = s || { email, xp: 0, badges: [] };
         settings.xp = (Number(settings.xp) || 0) + xpToAdd;
+        settings.updatedAt = Date.now();
         await SettingsDB.saveSettings(settings);
 
-        // update any on-screen XP display if present (id xpNumber used in progress page)
+        // 2) update UI immediately (any XP element on page)
         const xpEl =
           document.getElementById("xpNumber") ||
-          document.getElementById("xpValue");
+          document.getElementById("xpValue") ||
+          document.querySelector(".xp-number");
         if (xpEl)
           xpEl.textContent = (Number(settings.xp) || 0).toLocaleString();
 
+        // Also update any profile widget or header if it listens to localStorage or events:
+        // write a small storage key and dispatch an event so other listeners (leaderboard, header) can react
+        try {
+          // localStorage write (other tabs get storage event)
+          localStorage.setItem(
+            "gyan_last_xp_update",
+            JSON.stringify({
+              email,
+              xp: settings.xp,
+              updatedAt: settings.updatedAt,
+              ts: Date.now(),
+            })
+          );
+          // dispatch a custom event for same-tab listeners
+          const ev = new CustomEvent("gyan:xp-updated", {
+            detail: { email, xp: settings.xp },
+          });
+          window.dispatchEvent(ev);
+        } catch (e) {
+          console.warn("xp: local broadcast failed", e);
+        }
+
+        // show toast now (immediate)
         showXpToast(xpToAdd);
+
+        // 3) Asynchronously attempt remote JSONBin update (fire-and-forget)
+        (async function updateRemote() {
+          try {
+            const res = await fetch(JSONBIN_BASE, {
+              headers: { "X-Access-Key": JSONBIN_ACCESS_KEY },
+            });
+            if (!res.ok) throw new Error("jsonbin read failed " + res.status);
+            const payload = await res.json();
+            let users = Array.isArray(payload.record) ? payload.record : [];
+            const idx = users.findIndex(
+              (u) =>
+                String(u.email || "").toLowerCase() ===
+                String(email).toLowerCase()
+            );
+            if (idx >= 0) {
+              users[idx].xp = (Number(users[idx].xp) || 0) + xpToAdd;
+              users[idx].updatedAt = Date.now();
+            } else {
+              // push a minimal record (don't include password/phone)
+              users.push({
+                email,
+                name:
+                  settings.name ||
+                  (email.split && email.split("@")[0]) ||
+                  email,
+                xp: xpToAdd,
+                badges: settings.badges || [],
+                updatedAt: Date.now(),
+              });
+            }
+
+            // write back (use master key)
+            await fetch(JSONBIN_BASE, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Master-Key": JSONBIN_MASTER_KEY,
+              },
+              body: JSON.stringify(users),
+            });
+          } catch (err) {
+            // remote failures are non-fatal; we already applied local update
+            console.warn("Remote XP update failed", err);
+          }
+        })();
       } catch (e) {
         console.warn("awardXp failed", e);
       }

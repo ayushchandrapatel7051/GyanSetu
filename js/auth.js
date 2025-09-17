@@ -275,12 +275,17 @@ async function signupUser(user) {
 
 async function loginSuccess(user) {
   try {
+    // normalize and mark
+    user.email = normalizeEmailLocal(user.email || "");
     user.updatedAt = Date.now();
     user.isLoggedIn = true;
+
+    // update local auth DB
     await updateUserInDB(user).catch((e) =>
       console.warn("updateUserInDB failed", e)
     );
 
+    // write safe merged session
     writeLoginSessionSafely({
       email: user.email,
       firstName: user.firstName,
@@ -299,35 +304,116 @@ async function loginSuccess(user) {
       updatedAt: user.updatedAt,
     });
 
+    // ensure a settings record exists locally (seeds defaults if missing)
     await ensureSettingsForUser(user).catch((e) =>
       console.warn("ensureSettingsForUser during login failed", e)
     );
 
-    (async () => {
-      try {
-        const remote = await fetchUsersFromJsonbin();
-        if (Array.isArray(remote)) {
-          const idx = remote.findIndex(
-            (u) => String(u.email || "").toLowerCase() === user.email
-          );
-          const patched = Object.assign({}, remote[idx] || {}, user, {
-            updatedAt: user.updatedAt,
-          });
-          if (idx >= 0) remote[idx] = patched;
-          else remote.push(Object.assign({}, user, { xp: 0, lastLesson: "" }));
-          await writeUsersToJsonbin(remote);
-        }
-      } catch (e) {
-        console.warn("remote update after login failed", e);
-      }
-    })();
+    // ------ NEW: fetch remote JSONBin and update local xp if present ------
+    try {
+      const remote = await fetchUsersFromJsonbin(); // returns array or null
+      if (Array.isArray(remote)) {
+        const remoteUser = remote.find(
+          (u) => (u.email || "").toLowerCase() === user.email
+        );
+        if (remoteUser && remoteUser.xp != null) {
+          const remoteXp = Number(remoteUser.xp) || 0;
 
+          // update SettingsDB xp
+          try {
+            await SettingsDB.openDB();
+            const emailKey = user.email;
+            let settings = null;
+            try {
+              settings = await SettingsDB.getSettings(emailKey);
+            } catch (e) {
+              settings = null;
+            }
+
+            const mergedSettings = Object.assign({}, settings || {}, {
+              email: emailKey,
+              name:
+                settings && settings.name
+                  ? settings.name
+                  : user.name || (user.email ? user.email.split("@")[0] : ""),
+              xp: remoteXp,
+              lastLesson:
+                settings && settings.lastLesson != null
+                  ? settings.lastLesson
+                  : "",
+              badges: (settings && settings.badges) || [],
+              language:
+                (settings && settings.language) || user.language || "en",
+              grade: (settings && settings.grade) || user.grade || "8",
+              avatar:
+                (settings && settings.avatar) ||
+                user.avatar ||
+                "../assets/img/avatar.jpg",
+              updatedAt: Date.now(),
+            });
+
+            await SettingsDB.saveSettings(mergedSettings).catch((e) =>
+              console.warn(
+                "SettingsDB.saveSettings failed (remote xp merge)",
+                e
+              )
+            );
+            console.debug(
+              "SettingsDB xp updated from remote for",
+              emailKey,
+              remoteXp
+            );
+          } catch (e) {
+            console.warn("Failed to update SettingsDB with remote xp", e);
+          }
+
+          // update auth DB xp (so auth/users store mirrors xp)
+          try {
+            const localAuthUser = await getUserFromDB(user.email);
+            if (localAuthUser) {
+              localAuthUser.xp = remoteXp;
+              localAuthUser.updatedAt = Date.now();
+              await updateUserInDB(localAuthUser);
+            } else {
+              // seed an auth record if missing
+              const seedAuth = Object.assign({}, user, {
+                xp: remoteXp,
+                updatedAt: Date.now(),
+              });
+              try {
+                await addUserToDB(seedAuth);
+              } catch (e) {
+                /* ignore constraint errors */
+              }
+            }
+          } catch (e) {
+            console.warn("Failed to update auth DB xp", e);
+          }
+
+          // update session (optional)
+          try {
+            const sess = readLoginSession() || {};
+            sess.xp = remoteXp;
+            sess.updatedAt = Date.now();
+            writeLoginSessionSafely(sess);
+          } catch (e) {
+            /* ignore */
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("remote xp sync failed", e);
+    }
+    // ------ end remote sync ------
+
+    // redirect to index page
     const redirectPath = location.pathname.includes("/templates/")
       ? "../index.html"
       : "../index.html";
     setTimeout(() => (window.location.href = redirectPath), 300);
   } catch (err) {
     console.error("loginSuccess failed", err);
+    // fallback: still redirect
     window.location.href = "../index.html";
   }
 }

@@ -110,7 +110,7 @@
       lessonId,
       completed: false,
       percent: 0,
-      seenBlocks: [],     // 🔥 track seen block indexes
+      seenBlocks: [], // 🔥 track seen block indexes
       timeSpentSeconds: 0,
       lastViewedAt: Date.now(),
     };
