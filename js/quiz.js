@@ -202,54 +202,126 @@
        4. fallback 'en'
   ----------------------------- */
   async function getUserLanguage() {
-    try {
-      // 1) window.currentUser + SettingsDB
-      if (
-        window.currentUser &&
-        window.currentUser.email &&
-        window.SettingsDB &&
-        typeof SettingsDB.getSettings === "function"
-      ) {
-        try {
-          const s = await SettingsDB.getSettings(window.currentUser.email);
-          if (s && s.language)
-            return (String(s.language).toLowerCase() || "en").slice(0, 2);
-        } catch (e) {
-          /* ignore */
-        }
-      }
-
-      // 2) localStorage gyan_current_user
+  try {
+    // 0) Prefer global API if available (main.js exposes GyanSetu.getCurrentLanguage)
+    if (window.GyanSetu && typeof window.GyanSetu.getCurrentLanguage === "function") {
       try {
-        const raw = localStorage.getItem("gyan_current_user");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.language)
-            return (String(parsed.language).toLowerCase() || "en").slice(0, 2);
-        }
-      } catch (e) {}
+        const g = window.GyanSetu.getCurrentLanguage();
+        if (g) return (String(g).toLowerCase() || "en").slice(0, 2);
+      } catch (e) { /* ignore */ }
+    }
 
-      // 3) language select on page
+    // 1) window.currentUser + SettingsDB (existing logic)
+    if (
+      window.currentUser &&
+      window.currentUser.email &&
+      window.SettingsDB &&
+      typeof SettingsDB.getSettings === "function"
+    ) {
+      try {
+        const s = await SettingsDB.getSettings(window.currentUser.email);
+        if (s && s.language)
+          return (String(s.language).toLowerCase() || "en").slice(0, 2);
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    // 2) localStorage gyan_current_user
+    try {
+      const raw = localStorage.getItem("gyan_current_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.language)
+          return (String(parsed.language).toLowerCase() || "en").slice(0, 2);
+      }
+    } catch (e) {}
+
+    // 3) top-right selector injected by main.js
+    try {
+      const topSel = document.querySelector("#gs-language");
+      if (topSel && topSel.value) return (String(topSel.value).toLowerCase() || "en").slice(0, 2);
+    } catch (e) {}
+
+    // 4) language select on page (legacy)
+    try {
       const sel = document.querySelector("#language, .lang-select");
       if (sel && sel.value)
         return (String(sel.value).toLowerCase() || "en").slice(0, 2);
-    } catch (e) {
-      console.warn("getUserLanguage failed", e);
-    }
-    return "en";
+    } catch (e) {}
+
+  } catch (e) {
+    console.warn("getUserLanguage failed", e);
   }
+  return "en";
+}
 
   // If user changes the page-wide language select we should re-render current question in new language
   (function attachLanguageWatcher() {
-    const sel = document.querySelector("#language, .lang-select");
-    if (!sel) return;
-    sel.addEventListener("change", async () => {
+  // watch the legacy select(s) and the top-right select (#gs-language)
+  const selectors = [
+    () => document.querySelector("#language"),
+    () => document.querySelector(".lang-select"),
+    () => document.querySelector("#gs-language")
+  ];
+
+  function bindIfPresent(el) {
+    if (!el) return;
+    // avoid duplicate handlers
+    if (el._quizLangBound) return;
+    el._quizLangBound = true;
+    el.addEventListener("change", async () => {
       // re-render current question in new language
       if (questions && questions.length && currentIndex >= 0) {
-        await renderCurrent(); // re-render will call getUserLanguage() and pick right fields
+        try {
+          await renderCurrent();
+        } catch (e) { console.warn("renderCurrent failed after lang change", e); }
       }
     });
-  })();
+  }
+
+  // initial bind for elements that already exist
+  selectors.forEach((fn) => bindIfPresent(fn()));
+
+  // observe DOM for late-inserted #gs-language (since main.js injects early but safe)
+  const mo = new MutationObserver(() => {
+    selectors.forEach((fn) => bindIfPresent(fn()));
+  });
+  mo.observe(document.documentElement || document.body, { childList: true, subtree: true });
+
+  // listen for app-wide language updates via event dispatched by main.js
+  document.addEventListener("gyan:user-updated", async (ev) => {
+    try {
+      if (ev && ev.detail && ev.detail.language) {
+        // if top-right selector exists, keep it in sync (main.js should already)
+        const sel = document.querySelector("#gs-language");
+        if (sel && sel.value !== ev.detail.language) sel.value = ev.detail.language;
+
+        if (questions && questions.length && currentIndex >= 0) {
+          await renderCurrent();
+        }
+      }
+    } catch (e) {
+      console.warn("gyan:user-updated handler failed", e);
+    }
+  });
+
+  // also listen for storage events so if another tab changes language we update
+  window.addEventListener("storage", async (ev) => {
+    try {
+      if (!ev) return;
+      if (ev.key === "gyan_current_user" || ev.key === "gyan_guest_language") {
+        // re-render if language might have changed
+        if (questions && questions.length && currentIndex >= 0) {
+          await renderCurrent();
+        }
+      }
+    } catch (e) {
+      console.warn("storage event lang handler failed", e);
+    }
+  });
+})();
+
 
   /* -----------------------------
      Load questions file (maths.json/science.json/questions.json)
