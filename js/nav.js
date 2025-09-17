@@ -1,4 +1,4 @@
-// nav.js - highlights active sidebar item and persists language selection
+// nav.js - highlights active sidebar item, persists language selection, and handles logout
 (function () {
   // mapping of filenames to data-page values
   const map = {
@@ -73,19 +73,123 @@
     }
   });
 
-  // login toggle
+  // ---------- LOGOUT / LOGIN handling ----------
+  // Helper to safely read current user from localStorage
+  function readLocalSessionSafe() {
+    try {
+      const raw = localStorage.getItem("gyan_current_user");
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Helper to write local session safely (merge by timestamp if desired)
+  function writeLocalSession(obj) {
+    try {
+      if (!obj) {
+        localStorage.removeItem("gyan_current_user");
+      } else {
+        localStorage.setItem("gyan_current_user", JSON.stringify(obj));
+      }
+      localStorage.setItem("gyan_user_ping", String(Date.now()));
+    } catch (e) {
+      console.warn("writeLocalSession failed", e);
+    }
+  }
+
+  // Primary logout function - clears local session, tries to update auth DB, and redirects.
+  async function doLogout() {
+    try {
+      const cur = window.currentUser || readLocalSessionSafe();
+
+      // Step 1: attempt to update auth DB record if helper exists (best-effort)
+      // auth.js defines updateUserInDB / openAuthDB in some setups. Use them if available.
+      if (typeof updateUserInDB === "function" && cur && cur.email) {
+        try {
+          const mark = Object.assign({}, cur, {
+            email: String(cur.email).trim().toLowerCase(),
+            isLoggedIn: false,
+            updatedAt: Date.now(),
+          });
+          await updateUserInDB(mark).catch((e) => {
+            // ignore failure, still proceed with local logout
+            console.warn("updateUserInDB failed during logout", e);
+          });
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // Step 2: clear local session and global currentUser
+      try {
+        localStorage.removeItem("gyan_current_user");
+        // keep a ping so other tabs can notice change
+        localStorage.setItem("gyan_user_ping", String(Date.now()));
+      } catch (e) {
+        console.warn("Failed to clear local session during logout", e);
+      }
+      window.currentUser = null;
+
+      // Step 3: inform app via events so UI widgets can react
+      document.dispatchEvent(
+        new CustomEvent("gyan:user-logged-out", {
+          detail: { email: cur && cur.email ? cur.email : null },
+        })
+      );
+      document.dispatchEvent(
+        new CustomEvent("gyan:user-updated", { detail: { isLoggedIn: false } })
+      );
+
+      // Step 4: redirect to auth page (use templates path if your app uses it)
+      // prefer templates/auth.html when inside templates folder; otherwise use /templates/auth.html
+      const inTemplates = location.pathname.includes("/templates/");
+      const authPath = inTemplates ? "/templates/auth.html" : "/templates/auth.html";
+      window.location.href = authPath;
+    } catch (err) {
+      console.error("Logout failed", err);
+      // final fallback: force redirect
+      window.location.href = "/templates/auth.html";
+    }
+  }
+
+  // Attach to login/logout button
   const loginBtn = document.getElementById("loginBtn");
   if (loginBtn) {
-    let logged = false;
-    loginBtn.addEventListener("click", () => {
-      logged = !logged;
-      loginBtn.innerHTML = logged
+    // update UI label according to session
+    function refreshLoginButtonLabel() {
+      const cur = window.currentUser || readLocalSessionSafe();
+      const isLogged = cur && (cur.isLoggedIn === true || cur.email);
+      loginBtn.innerHTML = isLogged
         ? '<i class="fas fa-right-from-bracket"></i><span>Log Out</span>'
         : '<i class="fas fa-right-to-bracket"></i><span>Log In</span>';
+    }
+
+    refreshLoginButtonLabel();
+
+    loginBtn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      const cur = window.currentUser || readLocalSessionSafe();
+      const isLogged = cur && (cur.isLoggedIn === true || cur.email);
+      if (isLogged) {
+        // perform logout
+        await doLogout();
+      } else {
+        // navigate to auth page for login
+        const authPath = location.pathname.includes("/templates/")
+          ? "/templates/auth.html"
+          : "/templates/auth.html";
+        window.location.href = authPath;
+      }
     });
+
+    // update label if session changes elsewhere in the app
+    document.addEventListener("gyan:user-updated", refreshLoginButtonLabel);
+    document.addEventListener("gyan:user-logged-out", refreshLoginButtonLabel);
   }
+
   // mobile sidebar toggle
-  // Toggle sidebar + swap FontAwesome icon inside #sidebarMobile (bars <-> times)
   var opened = false;
   const sidebarMobile = document.getElementById("sidebarMobile");
   const sidebar = document.querySelector(".sidebar");
