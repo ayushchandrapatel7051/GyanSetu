@@ -27,9 +27,17 @@
         const tx = db.transaction(STORE_USERS, "readonly");
         const store = tx.objectStore(STORE_USERS);
         const req = store.getAll();
-        req.onsuccess = (ev) => { resolve(ev.target.result || []); db.close(); };
-        req.onerror = (ev) => { reject(ev.target.error); db.close(); };
-      } catch (err) { reject(err); }
+        req.onsuccess = (ev) => {
+          resolve(ev.target.result || []);
+          db.close();
+        };
+        req.onerror = (ev) => {
+          reject(ev.target.error);
+          db.close();
+        };
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -42,9 +50,17 @@
         const tx = db.transaction(STORE_USERS, "readonly");
         const store = tx.objectStore(STORE_USERS);
         const req = store.get(normalized);
-        req.onsuccess = (ev) => { resolve(ev.target.result || null); db.close(); };
-        req.onerror = (ev) => { reject(ev.target.error); db.close(); };
-      } catch (err) { reject(err); }
+        req.onsuccess = (ev) => {
+          resolve(ev.target.result || null);
+          db.close();
+        };
+        req.onerror = (ev) => {
+          reject(ev.target.error);
+          db.close();
+        };
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -58,9 +74,17 @@
         const tx = db.transaction(STORE_USERS, "readwrite");
         const store = tx.objectStore(STORE_USERS);
         const req = store.put(record);
-        req.onsuccess = () => { resolve(); db.close(); };
-        req.onerror = (ev) => { reject(ev.target.error); db.close(); };
-      } catch (err) { reject(err); }
+        req.onsuccess = () => {
+          resolve();
+          db.close();
+        };
+        req.onerror = (ev) => {
+          reject(ev.target.error);
+          db.close();
+        };
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -70,7 +94,9 @@
       const raw = localStorage.getItem("gyan_current_user");
       if (!raw) return null;
       return JSON.parse(raw);
-    } catch (e) { return null; }
+    } catch (e) {
+      return null;
+    }
   }
   function normalizeEmailLocal(email) {
     if (!email) return email;
@@ -92,14 +118,19 @@
     const older = bTime > aTime ? a : b;
     return {
       email: newer.email || older.email || "",
-      name: newer.name || older.name || (newer.firstName ? `${newer.firstName} ${newer.lastName || ""}`.trim() : "Unknown"),
+      name:
+        newer.name ||
+        older.name ||
+        (newer.firstName
+          ? `${newer.firstName} ${newer.lastName || ""}`.trim()
+          : "Unknown"),
       profile: newer.profile || older.profile || "",
       avatar: newer.avatar || older.avatar || "../assets/img/avatar.jpg",
       grade: newer.grade || older.grade || "",
       language: newer.language || older.language || "en",
       phone: newer.phone || older.phone || "",
       isLoggedIn: newer.isLoggedIn || older.isLoggedIn || false,
-      updatedAt: Math.max(aTime, bTime, now)
+      updatedAt: Math.max(aTime, bTime, now),
     };
   }
 
@@ -108,13 +139,19 @@
     if (!user || !user.email) return;
     user.email = normalizeEmailLocal(user.email);
     user.updatedAt = Date.now();
-    try { await putUser(user); } catch (e) { console.warn("putUser failed", e); }
+    try {
+      await putUser(user);
+    } catch (e) {
+      console.warn("putUser failed", e);
+    }
     try {
       localStorage.setItem("gyan_current_user", JSON.stringify(user));
       localStorage.setItem("gyan_user_ping", String(Date.now()));
     } catch (e) {}
     window.currentUser = user;
-    document.dispatchEvent(new CustomEvent("gyan:user-updated", { detail: user }));
+    document.dispatchEvent(
+      new CustomEvent("gyan:user-updated", { detail: user })
+    );
   }
 
   // update current user partially
@@ -125,10 +162,19 @@
     const merged = Object.assign({}, cur, updates);
     merged.email = normalizeEmailLocal(merged.email || cur.email || "");
     merged.updatedAt = Date.now();
-    try { await putUser(merged); } catch(e){ console.warn("putUser failed", e); }
-    try { localStorage.setItem("gyan_current_user", JSON.stringify(merged)); localStorage.setItem("gyan_user_ping", String(Date.now())); } catch(e){}
+    try {
+      await putUser(merged);
+    } catch (e) {
+      console.warn("putUser failed", e);
+    }
+    try {
+      localStorage.setItem("gyan_current_user", JSON.stringify(merged));
+      localStorage.setItem("gyan_user_ping", String(Date.now()));
+    } catch (e) {}
     window.currentUser = merged;
-    document.dispatchEvent(new CustomEvent("gyan:user-updated", { detail: merged }));
+    document.dispatchEvent(
+      new CustomEvent("gyan:user-updated", { detail: merged })
+    );
     return merged;
   }
 
@@ -140,11 +186,29 @@
     if (window.currentUser && window.currentUser.email) {
       return updateCurrentUser({ language: lang });
     } else {
-      try { localStorage.setItem("gyan_guest_language", JSON.stringify({ language: lang, updatedAt: Date.now() })); localStorage.setItem("gyan_user_ping", String(Date.now())); } catch(e){}
-      document.dispatchEvent(new CustomEvent("gyan:user-updated", { detail: { language: lang } }));
+      try {
+        localStorage.setItem(
+          "gyan_guest_language",
+          JSON.stringify({ language: lang, updatedAt: Date.now() })
+        );
+        localStorage.setItem("gyan_user_ping", String(Date.now()));
+      } catch (e) {}
+      document.dispatchEvent(
+        new CustomEvent("gyan:user-updated", { detail: { language: lang } })
+      );
     }
   };
-  window.GyanSetu.getCurrentLanguage = () => (window.currentUser && window.currentUser.language) || (function(){ try{ const g = localStorage.getItem("gyan_guest_language"); return g ? JSON.parse(g).language : null; }catch(e){return null;} })() || "en";
+  window.GyanSetu.getCurrentLanguage = () =>
+    (window.currentUser && window.currentUser.language) ||
+    (function () {
+      try {
+        const g = localStorage.getItem("gyan_guest_language");
+        return g ? JSON.parse(g).language : null;
+      } catch (e) {
+        return null;
+      }
+    })() ||
+    "en";
 
   // ---------- initialize canonical session ----------
   try {
@@ -152,7 +216,7 @@
     let mergedUser = null;
 
     if (localUser && localUser.email) {
-      const dbUser = await getUserByEmail(localUser.email).catch(()=>null);
+      const dbUser = await getUserByEmail(localUser.email).catch(() => null);
       if (dbUser) mergedUser = mergeSession(localUser, dbUser);
       else mergedUser = mergeSession(localUser, null);
     } else {
@@ -178,7 +242,8 @@
   // ---------- Create single top-right anchor (#gs-top-right) ----------
   function injectTopRightContainer() {
     try {
-      if (document.querySelector("#gs-top-right")) return document.querySelector("#gs-top-right");
+      if (document.querySelector("#gs-top-right"))
+        return document.querySelector("#gs-top-right");
 
       // container
       const container = document.createElement("div");
@@ -237,7 +302,7 @@
     // globe icon (fa or fallback)
     const globe = document.createElement("span");
     globe.className = "gs-globe";
-    globe.innerHTML = '&#127760;'; // fallback globe emoji
+    globe.innerHTML = "&#127760;"; // fallback globe emoji
     globe.style.fontSize = "14px";
     globe.style.display = "inline-block";
     globe.style.marginLeft = "2px";
@@ -276,7 +341,9 @@
       document.documentElement.setAttribute("lang", v);
       try {
         await window.GyanSetu.setLanguage(v);
-      } catch (err) { console.warn("setLanguage error", err); }
+      } catch (err) {
+        console.warn("setLanguage error", err);
+      }
     });
 
     // listen for updates
@@ -318,12 +385,13 @@
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", attach, { once: true });
       // also try immediate
-      try { attach(); } catch(e){}
+      try {
+        attach();
+      } catch (e) {}
     } else {
       attach();
     }
   } catch (e) {
     console.error("language injection error", e);
   }
-
 })();
