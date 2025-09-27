@@ -7,29 +7,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!gameContainer) return;
 
   // --- Achievements & Badges ---
-  let achievements = [];
+  let achievements = JSON.parse(localStorage.getItem('questAchievements') || '[]');
   function unlockAchievement(name) {
     if (!achievements.includes(name)) {
       achievements.push(name);
+      localStorage.setItem('questAchievements', JSON.stringify(achievements));
       showBadgeModal(name);
     }
   }
   function showBadgeModal(name) {
     const modal = document.createElement("div");
-    modal.style.cssText = `
-      position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
-      background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;
-    `;
+    modal.className = "quest-modal";
     modal.innerHTML = `
-      <div style="background:#fff;padding:32px 48px;border-radius:32px;box-shadow:0 4px 32px #222;text-align:center;">
-        <h2 style="font-family:'Fredoka One',Inter;font-size:2rem;color:#27ae60;">Achievement Unlocked!</h2>
-        <div style="font-size:3rem;margin:18px 0;">🏅</div>
-        <div style="font-size:1.3rem;color:#222;">${name}</div>
-        <button style="margin-top:24px;padding:12px 32px;border-radius:18px;background:#27ae60;color:#fff;font-size:1.1rem;border:none;cursor:pointer;" id="closeBadgeBtn">Close</button>
+      <div class="quest-modal-content">
+        <h2 class="quest-modal-title">Achievement Unlocked!</h2>
+        <div class="quest-modal-icon">🏅</div>
+        <div class="quest-modal-text">${name}</div>
+        <button class="quest-modal-btn" id="closeBadgeBtn">Close</button>
       </div>
     `;
     document.body.appendChild(modal);
     modal.querySelector("#closeBadgeBtn").onclick = () => modal.remove();
+    modal.style.setProperty('--quest-color', '#27ae60');
   }
 
   // --- Inventory/Rewards ---
@@ -40,24 +39,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function showInventoryModal() {
     const modal = document.createElement("div");
-    modal.style.cssText = `
-      position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
-      background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;
-    `;
+    modal.className = "quest-modal";
     modal.innerHTML = `
-      <div style="background:#fff;padding:32px 48px;border-radius:32px;box-shadow:0 4px 32px #222;text-align:center;">
-        <h2 style="font-family:'Fredoka One',Inter;font-size:2rem;color:#fdcb6e;">My Inventory</h2>
-        <div style="font-size:2rem;margin:18px 0;">🪙</div>
-        <div style="font-size:1.3rem;color:#222;">Coins: ${coins}</div>
-        <div style="margin:18px 0;">
-          <strong>Achievements:</strong>
-          <div style="font-size:1.1rem;color:#27ae60;">${achievements.length ? achievements.join(", ") : "None yet!"}</div>
-        </div>
-        <button style="margin-top:24px;padding:12px 32px;border-radius:18px;background:#fdcb6e;color:#fff;font-size:1.1rem;border:none;cursor:pointer;" id="closeInventoryBtn">Close</button>
+      <div class="quest-modal-content">
+        <h2 class="quest-modal-title">My Inventory</h2>
+        <div class="quest-modal-icon">🪙</div>
+        <div class="quest-modal-text">Coins: ${coins}</div>
+        <button class="quest-modal-btn" id="closeInventoryBtn">Close</button>
       </div>
     `;
     document.body.appendChild(modal);
     modal.querySelector("#closeInventoryBtn").onclick = () => modal.remove();
+    modal.style.setProperty('--quest-color', '#fdcb6e');
   }
 
   // --- Daily/Weekly Quests ---
@@ -69,31 +62,26 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   function showQuestLog() {
     const modal = document.createElement("div");
-    modal.style.cssText = `
-      position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
-      background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;
-    `;
+    modal.className = "quest-modal";
     modal.innerHTML = `
-      <div style="background:#fff;padding:32px 48px;border-radius:32px;box-shadow:0 4px 32px #222;text-align:center;">
-        <h2 style="font-family:'Fredoka One',Inter;font-size:2rem;color:#0984e3;">Quest Log</h2>
-        <ul style="list-style:none;padding:0;font-size:1.2rem;">
+      <div class="quest-modal-content">
+        <h2 class="quest-modal-title">Quest Log</h2>
+        <ul style="list-style:none;padding:0;font-size:1.2rem;text-align:left;">
           ${dailyQuests.map((q) => `<li>${q.completed ? "✅" : "⬜"} ${q.name}</li>`).join("")}
         </ul>
-        <button style="margin-top:24px;padding:12px 32px;border-radius:18px;background:#0984e3;color:#fff;font-size:1.1rem;border:none;cursor:pointer;" id="closeQuestLogBtn">Close</button>
+        <button class="quest-modal-btn" id="closeQuestLogBtn">Close</button>
       </div>
     `;
     document.body.appendChild(modal);
     modal.querySelector("#closeQuestLogBtn").onclick = () => modal.remove();
+    modal.style.setProperty('--quest-color', '#0984e3');
   }
 
   // --- Mini-Games: Unique for Each Quest ---
   function showMiniGameForQuest(questName, onComplete) {
     const modal = document.createElement("div");
-    modal.style.cssText = `
-      position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;
-      background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;
-    `;
-    let pairs, title;
+    modal.className = "mini-game-modal";
+    let pairs, title, leftBg, rightBg;
     if (questName === "Agricultural Scientist") {
       title = "Match Crops to Nutrients!";
       pairs = [
@@ -101,6 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
         { left: "Wheat", right: "Rust" },
         { left: "Soil", right: "Trees" },
       ];
+      leftBg = "#a3e635";
+      rightBg = "#bbf7d0";
     } else if (questName === "Village Engineer") {
       title = "Match Pipes to Lengths!";
       pairs = [
@@ -108,6 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
         { left: "Long Pipe", right: "50m" },
         { left: "Tank", right: "250L" },
       ];
+      leftBg = "#60a5fa";
+      rightBg = "#bae6fd";
     } else if (questName === "Market Math") {
       title = "Match Items to Prices!";
       pairs = [
@@ -115,6 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
         { left: "Basket", right: "₹50" },
         { left: "Bananas", right: "₹20/kg" },
       ];
+      leftBg = "#fbbf24";
+      rightBg = "#fef9c3";
     } else if (questName === "Language Helper") {
       title = "Match Words to Meanings!";
       pairs = [
@@ -122,6 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
         { left: "Easy", right: "Not difficult" },
         { left: "Environment", right: "Nature around us" },
       ];
+      leftBg = "#f472b6";
+      rightBg = "#fce7f3";
     } else {
       title = "Mini-Game!";
       pairs = [
@@ -129,41 +125,27 @@ document.addEventListener("DOMContentLoaded", () => {
         { left: "B", right: "2" },
         { left: "C", right: "3" },
       ];
+      leftBg = "#e0f7fa";
+      rightBg = "#fdcb6e";
     }
     let matched = 0;
     modal.innerHTML = `
-      <div style="background:#fff;padding:32px 48px;border-radius:32px;box-shadow:0 4px 32px #222;text-align:center;">
-        <h2 style="font-family:'Fredoka One',Inter;font-size:2rem;color:#27ae60;">Mini-Game: ${title}</h2>
-        <div id="matchArea" style="display:flex;gap:32px;justify-content:center;margin:24px 0;">
-          <div id="leftCol" style="display:flex;flex-direction:column;gap:18px;">
+      <div class="mini-game-content">
+        <h2 class="mini-game-title">Mini-Game: ${title}</h2>
+        <div id="matchArea" class="mini-game-area">
+          <div id="leftCol" class="mini-game-col">
             ${pairs
-              .map((p, i) => {
-                let bg;
-                if (questName === "Agricultural Scientist") bg = "#a3e635";
-                else if (questName === "Village Engineer") bg = "#60a5fa";
-                else if (questName === "Market Math") bg = "#fbbf24";
-                else if (questName === "Language Helper") bg = "#f472b6";
-                else bg = "#e0f7fa";
-                return `<div draggable="true" data-idx="${i}" style="padding:12px 24px;background:${bg};border-radius:12px;cursor:grab;font-size:1.1rem;">${p.left}</div>`;
-              })
+              .map((p, i) => `<div draggable="true" data-idx="${i}" class="mini-game-item draggable" style="--mini-bg-left: ${leftBg};">${p.left}</div>`)
               .join("")}
           </div>
-          <div id="rightCol" style="display:flex;flex-direction:column;gap:18px;">
+          <div id="rightCol" class="mini-game-col">
             ${pairs
-              .map((p, i) => {
-                let bg;
-                if (questName === "Agricultural Scientist") bg = "#bbf7d0";
-                else if (questName === "Village Engineer") bg = "#bae6fd";
-                else if (questName === "Market Math") bg = "#fef9c3";
-                else if (questName === "Language Helper") bg = "#fce7f3";
-                else bg = "#fdcb6e";
-                return `<div data-idx="${i}" style="padding:12px 24px;background:${bg};border-radius:12px;min-width:100px;font-size:1.1rem;">${p.right}</div>`;
-              })
+              .map((p, i) => `<div data-idx="${i}" class="mini-game-item target" style="--mini-bg-right: ${rightBg};">${p.right}</div>`)
               .join("")}
           </div>
         </div>
-        <div id="matchFeedback" style="font-size:1.2rem;color:#27ae60;margin:18px 0;"></div>
-        <button style="margin-top:24px;padding:12px 32px;border-radius:18px;background:#27ae60;color:#fff;font-size:1.1rem;border:none;cursor:pointer;display:none;" id="closeMiniGameBtn">Continue</button>
+        <div id="matchFeedback" class="mini-game-feedback"></div>
+        <button class="mini-game-continue" id="closeMiniGameBtn">Continue</button>
       </div>
     `;
     document.body.appendChild(modal);
@@ -172,26 +154,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const leftCol = modal.querySelector("#leftCol");
     const rightCol = modal.querySelector("#rightCol");
     let draggedIdx = null;
-    leftCol.querySelectorAll("div").forEach((el) => {
+    leftCol.querySelectorAll(".mini-game-item").forEach((el) => {
       el.ondragstart = (e) => {
         draggedIdx = el.getAttribute("data-idx");
       };
     });
-    rightCol.querySelectorAll("div").forEach((el) => {
+    rightCol.querySelectorAll(".mini-game-item").forEach((el) => {
       el.ondragover = (e) => e.preventDefault();
       el.ondrop = (e) => {
         if (el.getAttribute("data-idx") === draggedIdx) {
           el.style.background = "#27ae60";
-          el.textContent += " ✅";
-          leftCol.querySelector(`div[data-idx="${draggedIdx}"]`).style.display =
-            "none";
+          el.innerHTML += " ✅";
+          leftCol.querySelector(`[data-idx="${draggedIdx}"]`).style.display = "none";
           matched++;
           modal.querySelector("#matchFeedback").textContent = "Matched!";
           if (matched === pairs.length) {
-            modal.querySelector("#matchFeedback").textContent =
-              "All matched! Well done!";
-            modal.querySelector("#closeMiniGameBtn").style.display =
-              "inline-block";
+            modal.querySelector("#matchFeedback").textContent = "All matched! Well done!";
+            modal.querySelector("#closeMiniGameBtn").style.display = "inline-block";
           }
         } else {
           modal.querySelector("#matchFeedback").textContent = "Try again!";
@@ -287,6 +266,36 @@ document.addEventListener("DOMContentLoaded", () => {
         answer: 1,
         hint: "It is exhaled by animals.",
       },
+      {
+        question: "What is the main function of roots in plants?",
+        choices: ["Absorb water and nutrients", "Make food", "Protect from sun", "Store seeds"],
+        answer: 0,
+        hint: "They take water from the soil.",
+      },
+      {
+        question: "Which process do plants use to make their own food?",
+        choices: ["Respiration", "Photosynthesis", "Digestion", "Transpiration"],
+        answer: 1,
+        hint: "It uses sunlight and happens in leaves.",
+      },
+      {
+        question: "What is manure used for in farming?",
+        choices: ["Chemical spray", "Organic fertilizer", "Harvesting tool", "Water pump"],
+        answer: 1,
+        hint: "It is made from animal waste and improves soil.",
+      },
+      {
+        question: "Why do farmers practice crop rotation?",
+        choices: ["To use more water", "To prevent soil diseases", "To plant same crop", "To reduce sunlight"],
+        answer: 1,
+        hint: "It keeps the soil healthy and nutrient-rich.",
+      },
+      {
+        question: "What is the purpose of irrigation in agriculture?",
+        choices: ["To remove weeds", "To supply water to crops", "To measure land", "To store seeds"],
+        answer: 1,
+        hint: "It helps plants get water when rain is not enough.",
+      },
     ],
     "Village Engineer": [
       {
@@ -320,6 +329,36 @@ document.addEventListener("DOMContentLoaded", () => {
         choices: ["200L", "250L", "150L", "100L"],
         answer: 0,
         hint: "Subtract used from total.",
+      },
+      {
+        question: "What is the sum of the interior angles of a triangle?",
+        choices: ["90 degrees", "180 degrees", "360 degrees", "120 degrees"],
+        answer: 1,
+        hint: "It's always the same for any triangle.",
+      },
+      {
+        question: "What is the volume of a cuboidal tank 5 m long, 3 m wide, and 2 m deep?",
+        choices: ["30 cubic m", "10 cubic m", "15 cubic m", "20 cubic m"],
+        answer: 0,
+        hint: "Volume = length × width × height.",
+      },
+      {
+        question: "Simplify the ratio 40:60 to its lowest terms.",
+        choices: ["2:3", "4:6", "20:30", "10:15"],
+        answer: 0,
+        hint: "Divide both numbers by their greatest common divisor.",
+      },
+      {
+        question: "What is the perimeter of a triangle with sides 3 cm, 4 cm, and 5 cm?",
+        choices: ["12 cm", "9 cm", "15 cm", "18 cm"],
+        answer: 0,
+        hint: "Perimeter = sum of all sides.",
+      },
+      {
+        question: "Solve for x in the equation 3x = 12.",
+        choices: ["4", "3", "36", "15"],
+        answer: 0,
+        hint: "Divide both sides by 3.",
       },
     ],
     "Market Math": [
@@ -357,6 +396,36 @@ document.addEventListener("DOMContentLoaded", () => {
         answer: 0,
         hint: "Add cost of apples and bananas.",
       },
+      {
+        question: "What is the cost of 1.5 kg of rice at ₹40 per kg?",
+        choices: ["₹60", "₹40", "₹50", "₹70"],
+        answer: 0,
+        hint: "Multiply 1.5 by 40.",
+      },
+      {
+        question: "A shirt costs ₹200. After a 25% discount, what is the sale price?",
+        choices: ["₹150", "₹200", "₹50", "₹175"],
+        answer: 0,
+        hint: "25% of 200 is 50, subtract from total.",
+      },
+      {
+        question: "What is the average price of three items costing ₹10, ₹20, and ₹30?",
+        choices: ["₹20", "₹15", "₹25", "₹60"],
+        answer: 0,
+        hint: "Add all prices and divide by 3.",
+      },
+      {
+        question: "Half a dozen eggs cost ₹6 each. What is the total cost?",
+        choices: ["₹36", "₹12", "₹6", "₹18"],
+        answer: 0,
+        hint: "Half a dozen is 6 eggs.",
+      },
+      {
+        question: "A farmer buys goods for ₹80 and sells for ₹100. What is the profit?",
+        choices: ["₹20", "₹180", "₹80", "₹10"],
+        answer: 0,
+        hint: "Profit = selling price - buying price.",
+      },
     ],
     "Language Helper": [
       {
@@ -389,14 +458,78 @@ document.addEventListener("DOMContentLoaded", () => {
         answer: 0,
         hint: "Present tense verb.",
       },
+      {
+        question: "What is the past tense of the verb 'run'?",
+        choices: ["Runs", "Running", "Ran", "Runned"],
+        answer: 2,
+        hint: "It is an irregular verb.",
+      },
+      {
+        question: "Fill in the blank with the correct preposition: The book is ___ the table.",
+        choices: ["in", "on", "at", "by"],
+        answer: 1,
+        hint: "The book is located above the surface.",
+      },
+      {
+        question: "Choose the correct article: ___ sun rises in the east.",
+        choices: ["A", "An", "The", "No article"],
+        answer: 2,
+        hint: "Use 'the' for specific things.",
+      },
+      {
+        question: "Which word is an adjective in the sentence 'The red house is big'?",
+        choices: ["The", "Red", "House", "Is"],
+        answer: 1,
+        hint: "It describes the noun 'house'.",
+      },
+      {
+        question: "Add the correct punctuation: I love my country",
+        choices: [".", "!", "?", ","],
+        answer: 0,
+        hint: "It is a declarative sentence.",
+      },
     ],
   };
 
   // --- Playful Quest Selection UI ---
   function showQuestSelection() {
+    // Hide page title to avoid duplication
+    document.querySelector('.page-title').style.display = 'none';
+  
+    // Ensure normal layout without scroll
+    const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+    const body = document.body;
+    sidebar.style.display = 'block';
+    content.style.marginLeft = '260px';
+    content.style.width = 'calc(100% - 260px)';
+    content.style.padding = '0';
+    content.style.overflow = 'hidden';
+    content.style.height = '100vh';
+    body.classList.remove('quest-active');
+    gameContainer.style.position = 'relative';
+    gameContainer.style.top = '';
+    gameContainer.style.left = '';
+    gameContainer.style.width = '';
+    gameContainer.style.height = '';
+    gameContainer.style.zIndex = '';
+  
+    // Reset background to general quest bg
+    const questBg = document.querySelector('.quest-bg');
+    questBg.style.backgroundImage = "url('../assets/img/quest-bg.png')";
+    questBg.style.opacity = '0.18';
+  
+    // Remove black overlay if exists
+    if (window.questBlackOverlay) {
+      window.questBlackOverlay.remove();
+      window.questBlackOverlay = null;
+    }
+  
     gameContainer.innerHTML = "";
     // Ensure #game-container is relative so absolute mute button works
     gameContainer.style.position = "relative";
+    gameContainer.style.height = '100vh';
+    gameContainer.style.overflow = 'hidden';
 
     // Add mute/unmute button to bottom left corner inside quest game window
     const muteBtn = document.createElement("button");
@@ -437,159 +570,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add dark blurred overlay for quest selection
     const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1000;
-      background: linear-gradient(180deg, #16002a 0%, #2b0042 60%);
-    `;
+    overlay.className = "quest-overlay";
     gameContainer.appendChild(overlay);
 
     const wrapper = document.createElement("div");
-    wrapper.style.cssText =
-      "display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:600px;position:relative;z-index:1001;gap:32px;";
+    wrapper.className = "quest-wrapper";
+    wrapper.style.cssText = 'display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; padding: 20px; gap: 32px;';
 
     // Add headline for the page
     const headline = document.createElement("h2");
+    headline.className = "quest-headline";
     headline.textContent = "Quest Games";
-    headline.style.cssText =
-      "font-family:'Fredoka One',Inter;font-size:2.6rem;color:#fff;margin-bottom:18px;letter-spacing:1px;text-shadow:0 2px 12px #222;";
     wrapper.appendChild(headline);
 
     const cardsRow = document.createElement("div");
-    cardsRow.style.cssText = `
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 48px;
-      width: 100%;
-      margin-bottom: 32px;
-    `;
+    cardsRow.className = "quest-cards-row";
+    cardsRow.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 32px; width: 100%; max-height: 70vh; overflow: hidden;';
 
     Object.keys(questAssets).forEach((quest) => {
       const card = document.createElement("div");
-      card.style.cssText = `
-        width: 360px;
-        min-height: 400px;
-        border-radius: 32px;
-        background: rgba(255,255,255,0.10);
-        backdrop-filter: blur(8px);
-        box-shadow: 0 12px 40px rgba(44, 20, 80, 0.35);
-        border: 2.5px solid #ffd86b;
-        padding: 40px 28px 32px 28px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-        transition: transform 0.18s, box-shadow 0.18s;
-        position: relative;
-        overflow: hidden;
-      `;
-      card.onmouseover = () => {
-        card.style.transform = "scale(1.05)";
-        card.style.boxShadow = "0 16px 48px #ffd86b";
-      };
-      card.onmouseout = () => {
-        card.style.transform = "scale(1)";
-        card.style.boxShadow = "0 12px 40px rgba(44, 20, 80, 0.35)";
-      };
+      card.className = "quest-card";
+      card.style.setProperty('--quest-color', questAssets[quest].color);
       card.onclick = () => startQuest(quest);
 
       // Avatar
       const avatar = document.createElement("img");
+      avatar.className = "quest-avatar";
       avatar.src = questAssets[quest].avatar;
       avatar.alt = questAssets[quest].avatarName;
-      avatar.style.cssText = `
-        width: 128px;
-        height: 128px;
-        border-radius: 50%;
-        margin-bottom: 22px;
-        box-shadow: 0 4px 24px #ffd86b;
-        object-fit: cover;
-        border: 5px solid #ffd86b;
-        background: #fff;
-        transition: box-shadow 0.2s;
-      `;
-      avatar.onmouseover = () => {
-        avatar.style.boxShadow = "0 8px 32px #ffd86b";
-      };
-      avatar.onmouseout = () => {
-        avatar.style.boxShadow = "0 4px 24px #ffd86b";
-      };
 
       // Title
       const title = document.createElement("div");
-      title.textContent = questAssets[quest].title;
-      title.style.cssText = `
-        font-family: 'Fredoka One', Inter, system-ui;
-        font-size: 1.6rem;
-        color: ${questAssets[quest].color};
-        margin-bottom: 12px;
-        font-weight: 700;
-        text-align: center;
-        letter-spacing: 1.5px;
-        text-shadow: 0 2px 8px #222;
-        border-bottom: 2px solid ${questAssets[quest].color};
-        padding-bottom: 6px;
-        width: 85%;
-      `;
+      title.className = "quest-title";
+      title.textContent = quest;
 
       // Description
       const desc = document.createElement("div");
+      desc.className = "quest-desc";
       desc.textContent = questAssets[quest].avatarName + " needs your help!";
-      desc.style.cssText = `
-        font-size: 1.1rem;
-        color: #ffd86b;
-        margin-bottom: 10px;
-        text-align: center;
-        font-family: 'Fredoka One', Inter, system-ui;
-        font-weight: 600;
-        letter-spacing: 1px;
-      `;
 
       // Quest Description
       const questDesc = document.createElement("div");
+      questDesc.className = "quest-details";
       questDesc.textContent = questAssets[quest].description || "";
-      questDesc.style.cssText = `
-        font-size: 1.12rem;
-        color: #fff;
-        background: rgba(255, 216, 107, 0.22);
-        margin-bottom: 12px;
-        text-align: center;
-        line-height: 1.6;
-        font-weight: 500;
-        padding: 14px 12px;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px #ffd86b;
-        width: 95%;
-      `;
 
       // Play Button
       const playBtn = document.createElement("button");
+      playBtn.className = "quest-play-btn";
       playBtn.textContent = "Play Quest";
-      playBtn.style.cssText = `
-        margin-top: 18px;
-        padding: 14px 32px;
-        font-size: 1.15rem;
-        font-family: 'Fredoka One', Inter, system-ui;
-        border-radius: 18px;
-        background: linear-gradient(90deg, #ffd86b, #fdcb6e, #a55eea);
-        color: #222;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 2px 8px #ffd86b;
-        transition: background 0.2s, transform 0.15s;
-      `;
-      playBtn.onmouseover = () => {
-        playBtn.style.background =
-          "linear-gradient(90deg, #fdcb6e, #ffd86b, #a55eea)";
-        playBtn.style.transform = "scale(1.07)";
-      };
-      playBtn.onmouseout = () => {
-        playBtn.style.background =
-          "linear-gradient(90deg, #ffd86b, #fdcb6e, #a55eea)";
-        playBtn.style.transform = "scale(1)";
-      };
       playBtn.onclick = () => startQuest(quest);
 
       card.appendChild(avatar);
@@ -606,11 +634,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Playful Quest Game UI ---
   function startQuest(questName) {
-    // Clear container
-    gameContainer.innerHTML = "";
+    // Add fade out transition to selection
+    gameContainer.classList.add('quest-screen');
+    setTimeout(() => {
+      // Full screen mode
+      const sidebar = document.querySelector('.sidebar');
+      const content = document.querySelector('.content');
+      const body = document.body;
+      sidebar.style.display = 'none';
+      content.style.marginLeft = '0';
+      content.style.width = '100vw';
+      content.style.padding = '0';
+      content.style.overflow = 'hidden';
+      content.style.height = '100vh';
+      body.classList.add('quest-active');
+      gameContainer.style.position = 'fixed';
+      gameContainer.style.top = '0';
+      gameContainer.style.left = '0';
+      gameContainer.style.width = '100vw';
+      gameContainer.style.height = '100vh';
+      gameContainer.style.zIndex = '1001';
 
-    // --- Branching story structure for all quests ---
-    const branchingStories = {
+      gameContainer.innerHTML = "";
+      gameContainer.classList.remove('quest-screen');
+      gameContainer.classList.add('active');
+
+      // Set specific quest background
+      const questBg = document.querySelector('.quest-bg');
+      questBg.style.backgroundImage = `url('${questAssets[questName].bg}')`;
+      questBg.style.opacity = '0.5';
+
+      // Add black overlay for contrast
+      const blackOverlay = document.createElement("div");
+      blackOverlay.className = "quest-black-overlay";
+      blackOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: -1;
+      `;
+      document.body.appendChild(blackOverlay);
+      window.questBlackOverlay = blackOverlay;
+
+      // --- Branching story structure for all quests ---
+      const branchingStories = {
       "Agricultural Scientist": {
         intro:
           "You are Dr. Ananya, visiting Sundarpur village. Two farmers need your help: Ramesh (rice problem) and Sita (wheat problem). Who do you want to help first?",
@@ -627,17 +697,25 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             {
               context: "Ramesh also has a soil erosion problem.",
-              questionIdx: 2,
+              questionIdx: 1,
+            },
+            {
+              context: "Ramesh asks about the role of roots in absorbing water for his crops.",
+              questionIdx: 5,
             },
           ],
           sita: [
             {
               context: "Sita's wheat has rust-colored spots.",
-              questionIdx: 1,
+              questionIdx: 2,
             },
             {
               context: "Which insect helps pollinate Sita’s crops?",
               questionIdx: 3,
+            },
+            {
+              context: "Sita wonders why rotating crops is important for her farm.",
+              questionIdx: 8,
             },
           ],
         },
@@ -646,6 +724,18 @@ document.addEventListener("DOMContentLoaded", () => {
             context:
               "Both farmers want to know: What gas do plants absorb during photosynthesis?",
             questionIdx: 4,
+          },
+          {
+            context: "Now, about how plants make their own food using sunlight.",
+            questionIdx: 6,
+          },
+          {
+            context: "What about using manure to enrich the soil for better growth?",
+            questionIdx: 7,
+          },
+          {
+            context: "Finally, how can irrigation help in dry seasons for the crops?",
+            questionIdx: 9,
           },
         ],
       },
@@ -666,6 +756,10 @@ document.addEventListener("DOMContentLoaded", () => {
               context: "Water flows at 2 liters per minute.",
               questionIdx: 1,
             },
+            {
+              context: "For planning the channels, what is the sum of angles in a triangle?",
+              questionIdx: 5,
+            },
           ],
           small: [
             { context: "The small field is 40m by 30m.", questionIdx: 2 },
@@ -673,12 +767,28 @@ document.addEventListener("DOMContentLoaded", () => {
               context: "Which tool measures angles in construction?",
               questionIdx: 3,
             },
+            {
+              context: "For the boundary fence, what is the perimeter of a triangular plot with sides 3m, 4m, 5m?",
+              questionIdx: 8,
+            },
           ],
         },
         merge: [
           {
             context: "The tank holds 250L, 50L used. How much is left?",
             questionIdx: 4,
+          },
+          {
+            context: "For the storage tank design, what is the volume of a 5m x 3m x 2m cuboid?",
+            questionIdx: 6,
+          },
+          {
+            context: "The pipe ratio is 40:60, simplify it.",
+            questionIdx: 7,
+          },
+          {
+            context: "To find the length, solve 3x = 12 for x.",
+            questionIdx: 9,
           },
         ],
       },
@@ -692,17 +802,37 @@ document.addEventListener("DOMContentLoaded", () => {
         branches: {
           tomato: [
             { context: "12kg tomatoes at ₹15/kg.", questionIdx: 0 },
-            { context: "Discount of ₹10 on ₹60 item.", questionIdx: 2 },
+            { context: "Discount of ₹10 on ₹60 item.", questionIdx: 1 },
+            {
+              context: "For the rice sack, what is the cost of 1.5 kg at ₹40 per kg?",
+              questionIdx: 5,
+            },
           ],
           basket: [
-            { context: "Basket costs ₹50, farmer buys 4.", questionIdx: 1 },
+            { context: "Basket costs ₹50, farmer buys 4.", questionIdx: 2 },
             { context: "Farmer earns ₹500, spends ₹350.", questionIdx: 3 },
+            {
+              context: "For the eggs, half a dozen at ₹6 each, total cost?",
+              questionIdx: 8,
+            },
           ],
         },
         merge: [
           {
             context: "3kg apples at ₹30/kg, 2kg bananas at ₹20/kg.",
             questionIdx: 4,
+          },
+          {
+            context: "A shirt costs ₹200 with 25% discount, sale price?",
+            questionIdx: 6,
+          },
+          {
+            context: "Average price of items ₹10, ₹20, ₹30?",
+            questionIdx: 7,
+          },
+          {
+            context: "Farmer buys for ₹80, sells for ₹100, profit?",
+            questionIdx: 9,
           },
         ],
       },
@@ -717,6 +847,10 @@ document.addEventListener("DOMContentLoaded", () => {
           letter: [
             { context: "What is the plural of ‘child’?", questionIdx: 0 },
             { context: "Which word means ‘to help’?", questionIdx: 1 },
+            {
+              context: "In the letter, what is the past tense of 'run'?",
+              questionIdx: 5,
+            },
           ],
           sign: [
             {
@@ -724,6 +858,10 @@ document.addEventListener("DOMContentLoaded", () => {
               questionIdx: 2,
             },
             { context: "Opposite of ‘difficult’?", questionIdx: 3 },
+            {
+              context: "The sign says: The book is ___ the table. Fill with preposition.",
+              questionIdx: 6,
+            },
           ],
         },
         merge: [
@@ -731,13 +869,24 @@ document.addEventListener("DOMContentLoaded", () => {
             context: "Fill in the blank: The sun ____ in the east.",
             questionIdx: 4,
           },
+          {
+            context: "For the sign: ___ sun rises in the east. Choose article.",
+            questionIdx: 7,
+          },
+          {
+            context: "In the sentence 'The red house is big', identify the adjective.",
+            questionIdx: 8,
+          },
+          {
+            context: "Add punctuation: I love my country",
+            questionIdx: 9,
+          },
         ],
       },
     };
 
     // State
     const questions = questionSets[questName];
-    let current = 0;
     let score = 0;
     let stars = 0;
     let completed = false;
@@ -751,86 +900,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Main Render Function ---
     function render() {
+      const previousScreen = gameContainer.querySelector('.quest-screen');
+      if (previousScreen) {
+        previousScreen.classList.remove('active');
+      }
       gameContainer.innerHTML = "";
-
-      // Black semi-transparent overlay background
-      const overlay = document.createElement("div");
-      overlay.style.cssText = `
-        position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-2;
-        background: rgba(0,0,0,0.55);
-      `;
-      gameContainer.appendChild(overlay);
-
-      // Main background image
-      const bg = document.createElement("div");
-      bg.style.cssText = `
-        position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;
-        background: url('${bgImg}') center center/cover no-repeat;
-        opacity:0.18;
-      `;
-      gameContainer.appendChild(bg);
-
+      gameContainer.classList.add('quest-screen', 'active');
+  
       // Main layout
       const layout = document.createElement("div");
-      layout.style.cssText =
-        "display:flex;flex-direction:row;align-items:flex-end;justify-content:center;min-height:600px;gap:0;background:transparent;";
+      layout.className = "quest-layout";
 
       // Avatar (bigger)
       const avatar = document.createElement("img");
+      avatar.className = "quest-avatar-large";
       avatar.src = avatarImg;
       avatar.alt = avatarName;
-      avatar.style.cssText =
-        "width:220px;height:270px;border-radius:32px;box-shadow:0 4px 24px #222;margin-bottom:32px;margin-right:0;";
 
       // Dialog bubble with white background and black shadow
       const bubble = document.createElement("div");
-      bubble.style.cssText = `
-        background: #fff;
-        border-radius: 32px;
-        box-shadow: 0 4px 24px #000;
-        padding: 32px 32px;
-        max-width: 520px;
-        min-width: 320px;
-        min-height: 120px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        margin-bottom: 32px;
-        font-family: Inter;
-        border: 2px solid #222;
-      `;
+      bubble.className = "quest-bubble";
 
       // Progress bar with animated stars
       const progressBar = document.createElement("div");
-      progressBar.style.cssText =
-        "display:flex;gap:8px;justify-content:center;margin-bottom:12px;";
-      for (let i = 0; i < questions.length; i++) {
+      progressBar.className = "quest-progress";
+      for (let i = 0; i < 5; i++) {
         const star = document.createElement("img");
+        star.className = `quest-star ${i < stars ? 'active' : ''}`;
         star.src = starImg;
         star.alt = "star";
-        star.style.cssText = `width:28px;height:28px;filter:drop-shadow(0 2px 4px #fdcb6e);opacity:${i < stars ? 1 : 0.3};transition:opacity 0.2s;`;
-        if (i < stars) {
-          star.animate(
-            [
-              { transform: "scale(1.2)", opacity: 0.5 },
-              { transform: "scale(1)", opacity: 1 },
-            ],
-            {
-              duration: 400,
-              easing: "ease-out",
-            },
-          );
-        }
         progressBar.appendChild(star);
       }
       bubble.appendChild(progressBar);
 
       // Dialog text
       const dialog = document.createElement("div");
-      dialog.style.cssText =
-        "font-size:1.2rem;color:#222;text-align:center;margin-bottom:18px;line-height:1.5;";
+      dialog.className = "quest-dialog";
 
       // --- Branching story structure for all quests ---
       const branchingStories = {
@@ -852,6 +957,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 context: "Ramesh also has a soil erosion problem.",
                 questionIdx: 2,
               },
+              {
+                context: "Ramesh asks about the role of roots in absorbing water for his crops.",
+                questionIdx: 5,
+              },
             ],
             sita: [
               {
@@ -862,6 +971,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 context: "Which insect helps pollinate Sita’s crops?",
                 questionIdx: 3,
               },
+              {
+                context: "Sita wonders why rotating crops is important for her farm.",
+                questionIdx: 8,
+              },
             ],
           },
           merge: [
@@ -869,6 +982,18 @@ document.addEventListener("DOMContentLoaded", () => {
               context:
                 "Both farmers want to know: What gas do plants absorb during photosynthesis?",
               questionIdx: 4,
+            },
+            {
+              context: "Now, about how plants make their own food using sunlight.",
+              questionIdx: 6,
+            },
+            {
+              context: "What about using manure to enrich the soil for better growth?",
+              questionIdx: 7,
+            },
+            {
+              context: "Finally, how can irrigation help in dry seasons for the crops?",
+              questionIdx: 9,
             },
           ],
         },
@@ -889,6 +1014,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 context: "Water flows at 2 liters per minute.",
                 questionIdx: 1,
               },
+              {
+                context: "For planning the channels, what is the sum of angles in a triangle?",
+                questionIdx: 5,
+              },
             ],
             small: [
               { context: "The small field is 40m by 30m.", questionIdx: 2 },
@@ -896,12 +1025,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 context: "Which tool measures angles in construction?",
                 questionIdx: 3,
               },
+              {
+                context: "For the boundary fence, what is the perimeter of a triangular plot with sides 3m, 4m, 5m?",
+                questionIdx: 8,
+              },
             ],
           },
           merge: [
             {
               context: "The tank holds 250L, 50L used. How much is left?",
               questionIdx: 4,
+            },
+            {
+              context: "For the storage tank design, what is the volume of a 5m x 3m x 2m cuboid?",
+              questionIdx: 6,
+            },
+            {
+              context: "The pipe ratio is 40:60, simplify it.",
+              questionIdx: 7,
+            },
+            {
+              context: "To find the length, solve 3x = 12 for x.",
+              questionIdx: 9,
             },
           ],
         },
@@ -916,16 +1061,36 @@ document.addEventListener("DOMContentLoaded", () => {
             tomato: [
               { context: "12kg tomatoes at ₹15/kg.", questionIdx: 0 },
               { context: "Discount of ₹10 on ₹60 item.", questionIdx: 2 },
+              {
+                context: "For the rice sack, what is the cost of 1.5 kg at ₹40 per kg?",
+                questionIdx: 5,
+              },
             ],
             basket: [
               { context: "Basket costs ₹50, farmer buys 4.", questionIdx: 1 },
               { context: "Farmer earns ₹500, spends ₹350.", questionIdx: 3 },
+              {
+                context: "For the eggs, half a dozen at ₹6 each, total cost?",
+                questionIdx: 8,
+              },
             ],
           },
           merge: [
             {
               context: "3kg apples at ₹30/kg, 2kg bananas at ₹20/kg.",
               questionIdx: 4,
+            },
+            {
+              context: "A shirt costs ₹200 with 25% discount, sale price?",
+              questionIdx: 6,
+            },
+            {
+              context: "Average price of items ₹10, ₹20, ₹30?",
+              questionIdx: 7,
+            },
+            {
+              context: "Farmer buys for ₹80, sells for ₹100, profit?",
+              questionIdx: 9,
             },
           ],
         },
@@ -940,6 +1105,10 @@ document.addEventListener("DOMContentLoaded", () => {
             letter: [
               { context: "What is the plural of ‘child’?", questionIdx: 0 },
               { context: "Which word means ‘to help’?", questionIdx: 1 },
+              {
+                context: "In the letter, what is the past tense of 'run'?",
+                questionIdx: 5,
+              },
             ],
             sign: [
               {
@@ -947,6 +1116,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 questionIdx: 2,
               },
               { context: "Opposite of ‘difficult’?", questionIdx: 3 },
+              {
+                context: "The sign says: The book is ___ the table. Fill with preposition.",
+                questionIdx: 6,
+              },
             ],
           },
           merge: [
@@ -954,50 +1127,26 @@ document.addEventListener("DOMContentLoaded", () => {
               context: "Fill in the blank: The sun ____ in the east.",
               questionIdx: 4,
             },
+            {
+              context: "For the sign: ___ sun rises in the east. Choose article.",
+              questionIdx: 7,
+            },
+            {
+              context: "In the sentence 'The red house is big', identify the adjective.",
+              questionIdx: 8,
+            },
+            {
+              context: "Add punctuation: I love my country",
+              questionIdx: 9,
+            },
           ],
         },
-      };
-
-      // Feedback scripts remain unchanged
-      const feedbackScripts = {
-        "Agricultural Scientist": [
-          "",
-          "Great! Ramesh will add nitrogen fertilizer.",
-          "Exactly! Let’s treat rust disease together.",
-          "Well done! Planting trees will protect the soil.",
-          "Butterflies are important for pollination!",
-          "Correct! Plants need carbon dioxide.",
-        ],
-        "Village Engineer": [
-          "",
-          "Perfect! Now we know how much pipe we need.",
-          "Good calculation! Let’s set up the water tank.",
-          "Great! We’ll fence the field with 140 meters of wire.",
-          "A protractor will help us build straight walls.",
-          "200 liters left! Enough for the next crop.",
-        ],
-        "Market Math": [
-          "",
-          "₹180! The farmer is happy with the sale.",
-          "₹200! The farmer can carry all his vegetables.",
-          "₹50! The customer is pleased.",
-          "₹150 profit! Good business.",
-          "₹130! The shopper gets fresh fruits.",
-        ],
-        "Language Helper": [
-          "",
-          "Children! Now the letter is correct.",
-          "Assist! The villagers appreciate your kindness.",
-          "Well done! The sign will be clear.",
-          "Easy! The villagers understand your explanation.",
-          "Rises! The poem is complete.",
-        ],
       };
 
       // --- Branching story logic ---
       if (!completed) {
         // Initial decision point
-        if (current === 0 && !window.branchChoice) {
+        if (!window.branchChoice) {
           dialog.textContent =
             questAssets[questName].avatarName +
             " says: " +
@@ -1078,6 +1227,10 @@ document.addEventListener("DOMContentLoaded", () => {
           dialog.textContent = `🎉 ${completionMsg}\n\nCoins earned: ${coins}`;
           // Show inventory modal at quest completion
           showInventoryModal();
+          if (sounds.win) sounds.win.play();
+          setTimeout(() => {
+            showConfetti();
+          }, 400);
         }
         bubble.appendChild(dialog);
       } else {
@@ -1098,6 +1251,10 @@ document.addEventListener("DOMContentLoaded", () => {
           completionMsg = `🎉 Well done! You completed the quest with ${score} points!`;
         }
         dialog.textContent = `🎉 ${completionMsg}`;
+        if (sounds.win) sounds.win.play();
+        setTimeout(() => {
+          showConfetti();
+        }, 400);
       }
       bubble.appendChild(dialog);
 
@@ -1132,18 +1289,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         const choices = qObj.choices;
         const btnGroup = document.createElement("div");
-        btnGroup.style.cssText =
-          "display:flex;flex-direction:column;gap:18px;margin-top:8px;";
+        btnGroup.className = "quest-btn-group";
+        btnGroup.style.setProperty('--quest-color', questColor);
 
         choices.forEach((choice, idx) => {
           const btn = document.createElement("button");
-          btn.textContent = choice;
           btn.className = "quest-btn";
-          btn.style.cssText = `
-            font-family:Inter;font-size:1.3rem;padding:22px 0;border-radius:24px;border:none;background:${questColor};color:#fff;box-shadow:0 2px 8px #b2bec3;cursor:pointer;transition:transform 0.15s;width:340px;max-width:90vw;
-          `;
-          btn.onmouseover = () => (btn.style.transform = "scale(1.05)");
-          btn.onmouseout = () => (btn.style.transform = "scale(1)");
+          btn.textContent = choice;
           btn.onclick = () => handleBranchAnswer(idx);
           btnGroup.appendChild(btn);
         });
@@ -1151,10 +1303,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Hint button
         const hintBtn = document.createElement("button");
+        hintBtn.className = "quest-hint-btn";
         hintBtn.textContent = "Hint";
-        hintBtn.style.cssText = `
-          margin-top:12px;font-family:Inter;font-size:1rem;padding:8px 24px;border-radius:12px;border:none;background:#fdcb6e;color:#fff;box-shadow:0 2px 8px #b2bec3;cursor:pointer;
-        `;
         hintBtn.onclick = () => {
           showHint(qObj.hint);
         };
@@ -1162,20 +1312,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Next button for story intro or after completion
-      // Only show "Start Quest" button if no branch choice is required
-      if ((current === 0 && !completed && !window.branchChoice) || completed) {
-        // If branching is required, do not show the button
-        if (completed) {
-          const nextBtn = document.createElement("button");
-          nextBtn.textContent = "Back to Quests";
-          nextBtn.style.cssText = `
-            margin-top:18px;font-family:Inter;font-size:1.1rem;padding:12px 32px;border-radius:18px;border:none;background:${questColor};color:#fff;box-shadow:0 2px 8px #b2bec3;cursor:pointer;
-          `;
-          nextBtn.onclick = () => {
-            showQuestSelection();
-          };
-          bubble.appendChild(nextBtn);
-        }
+      // Only show "Back to Quests" button on completion
+      if (completed) {
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "quest-next-btn";
+        nextBtn.style.setProperty('--quest-color', questColor);
+        nextBtn.textContent = "Back to Quests";
+        nextBtn.onclick = () => {
+          // Remove black overlay
+          if (window.questBlackOverlay) {
+            window.questBlackOverlay.remove();
+            window.questBlackOverlay = null;
+          }
+
+          // Restore normal layout
+          const sidebar = document.querySelector('.sidebar');
+          const content = document.querySelector('.content');
+          const body = document.body;
+          sidebar.style.display = 'block';
+          content.style.marginLeft = '260px';
+          content.style.width = 'calc(100% - 260px)';
+          content.style.padding = '0';
+          content.style.overflow = 'hidden';
+          content.style.height = '100vh';
+          body.classList.remove('quest-active');
+          gameContainer.style.position = '';
+          gameContainer.style.top = '';
+          gameContainer.style.left = '';
+          gameContainer.style.width = '';
+          gameContainer.style.height = '';
+          gameContainer.style.zIndex = '';
+
+          // Reset background to general quest bg
+          const questBg = document.querySelector('.quest-bg');
+          questBg.style.backgroundImage = "url('../assets/img/quest-bg.png')";
+          questBg.style.opacity = '0.18';
+
+          showQuestSelection();
+        };
+        bubble.appendChild(nextBtn);
       }
 
       // Add avatar and bubble to layout
@@ -1211,75 +1386,46 @@ document.addEventListener("DOMContentLoaded", () => {
         stars += 1;
         if (sounds.correct) sounds.correct.play();
         showFeedback("Great job! ⭐");
-      } else {
-        if (sounds.wrong) sounds.wrong.play();
-        showFeedback("Try again! 😅");
-      }
-      setTimeout(() => {
-        // Mini-game after first branch question
-        if (isBranch && window.branchProgress === 0) {
-          showMiniGameForQuest(questName, () => {
-            window.branchProgress = (window.branchProgress || 0) + 1;
-            render();
-          });
-        } else {
-          if (isBranch) {
-            window.branchProgress = (window.branchProgress || 0) + 1;
+        setTimeout(() => {
+          // Mini-game after first branch question
+          if (isBranch && window.branchProgress === 0) {
+            showMiniGameForQuest(questName, () => {
+              window.branchProgress = (window.branchProgress || 0) + 1;
+              render();
+            });
           } else {
-            window.mergeProgress = (window.mergeProgress || 0) + 1;
+            if (isBranch) {
+              window.branchProgress = (window.branchProgress || 0) + 1;
+            } else {
+              window.mergeProgress = (window.mergeProgress || 0) + 1;
+            }
+            render();
           }
-          render();
-        }
-      }, 1200);
-
-      // Achievements & Inventory
-      if (isCorrect) {
+        }, 1200);
         addCoins(5);
         if (score === 50) unlockAchievement("Perfect Score!");
         if (stars === 5) unlockAchievement("All Stars!");
+      } else {
+        if (sounds.wrong) sounds.wrong.play();
+        showFeedback("Try again! 😅");
       }
     }
 
     // --- Show Feedback and Move to Next Question ---
     function showFeedback(msg) {
-      // Show feedback in dialog bubble, then move to next question
-      const bubble = gameContainer.querySelector(
-        "div[style*='border-radius:32px']",
-      );
+      const bubble = gameContainer.querySelector(".quest-bubble");
       if (bubble) {
-        const dialog = bubble.querySelector("div");
+        const dialog = bubble.querySelector(".quest-dialog");
         if (dialog) {
-          // Show story-based feedback
-          let feedbackMsg = "";
-          if (
-            feedbackScripts[questName] &&
-            feedbackScripts[questName][current]
-          ) {
-            feedbackMsg = feedbackScripts[questName][current];
-          }
-          dialog.textContent = feedbackMsg ? feedbackMsg : msg;
+          dialog.textContent = msg;
           dialog.style.color = "#27ae60";
         }
       }
-      setTimeout(() => {
-        current++;
-        if (current >= questions.length + 1) {
-          completed = true;
-          if (sounds.win) sounds.win.play();
-          // Confetti animation on quest completion
-          setTimeout(() => {
-            showConfetti();
-          }, 400);
-        }
-        render();
-      }, 1200);
     }
 
     // --- Show Hint ---
     function showHint(hint) {
-      const bubble = gameContainer.querySelector(
-        "div[style*='border-radius:32px']",
-      );
+      const bubble = gameContainer.querySelector(".quest-bubble");
       if (bubble) {
         let hintBox = bubble.querySelector(".hint-box");
         if (!hintBox) {
@@ -1295,62 +1441,86 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Confetti Animation ---
     function showConfetti() {
-      // Simple confetti using emoji
       const confettiContainer = document.createElement("div");
-      confettiContainer.style.cssText =
-        "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;";
-      for (let i = 0; i < 40; i++) {
-        const conf = document.createElement("div");
-        conf.textContent = ["🎉", "✨", "🥳", "🌟"][
-          Math.floor(Math.random() * 4)
-        ];
-        conf.style.cssText = `
-          position:absolute;
-          left:${Math.random() * 100}vw;
-          top:${Math.random() * 100}vh;
-          font-size:${Math.random() * 32 + 24}px;
-          opacity:${Math.random() * 0.7 + 0.3};
-          transition:top 2.2s cubic-bezier(.17,.67,.83,.67);
-        `;
-        confettiContainer.appendChild(conf);
-        setTimeout(() => {
-          conf.style.top = "110vh";
-        }, 100);
-      }
+      confettiContainer.className = "confetti-container";
       document.body.appendChild(confettiContainer);
+      const emojis = ["🎉", "✨", "🥳", "🌟", "⭐", "🎊"];
+      for (let i = 0; i < 60; i++) {
+        const particle = document.createElement("div");
+        particle.className = "confetti-particle";
+        particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        particle.style.left = Math.random() * 100 + "vw";
+        particle.style.animationDuration = (Math.random() * 3 + 2) + "s";
+        particle.style.animationDelay = Math.random() * 2 + "s";
+        confettiContainer.appendChild(particle);
+      }
       setTimeout(() => {
         confettiContainer.remove();
-      }, 2200);
+      }, 5000);
     }
 
-    // --- Initial Render ---
-    // Reset branching state
-    window.branchChoice = undefined;
-    window.branchProgress = 0;
-    window.mergeProgress = 0;
+        // Add inventory and quest log buttons
+        if (!document.getElementById("inventoryBtn")) {
+          const inventoryBtn = document.createElement("button");
+          inventoryBtn.id = "inventoryBtn";
+          inventoryBtn.innerHTML = "Inventory";
+          inventoryBtn.style.cssText =
+            "position:fixed;bottom:32px;right:32px;z-index:1200;padding:12px 24px;border-radius:16px;background:#fdcb6e;color:#fff;font-size:1.1rem;border:none;box-shadow:0 2px 8px #b2bec3;cursor:pointer;";
+          inventoryBtn.onclick = showInventoryModal;
+          document.body.appendChild(inventoryBtn);
+        }
+        if (!document.getElementById("questLogBtn")) {
+          const questLogBtn = document.createElement("button");
+          questLogBtn.id = "questLogBtn";
+          questLogBtn.innerHTML = "Quest Log";
+          questLogBtn.style.cssText =
+            "position:fixed;bottom:32px;right:180px;z-index:1200;padding:12px 24px;border-radius:16px;background:#0984e3;color:#fff;font-size:1.1rem;border:none;box-shadow:0 2px 8px #b2bec3;cursor:pointer;";
+          questLogBtn.onclick = showQuestLog;
+          document.body.appendChild(questLogBtn);
+        }
 
-    // Add inventory and quest log buttons
-    if (!document.getElementById("inventoryBtn")) {
-      const inventoryBtn = document.createElement("button");
-      inventoryBtn.id = "inventoryBtn";
-      inventoryBtn.innerHTML = "Inventory";
-      inventoryBtn.style.cssText =
-        "position:fixed;bottom:32px;right:32px;z-index:1200;padding:12px 24px;border-radius:16px;background:#fdcb6e;color:#fff;font-size:1.1rem;border:none;box-shadow:0 2px 8px #b2bec3;cursor:pointer;";
-      inventoryBtn.onclick = showInventoryModal;
-      document.body.appendChild(inventoryBtn);
-    }
-    if (!document.getElementById("questLogBtn")) {
-      const questLogBtn = document.createElement("button");
-      questLogBtn.id = "questLogBtn";
-      questLogBtn.innerHTML = "Quest Log";
-      questLogBtn.style.cssText =
-        "position:fixed;bottom:32px;right:180px;z-index:1200;padding:12px 24px;border-radius:16px;background:#0984e3;color:#fff;font-size:1.1rem;border:none;box-shadow:0 2px 8px #b2bec3;cursor:pointer;";
-      questLogBtn.onclick = showQuestLog;
-      document.body.appendChild(questLogBtn);
-    }
+        // Add achievements button
+        if (!document.getElementById("achievementsBtn")) {
+          const achievementsBtn = document.createElement("button");
+          achievementsBtn.id = "achievementsBtn";
+          achievementsBtn.innerHTML = "Achievements";
+          achievementsBtn.style.cssText =
+            "position:fixed;bottom:32px;right:320px;z-index:1200;padding:12px 24px;border-radius:16px;background:#27ae60;color:#fff;font-size:1.1rem;border:none;box-shadow:0 2px 8px #b2bec3;cursor:pointer;";
+          achievementsBtn.onclick = showAchievementsGallery;
+          document.body.appendChild(achievementsBtn);
+        }
 
-    render();
+        // Reset branching state
+        window.branchChoice = undefined;
+        window.branchProgress = 0;
+        window.mergeProgress = 0;
+
+        render();
+      }, 300);
   }
+  function showAchievementsGallery() {
+    const modal = document.createElement("div");
+    modal.className = "quest-modal";
+    modal.innerHTML = `
+      <div class="quest-modal-content" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+        <h2 class="quest-modal-title">Achievement Gallery</h2>
+        <div class="quest-modal-icon">🏆</div>
+        ${achievements.length > 0
+          ? achievements.map(name => `
+            <div class="achievement-badge" style="background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; padding: 12px; margin: 8px 0; border-radius: 12px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              <strong>${name}</strong>
+            </div>
+          `).join('')
+          : '<p style="text-align: center; color: #bdc3c7;">No achievements unlocked yet! Keep playing to earn badges.</p>'
+        }
+        <button class="quest-modal-btn" id="closeAchievementsBtn" style="margin-top: 20px;">Close</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector("#closeAchievementsBtn").onclick = () => modal.remove();
+    modal.style.setProperty('--quest-color', '#27ae60');
+  }
+
   // --- Start with Quest Selection ---
   showQuestSelection();
 });

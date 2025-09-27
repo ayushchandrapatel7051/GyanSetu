@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="../css/style.css" />
     <style>
       body {
-        background: linear-gradient(135deg, #e0f7fa 0%, #c8e6c9 100%);
+        background: linear-gradient(180deg, #16002a, #2b0042 60%);
         min-height: 100vh;
         font-family: "Fredoka One", "Inter", system-ui, -apple-system,
           "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -93,37 +93,6 @@
     <script src="../js/questGame.js" defer></script>
     <!-- Background Music -->
     <audio id="bg-music" src="../assets/sfx/bg-music.mp3" loop autoplay></audio>
-    <script>
-      // Mute/unmute button logic
-      window.addEventListener("DOMContentLoaded", function () {
-        const music = document.getElementById("bg-music");
-        let muted = false;
-        // Create mute button
-        const muteBtn = document.createElement("button");
-        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        muteBtn.style.position = "fixed";
-        muteBtn.style.bottom = "18px";
-        muteBtn.style.left = "18px";
-        muteBtn.style.zIndex = "2000";
-        muteBtn.style.background = "#222";
-        muteBtn.style.color = "#fff";
-        muteBtn.style.border = "none";
-        muteBtn.style.borderRadius = "50%";
-        muteBtn.style.width = "48px";
-        muteBtn.style.height = "48px";
-        muteBtn.style.fontSize = "1.5rem";
-        muteBtn.style.boxShadow = "0 2px 8px #222";
-        muteBtn.style.cursor = "pointer";
-        muteBtn.onclick = function () {
-          muted = !muted;
-          music.muted = muted;
-          muteBtn.innerHTML = muted
-            ? '<i class="fas fa-volume-mute"></i>'
-            : '<i class="fas fa-volume-up"></i>';
-        };
-        document.body.appendChild(muteBtn);
-      });
-    </script>
   </head>
   <body>
     <div class="quest-bg"></div>
@@ -172,7 +141,7 @@
       </aside>
       <main class="content">
         <section class="page active">
-          <h2 class="page-title" style="color: #27ae60">Quest Game</h2>
+          <h2 class="page-title" style="color: #27ae60; display: none;">Quest Game</h2>
           <div id="game-container"></div>
           <!-- Modals and overlays will be injected by questGame.js -->
         </section>

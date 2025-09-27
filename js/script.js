@@ -55,6 +55,12 @@ function writeSessionSafely(obj) {
 
 // show/hide pages
 function showPageById(pageId) {
+  // Skip page switching on game pages to avoid interfering with game logic
+  if (document.getElementById('playhub-container')) {
+    console.log('Skipping page switching on Smart Farming Simulator page');
+    return;
+  }
+
   pages.forEach((p) => p.classList.remove("active"));
   const page = document.getElementById(pageId);
   if (page) page.classList.add("active");

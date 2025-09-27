@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Smart Farming Simulator</title>
+    <link rel="icon" type="image/x-icon" href="../assets/img/logo1.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/playhubGame.css" />
+    <script src="../js/settings-db.js" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <div class="sidebar-mobile" id="sidebarMobile">
+        <i class="fas fa-bars"></i>
+      </div>
+      <aside class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-inner">
+          <h1 class="logo">GyanSetu</h1>
+          <nav>
+            <ul class="menu">
+              <li class="menu-item" data-page="home">
+                <i class="fas fa-house"></i
+                ><span
+                  style="
+                    text-decoration: none;
+                    color: rgba(255, 255, 255, 0.65);
+                  "
+                  >Home</span
+                >
+              </li>
+              <li class="menu-item" data-page="lessons">
+                <i class="fas fa-book-open"></i><span>Lessons</span>
+              </li>
+              <li class="menu-item active" data-page="games">
+                <i class="fas fa-gamepad"></i><span>Games</span>
+              </li>
+              <li class="menu-item" data-page="progress">
+                <i class="fas fa-chart-simple"></i><span>Progress</span>
+              </li>
+              <li class="menu-item" data-page="rewards">
+                <i class="fas fa-award"></i><span>Rewards</span>
+              </li>
+              <li class="menu-item" data-page="settings">
+                <i class="fas fa-gear"></i><span>Settings</span>
+              </li>
+            </ul>
+          </nav>
+          <div class="sidebar-bottom">
+            <button class="login" id="loginBtn" style="background: none">
+              <i class="fas fa-right-from-bracket"></i><span>Log Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="page active">
+          <h2 class="page-title" style="display: none;">Smart Farming Simulator</h2>
+          <div id="playhub-container">
+            <div class="app-container">
+              <!-- Homepage with Enhanced Progression -->
+              <div class="homepage active" id="homepage">
+                <header class="homepage-header">
+                  <h1>🌱 Smart Farming Simulator</h1>
+                  <p class="subtitle">Master agriculture through progressive cycles of learning and growth</p>
+                  
+                  <!-- Cycle Progress Dashboard -->
+                  <div class="cycle-dashboard">
+                    <div class="cycle-info">
+                      <span class="cycle-badge">Cycle <span id="current-cycle">1</span></span>
+                      <span class="cycle-title" id="cycle-title">Beginner Farmer</span>
+                    </div>
+                    <div class="stats-display">
+                      <div class="stat-item">💰 ₹<span id="total-money">500</span></div>
+                      <div class="stat-item">🪙 <span id="total-gc">150</span> GC</div>
+                      <div class="stat-item">🏆 <span id="achievements-count">0</span> Badges</div>
+                    </div>
+                  </div>
+                </header>
+                
+                <main class="cards-container">
+                  <!-- Card 1: Farm Cycle -->
+                  <div class="feature-card farm-cycle-card" id="farm-cycle-card" role="button" tabindex="0" aria-label="Start Progressive Farm Cycle">
+                    <div class="card-icon">
+                      <span class="large-emoji" aria-hidden="true">🌱</span>
+                    </div>
+                    <div class="card-content">
+                      <h2>Progressive Farm Cycle</h2>
+                      <p>Complete farming cycles with increasing complexity and rewards</p>
+                      <ul class="features-list">
+                        <li>🌾 <span id="available-crops-count">4</span> Crop Varieties Available</li>
+                        <li>🧮 <span id="math-level">Basic Arithmetic</span></li>
+                        <li>💧 <span id="irrigation-complexity">Simple Irrigation</span></li>
+                        <li>📈 Efficiency-Based Growth Times</li>
+                      </ul>
+                      <div class="unlock-preview" id="next-unlock">
+                        <small>🔒 Next: Unlock Corn & Green Beans (Cycle 2)</small>
+                      </div>
+                    </div>
+                    <button class="cta-button btn btn--primary btn--lg">
+                      <span>Start Cycle <span id="cycle-number">1</span></span>
+                      <span class="button-arrow" aria-hidden="true">→</span>
+                    </button>
+                  </div>
+
+                  <!-- Card 2: Enhanced Trading -->
+                  <div class="feature-card trading-card" id="trading-card" role="button" tabindex="0" aria-label="Open Progressive Trading Market">
+                    <div class="card-icon">
+                      <span class="large-emoji" aria-hidden="true">💰</span>
+                    </div>
+                    <div class="card-content">
+                      <h2>Progressive Trading</h2>
+                      <p>Master increasingly complex economic challenges and negotiations</p>
+                      <ul class="features-list">
+                        <li>🤝 <span id="trader-count">2</span> Active Traders</li>
+                        <li>📊 Quality Grade Bonuses</li>
+                        <li>💹 Market Efficiency Rewards</li>
+                        <li>🎯 Achievement-Based Unlocks</li>
+                      </ul>
+                      <div class="unlock-preview">
+                        <small>🔒 Next: Premium Trader (Cycle 2)</small>
+                      </div>
+                    </div>
+                    <button class="cta-button btn btn--primary btn--lg">
+                      <span>Enter Market</span>
+                      <span class="button-arrow" aria-hidden="true">→</span>
+                    </button>
+                  </div>
+                </main>
+
+                <!-- Achievement Gallery -->
+                <div class="achievements-section">
+                  <h3>🏆 Achievement Gallery</h3>
+                  <div class="achievements-grid" id="achievements-gallery">
+                    <!-- Achievement badges will be populated by JavaScript -->
+                  </div>
+                  <div class="pagination-controls" id="pagination-controls">
+                    <button class="btn btn--outline btn--sm" id="prev-page" disabled>Previous</button>
+                    <span id="page-info">Page 1 of 2</span>
+                    <button class="btn btn--outline btn--sm" id="next-page">Next</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Enhanced Farm Cycle Section -->
+              <div class="section hidden" id="farm-cycle-section">
+                <header class="section-header">
+                  <button class="back-button btn btn--outline" id="back-to-home" aria-label="Back to homepage">
+                    <span aria-hidden="true">←</span> Back to Home
+                  </button>
+                  <div class="cycle-header">
+                    <h1>🌱 <span id="section-cycle-title">Cycle 1: Beginner Farmer</span></h1>
+                    <div class="efficiency-meter">
+                      <span>Irrigation Efficiency: </span>
+                      <div class="efficiency-bar">
+                        <div class="efficiency-fill" id="efficiency-fill"></div>
+                      </div>
+                      <span id="efficiency-percentage">0%</span>
+                    </div>
+                  </div>
+                  <div class="phase-progress" role="progressbar" aria-label="Farm cycle progress">
+                    <div class="progress-step active" data-phase="soil">🌱 Soil Selection</div>
+                    <div class="progress-step" data-phase="irrigation">💧 Irrigation Design</div>
+                    <div class="progress-step" data-phase="growth">📈 Growth Monitoring</div>
+                    <div class="progress-step" data-phase="harvest">🌾 Quality Harvest</div>
+                  </div>
+                </header>
+
+                <!-- Enhanced Soil Selection Phase -->
+                <div class="phase-content active" id="soil-phase">
+                  <div class="card">
+                    <div class="card__header">
+                      <h2>🌱 Advanced Soil Selection</h2>
+                      <p>Match crops to optimal soil types for maximum quality and yield</p>
+                    </div>
+                    <div class="card__body">
+                      <div class="soil-selection-container">
+                        <div class="crop-inventory">
+                          <h3>Available Crops (Cycle <span id="soil-cycle">1</span>)</h3>
+                          <div class="crop-items" id="available-crops">
+                            <!-- Crops will be populated based on current cycle -->
+                          </div>
+                          
+                          <div class="locked-crops" id="locked-crops">
+                            <h4>🔒 Locked Crops</h4>
+                            <div class="locked-crop-preview" id="locked-crop-list">
+                              <!-- Locked crops preview -->
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="soil-plots">
+                          <h3>Soil Types Available</h3>
+                          <div class="plots-grid" id="soil-plots-grid">
+                            <!-- Soil types will be populated based on cycle -->
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn--primary btn--full-width btn--lg hidden" id="complete-planting">
+                        Complete Planting & Design Irrigation System
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enhanced Irrigation Phase -->
+                <div class="phase-content hidden" id="irrigation-phase">
+                  <div class="card">
+                    <div class="card__header">
+                      <h2>💧 Advanced Irrigation Engineering</h2>
+                      <p>Design efficient water systems - your efficiency affects crop growth speed!</p>
+                    </div>
+                    <div class="card__body">
+                      <div class="irrigation-container">
+                        <div class="irrigation-field">
+                          <h3>Your Field Layout</h3>
+                          <div class="field-info">
+                            <span>Grid Size: <span id="grid-size">8x6</span></span>
+                            <span>Plots to Connect: <span id="plots-count">3</span></span>
+                          </div>
+                          <div class="field-grid" id="irrigation-grid" role="grid" aria-label="Irrigation system design grid">
+                            <!-- Grid cells will be generated by JavaScript -->
+                          </div>
+                          <div class="water-source">
+                            <div class="source-icon">🏞️</div>
+                            <span>Water Source</span>
+                          </div>
+                        </div>
+
+                        <div class="pipe-inventory">
+                          <h3>Pipe Components</h3>
+                          <div class="pipe-components" id="available-pipes">
+                            <!-- Pipes will vary by cycle complexity -->
+                          </div>
+                          
+                          <div class="efficiency-factors">
+                            <h4>Efficiency Factors</h4>
+                            <div class="factor-list">
+                              <div class="factor">📏 Pipe Length: Shorter = Better</div>
+                              <div class="factor">🔀 T-Junctions: Fewer = Better</div>
+                              <div class="factor">⚡ Pumps: Strategic Placement</div>
+                            </div>
+                          </div>
+
+                          <div class="geometry-challenge" id="geometry-challenge">
+                            <!-- Geometry questions will vary by cycle -->
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn--primary btn--full-width btn--lg hidden" id="test-water-system">
+                        Test Irrigation System
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enhanced Growth Phase -->
+                <div class="phase-content hidden" id="growth-phase">
+                  <div class="card">
+                    <div class="card__header">
+                      <h2>📈 Efficiency-Based Growth Tracking</h2>
+                      <p>Monitor plant development - irrigation efficiency affects growth speed!</p>
+                    </div>
+                    <div class="card__body">
+                      <div class="growth-container">
+                        <div class="growth-field" id="growth-field">
+                          <!-- Growing plants with efficiency-modified timers -->
+                        </div>
+                        <div class="growth-controls">
+                          <h3>Growth Monitoring</h3>
+                          <div class="growth-stats">
+                            <div class="stat">Day: <span id="growth-day">1</span></div>
+                            <div class="stat">Efficiency Bonus: <span id="growth-bonus">0%</span></div>
+                            <div class="stat">Average Growth: <span id="average-growth">0%</span></div>
+                          </div>
+                          
+                          <button class="btn btn--secondary btn--lg" id="speed-up-growth">⏭️ Accelerate Time</button>
+                          
+                          <div class="growth-info">
+                            <h4>Agricultural Science</h4>
+                            <div id="growth-facts">
+                              Efficient irrigation delivers optimal water and nutrients to plant roots!
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn--primary btn--full-width btn--lg hidden" id="start-harvest">
+                        All Crops Mature - Begin Harvest!
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enhanced Harvest Phase -->
+                <div class="phase-content hidden" id="harvest-phase">
+                  <div class="card">
+                    <div class="card__header">
+                      <h2>🌾 Quality Assessment & Harvest</h2>
+                      <p>Collect your crops and see the results of your agricultural expertise</p>
+                    </div>
+                    <div class="card__body">
+                      <div class="harvest-container">
+                        <div class="harvest-field" id="harvest-field">
+                          <!-- Harvestable crops with detailed information -->
+                        </div>
+                        <div class="harvest-summary">
+                          <div class="harvest-header">
+                            <div class="money-display">💰 Money: ₹<span id="cycle-money">500</span></div>
+                            <div class="gc-display">🪙 GC: <span id="cycle-gc">150</span></div>
+                          </div>
+                          
+                          <h3>🌾 Harvest Inventory:</h3>
+                          <div class="inventory-grid" id="harvest-inventory">
+                            <!-- Detailed harvest inventory with kg amounts -->
+                          </div>
+                          
+                          <div class="harvest-totals">
+                            <div class="total-value">Total Harvest Value: ₹<span id="total-harvest-value">0</span></div>
+                            <div class="efficiency-bonus-display">Efficiency Bonus: <span id="harvest-efficiency-bonus">0%</span></div>
+                          </div>
+                          
+                          <div class="harvest-actions">
+                            <button class="btn btn--secondary btn--lg" id="go-to-trading">
+                              Take Crops to Market
+                            </button>
+                            <button class="btn btn--primary btn--lg hidden" id="complete-cycle">
+                              Complete Cycle & Advance
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Enhanced Trading Section -->
+              <div class="section hidden" id="trading-section">
+                <header class="section-header">
+                  <button class="back-button btn btn--outline" id="back-to-home-from-trading" aria-label="Back to homepage">
+                    <span aria-hidden="true">←</span> Back to Home
+                  </button>
+                  <h1>💰 Progressive Agricultural Trading</h1>
+                  <div class="trading-stats">
+                    <div class="money-display">💰 Money: ₹<span id="player-money">500</span></div>
+                    <div class="gc-display">🏆 GC Points: <span id="gc-points">150</span></div>
+                    <div class="cycle-display">🌱 Cycle: <span id="trading-cycle">1</span></div>
+                  </div>
+                </header>
+
+                <div class="trading-content">
+                  <div class="market-scene">
+                    <h2>Progressive Village Market</h2>
+                    <div class="market-info">
+                      <span>Available Traders: <span id="available-traders">2</span></span>
+                      <span>Math Complexity: <span id="math-complexity">Basic</span></span>
+                    </div>
+                    
+                    <div class="trader-booths" id="trader-booths">
+                      <!-- Traders will be populated based on cycle -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cycle Completion Modal -->
+              <div class="modal hidden" id="cycle-complete-modal" role="dialog" aria-labelledby="cycle-complete-title" aria-modal="true">
+                <div class="modal-backdrop" role="button" tabindex="0" aria-label="Close modal"></div>
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 id="cycle-complete-title">🎉 Cycle Complete!</h3>
+                    <button class="btn btn--outline btn--sm" id="close-cycle-modal" aria-label="Close modal">×</button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="cycle-results">
+                      <!-- Cycle completion results -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Educational Modal -->
+              <div class="modal hidden" id="education-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+                <div class="modal-backdrop" role="button" tabindex="0" aria-label="Close modal"></div>
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 id="modal-title">Educational Information</h3>
+                    <button class="btn btn--outline btn--sm" id="close-modal" aria-label="Close modal">×</button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="modal-content">
+                      <!-- Educational content will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Trading Game Modal -->
+              <div class="modal hidden" id="trading-modal" role="dialog" aria-labelledby="trading-modal-title" aria-modal="true">
+                <div class="modal-backdrop" role="button" tabindex="0" aria-label="Close modal"></div>
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 id="trading-modal-title">Progressive Math Challenge</h3>
+                    <button class="btn btn--outline btn--sm" id="close-trading-modal" aria-label="Close modal">×</button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="trading-game-content">
+                      <!-- Trading game will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Achievement Details Modal -->
+              <div class="modal hidden" id="achievement-details-modal" role="dialog" aria-labelledby="achievement-details-title" aria-modal="true">
+                <div class="modal-backdrop" role="button" tabindex="0" aria-label="Close modal"></div>
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 id="achievement-details-title">Achievement Details</h3>
+                    <button class="btn btn--outline btn--sm" id="close-achievement-modal" aria-label="Close modal">×</button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="achievement-details-content">
+                      <!-- Achievement details will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Enhanced Achievement Notification -->
+              <div class="achievement-notification hidden" id="achievement-notification" role="status" aria-live="polite">
+                <div class="achievement-content">
+                  <span class="achievement-icon">🏆</span>
+                  <span class="achievement-text"></span>
+                  <span class="achievement-points"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="../js/profile-widget.js"></script>
+    <script src="../js/nav.js"></script>
+    <script src="../js/script.js"></script>
+    <script src="../js/playhubGame.js"></script>
+  </body>
+</html>

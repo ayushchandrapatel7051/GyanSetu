@@ -818,3 +818,629 @@ select option {
   background-clip: text;
   color: transparent; /* necessary so the background shows through */
 }
+
+/* Quest Game Enhancements */
+.quest-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  background: linear-gradient(180deg, #16002a 0%, #2b0042 60%);
+}
+
+.quest-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 600px;
+  position: relative;
+  z-index: 1001;
+  gap: 32px;
+  padding: 20px;
+}
+
+.quest-headline {
+  font-family: 'Fredoka One', Inter, system-ui;
+  font-size: 2.6rem;
+  color: #fff;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 12px #222;
+}
+
+.quest-cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.quest-card {
+  width: 360px;
+  height: 520px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 40px rgba(44, 20, 80, 0.35);
+  border: 2.5px solid #ffd86b;
+  padding: 40px 28px 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: cardFloat 3s ease-in-out infinite;
+}
+
+.quest-card:hover {
+  transform: scale(1.05) translateY(-10px);
+  box-shadow: 0 20px 50px rgba(255, 216, 107, 0.4);
+  border-color: #fff;
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.quest-avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 24px #ffd86b;
+  object-fit: cover;
+  border: 5px solid #ffd86b;
+  background: #fff;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.quest-avatar:hover {
+  box-shadow: 0 8px 32px #ffd86b;
+  transform: scale(1.1);
+}
+
+.quest-title {
+  font-family: 'Fredoka One', Inter, system-ui;
+  font-size: 1.6rem;
+  color: var(--quest-color);
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px #222;
+  border-bottom: 2px solid var(--quest-color);
+  padding-bottom: 6px;
+  width: 85%;
+}
+
+.quest-desc {
+  font-size: 1.1rem;
+  color: #ffd86b;
+  margin-bottom: 10px;
+  text-align: center;
+  font-family: 'Fredoka One', Inter, system-ui;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.quest-details {
+  font-size: 1.15rem;
+  color: #fff;
+  background: rgba(255, 216, 107, 0.22);
+  margin-bottom: 12px;
+  text-align: center;
+  line-height: 1.8;
+  font-weight: 500;
+  padding: 20px 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #ffd86b;
+  width: 95%;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.quest-play-btn {
+  margin-top: 18px;
+  padding: 14px 32px;
+  font-size: 1.15rem;
+  font-family: 'Fredoka One', Inter, system-ui;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #ffd86b, #fdcb6e, #a55eea);
+  color: #222;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 216, 107, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-play-btn:hover {
+  background: linear-gradient(90deg, #fdcb6e, #ffd86b, #a55eea);
+  transform: scale(1.07) translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 216, 107, 0.5);
+}
+
+.quest-play-btn:active {
+  transform: scale(0.98);
+}
+
+/* In-game UI Enhancements */
+.quest-game-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.quest-bg-img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+}
+
+.quest-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 600px;
+  gap: 0;
+  background: transparent;
+  padding: 20px;
+}
+
+.quest-avatar-large {
+  width: 220px;
+  height: 270px;
+  border-radius: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 32px;
+  object-fit: cover;
+  animation: avatarBounce 2s ease-in-out infinite;
+}
+
+@keyframes avatarBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.quest-bubble {
+  background: transparent;
+  border-radius: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding: 32px;
+  max-width: 520px;
+  min-width: 320px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 32px;
+  font-family: Inter, sans-serif;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: bubbleSlide 0.5s ease-out;
+}
+
+@keyframes bubbleSlide {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quest-progress {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.quest-star {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 2px 4px #ffd86b);
+  opacity: 0.3;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.quest-star.active {
+  opacity: 1;
+  animation: starGlow 0.5s ease-out;
+}
+
+@keyframes starGlow {
+  0% { transform: scale(0.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.quest-dialog {
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-align: center;
+  margin-bottom: 18px;
+  line-height: 1.5;
+  font-family: 'Fredoka One', Inter, sans-serif;
+}
+
+.quest-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.quest-btn {
+  font-family: Inter, sans-serif;
+  font-size: 1.3rem;
+  padding: 22px 0;
+  border-radius: 24px;
+  border: none;
+  background: var(--quest-color);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 340px;
+  max-width: 90vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.quest-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.quest-btn:active {
+  transform: scale(0.98);
+}
+
+.quest-hint-btn {
+  margin-top: 12px;
+  font-family: Inter, sans-serif;
+  font-size: 1rem;
+  padding: 8px 24px;
+  border-radius: 12px;
+  border: none;
+  background: #fdcb6e;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(253, 203, 110, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quest-hint-btn:hover {
+  background: #f4b33a;
+  transform: translateY(-1px);
+}
+
+.quest-next-btn {
+  margin-top: 18px;
+  font-family: Inter, sans-serif;
+  font-size: 1.1rem;
+  padding: 12px 32px;
+  border-radius: 18px;
+  border: none;
+  background: var(--quest-color);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quest-next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Enhancements */
+.quest-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFade 0.3s ease-out;
+}
+
+@keyframes modalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.quest-modal-content {
+  background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
+  padding: 32px 48px;
+  border-radius: 32px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  animation: modalSlide 0.4s ease-out;
+}
+
+@keyframes modalSlide {
+  from { opacity: 0; transform: scale(0.8) translateY(-20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.quest-modal-title {
+  font-family: 'Fredoka One', Inter;
+  font-size: 2rem;
+  color: var(--quest-color);
+  margin-bottom: 16px;
+}
+
+.quest-modal-icon {
+  font-size: 3rem;
+  margin: 18px 0;
+}
+
+.quest-modal-text {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.quest-modal-btn {
+  padding: 12px 32px;
+  border-radius: 18px;
+  background: var(--quest-color);
+  color: #fff;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.quest-modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Mini-game Styles */
+.mini-game-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-game-content {
+  background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+  padding: 32px 48px;
+  border-radius: 32px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+}
+
+.mini-game-title {
+  font-family: 'Fredoka One', Inter;
+  font-size: 2rem;
+  color: #27ae60;
+  margin-bottom: 24px;
+}
+
+.mini-game-area {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.mini-game-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.mini-game-item {
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: grab;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  text-align: center;
+}
+
+.mini-game-item:hover {
+  transform: scale(1.05);
+}
+
+.mini-game-item.draggable {
+  background: var(--mini-bg-left);
+}
+
+.mini-game-item.target {
+  background: var(--mini-bg-right);
+}
+
+.mini-game-feedback {
+  font-size: 1.2rem;
+  color: #27ae60;
+  margin: 18px 0;
+  font-weight: 600;
+}
+
+.mini-game-continue {
+  margin-top: 24px;
+  padding: 12px 32px;
+  border-radius: 18px;
+  background: #27ae60;
+  color: #fff;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  display: none;
+  transition: all 0.2s ease;
+}
+
+.mini-game-continue:hover {
+  background: #219a52;
+  transform: translateY(-2px);
+}
+
+/* Mobile Responsiveness for Quest Game */
+@media (max-width: 768px) {
+  .quest-cards-row {
+    gap: 24px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .quest-card {
+    width: 90vw;
+    max-width: 360px;
+    padding: 30px 20px;
+  }
+
+  .quest-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .quest-avatar-large {
+    width: 180px;
+    height: 220px;
+  }
+
+  .quest-bubble {
+    max-width: 90vw;
+    min-width: auto;
+    padding: 24px;
+  }
+
+  .quest-btn {
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 18px 0;
+  }
+
+  .mini-game-area {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .mini-game-col {
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .mini-game-item {
+    padding: 10px 16px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quest-headline {
+    font-size: 2rem;
+  }
+
+  .quest-dialog {
+    font-size: 1.1rem;
+  }
+
+  .quest-star {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Screen Transitions */
+.quest-screen {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.quest-screen.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Enhanced Confetti */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.confetti-particle {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: confettiFall linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Vary animation delays and durations for natural effect */
+.confetti-particle:nth-child(odd) {
+  animation-duration: 3s;
+  animation-delay: 0s;
+}
+
+.confetti-particle:nth-child(even) {
+  animation-duration: 4s;
+  animation-delay: 1s;
+  font-size: 32px;
+}
